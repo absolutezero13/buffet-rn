@@ -7,10 +7,7 @@ import {
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useApp } from "../context/AppContext";
 import { theme } from "../theme";
-import { Portfolio } from "./screens/Portfolio";
-import { Chat } from "./screens/Chat";
-import { Welcome } from "./screens/Welcome";
-import { AssetDetail } from "./screens/AssetDetail";
+import { Portfolio, Chat, Welcome, AssetDetail } from "./screens";
 
 const Tabs = createNativeBottomTabNavigator();
 

@@ -93,7 +93,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (isLoading || assets.length === 0) return;
 
     const interval = setInterval(() => {
-      refreshPrices();
+      // refreshPrices();
     }, 60000);
 
     return () => clearInterval(interval);
@@ -136,9 +136,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     // Fetch current price immediately when adding
     let currentPrice = asset.purchasePrice;
     try {
-      const price = await api.getStockPrice(asset.symbol);
-      if (price && price > 0) {
-        currentPrice = price;
+      let price;
+      if (asset.type === "crypto" && asset.cryptoId) {
+        price = await api.getCryptoPrice([asset.cryptoId]);
+      } else {
+        price = await api.getStockPrice(asset.symbol);
+        if (price && price > 0) {
+          currentPrice = price;
+        }
       }
     } catch (error) {
       console.error(`Failed to fetch price for ${asset.symbol}:`, error);

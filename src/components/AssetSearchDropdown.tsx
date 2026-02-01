@@ -53,6 +53,7 @@ export function AssetSearchDropdown({
       try {
         if (assetType === "crypto") {
           const cryptoResults = await api.searchCrypto(searchQuery);
+          console.log("Crypto search results:", cryptoResults);
           setResults(
             cryptoResults.map((c) => ({
               symbol: c.symbol.toUpperCase(),
@@ -76,6 +77,7 @@ export function AssetSearchDropdown({
             })),
           );
         }
+        setShowResults(true);
       } catch (error) {
         setResults([]);
       } finally {
@@ -138,7 +140,7 @@ export function AssetSearchDropdown({
           }}
           onFocus={handleFocus}
           onBlur={() => {
-            setTimeout(() => setShowResults(false), 200);
+            setTimeout(() => setShowResults(false), 50);
           }}
         />
         {isLoading && (

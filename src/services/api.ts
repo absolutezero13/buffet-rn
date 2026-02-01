@@ -14,6 +14,9 @@ const twelveDataClient = axios.create({
 
 const coingeckoClient = axios.create({
   baseURL: COINGECKO_BASE,
+  params: {
+    apiKey: "CG-u6N8ZTM5Xg4HjkXCcDuVN2wt",
+  },
 });
 
 // Twelve Data Response Interfaces
@@ -72,14 +75,31 @@ export interface TwelveDataPrice {
 }
 
 export interface TwelveDataStockSearch {
+  //  {
+  //           "symbol": "AA",
+  //           "instrument_name": "Alcoa Corp",
+  //           "exchange": "NYSE",
+  //           "mic_code": "XNYS",
+  //           "exchange_timezone": "America/New_York",
+  //           "instrument_type": "Common Stock",
+  //           "country": "United States",
+  //           "currency": "USD",
+  //           "access": {
+  //               "global": "Basic",
+  //               "plan": "Basic"
   data: Array<{
     symbol: string;
-    name: string;
-    currency: string;
+    instrument_name: string;
     exchange: string;
     mic_code: string;
+    exchange_timezone: string;
+    instrument_type: string;
     country: string;
-    type: string;
+    currency: string;
+    access: {
+      global: string;
+      plan: string;
+    };
   }>;
 }
 
@@ -213,6 +233,8 @@ export const api = {
         },
       );
 
+      console.log("Crypto history response:", response.data);
+
       const prices = response.data?.prices || [];
       return prices.map(([timestamp, price]: [number, number]) => ({
         timestamp,
@@ -242,8 +264,8 @@ export const api = {
         interval = "1h";
         outputsize = 24;
       } else if (days <= 7) {
-        interval = "4h";
-        outputsize = days * 6;
+        interval = "1day";
+        outputsize = days;
       } else if (days <= 30) {
         interval = "1day";
         outputsize = days;
@@ -330,11 +352,10 @@ export const api = {
     try {
       // Use Twelve Data stocks endpoint with filter
       const response = await twelveDataClient.get<TwelveDataStockSearch>(
-        "/stocks",
+        "/symbol_search",
         {
           params: {
             symbol: query.toUpperCase(),
-            show_plan: false,
           },
         },
       );
@@ -342,7 +363,7 @@ export const api = {
       const stocks = response.data?.data || [];
       return stocks.slice(0, 10).map((stock) => ({
         symbol: stock.symbol,
-        description: `${stock.name} (${stock.exchange})`,
+        description: `${stock.instrument_name} (${stock.exchange})`,
       }));
     } catch (error) {
       console.error("Error searching symbol from Twelve Data:", error);
@@ -357,6 +378,7 @@ export const api = {
       const response = await coingeckoClient.get("/search", {
         params: { query },
       });
+      console.log("Crypto search response:", response.data.coins[0]);
       return response.data?.coins?.slice(0, 10) || [];
     } catch (error) {
       console.error("Error searching crypto:", error);
