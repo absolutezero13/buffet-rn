@@ -11,6 +11,7 @@ import {
   AddAssetForm,
 } from "./components";
 import { styles } from "./styles";
+import { theme } from "../../../theme";
 
 export function Portfolio() {
   const {
@@ -82,6 +83,7 @@ export function Portfolio() {
         <ScrollView
           style={styles.scrollView}
           showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.contentContainer}
         >
           <PortfolioHeader />
 
@@ -119,7 +121,7 @@ export function Portfolio() {
         detents={["auto"]}
         cornerRadius={24}
         onDidDismiss={resetForm}
-        blurTint="system-thin-material-dark"
+        backgroundColor={theme.colors.background}
         insetAdjustment="never"
         blurOptions={{
           interaction: false,

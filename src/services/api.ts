@@ -1,11 +1,11 @@
 import axios from "axios";
 
-// Twelve Data API Configuration
-// Get your free API key at https://twelvedata.com/
 const TWELVE_DATA_API_KEY = "80e10fa0a0104fc3a4ec0ed6737734e2";
 const TWELVE_DATA_BASE = "https://api.twelvedata.com";
 
 const COINGECKO_BASE = "https://api.coingecko.com/api/v3";
+const COINGECKO_API_KEY = "CG-u6N8ZTM5Xg4HjkXCcDuVN2wt";
+const SWISSQUOTE_BASE = "https://forex-data-feed.swissquote.com";
 
 const twelveDataClient = axios.create({
   baseURL: TWELVE_DATA_BASE,
@@ -14,8 +14,9 @@ const twelveDataClient = axios.create({
 
 const coingeckoClient = axios.create({
   baseURL: COINGECKO_BASE,
-  params: {
-    apiKey: "CG-u6N8ZTM5Xg4HjkXCcDuVN2wt",
+  headers: {
+    "x-cg-demo-api-key": COINGECKO_API_KEY,
+    "Accept-Encoding": "identity",
   },
 });
 
@@ -74,19 +75,16 @@ export interface TwelveDataPrice {
   price: string;
 }
 
+export type AssetType = "stock" | "etf" | "crypto" | "gold" | "other";
+interface SwissquoteBboQuote {
+  spreadProfilePrices: Array<{
+    spreadProfile: string;
+    bid?: number;
+    ask?: number;
+  }>;
+  ts: number;
+}
 export interface TwelveDataStockSearch {
-  //  {
-  //           "symbol": "AA",
-  //           "instrument_name": "Alcoa Corp",
-  //           "exchange": "NYSE",
-  //           "mic_code": "XNYS",
-  //           "exchange_timezone": "America/New_York",
-  //           "instrument_type": "Common Stock",
-  //           "country": "United States",
-  //           "currency": "USD",
-  //           "access": {
-  //               "global": "Basic",
-  //               "plan": "Basic"
   data: Array<{
     symbol: string;
     instrument_name: string;
@@ -113,13 +111,6 @@ export interface StockQuote {
   o: number; // Open
   pc: number; // Previous close
   t: number; // Timestamp
-}
-
-export interface CryptoPrice {
-  [key: string]: {
-    usd: number;
-    usd_24h_change: number;
-  };
 }
 
 export interface PriceHistoryPoint {
@@ -168,6 +159,23 @@ export const api = {
     }
   },
 
+  getPriceByAssetType: async (
+    assetType: AssetType,
+    identifier: string,
+  ): Promise<number | null> => {
+    switch (assetType) {
+      case "stock":
+      case "etf":
+        return api.getStockPrice(identifier);
+      case "crypto":
+        const price = await api.getCryptoPrice([identifier]);
+        return price;
+      case "gold":
+        return api.getCommodityPrice(identifier);
+      default:
+        return null;
+    }
+  },
   // Get full quote details from Twelve Data
   getStockQuoteFull: async (
     symbol: string,
@@ -183,16 +191,30 @@ export const api = {
     }
   },
 
-  getCryptoPrice: async (ids: string[]): Promise<CryptoPrice | null> => {
+  getCryptoPrice: async (ids: string[]): Promise<number | null> => {
     try {
-      const response = await coingeckoClient.get<CryptoPrice>("/simple/price", {
-        params: {
-          ids: ids.join(","),
-          vs_currencies: "usd",
-          include_24hr_change: true,
+      // const response = await coingeckoClient.get<CryptoPrice>("/simple/price", {
+      //   params: {
+      //     ids: ids.join(","),
+      //     vs_currencies: "usd",
+      //     include_24hr_change: true,
+      //   },
+      // });
+
+      const response = await fetch(
+        `https://api.coingecko.com/api/v3/coins/ethereum?localization=false&tickers=false&market_data=true`,
+        {
+          headers: {
+            "x-cg-demo-api-key": COINGECKO_API_KEY,
+            "Accept-Encoding": "identity",
+          },
         },
-      });
-      return response.data;
+      );
+      const data = await response.json();
+
+      const price = data.market_data.current_price.usd;
+
+      return price;
     } catch (error) {
       console.error("Error fetching crypto price:", error);
       return null;
@@ -200,20 +222,46 @@ export const api = {
   },
 
   getGoldPrice: async (): Promise<number | null> => {
+    return api.getCommodityPrice("XAU");
+  },
+
+  getCommodityPrice: async (symbol: string): Promise<number | null> => {
     try {
-      const response = await axios.get(
-        "https://api.metalpriceapi.com/v1/latest",
-        {
-          params: {
-            api_key: "demo",
-            base: "USD",
-            currencies: "XAU",
-          },
-        },
+      const instrument = symbol.toUpperCase();
+      const response = await axios.get<SwissquoteBboQuote[]>(
+        `${SWISSQUOTE_BASE}/public-quotes/bboquotes/instrument/${instrument}/USD`,
       );
-      return response.data?.rates?.XAU ? 1 / response.data.rates.XAU : null;
+
+      const quotes = response.data;
+      if (!Array.isArray(quotes) || quotes.length === 0) {
+        return null;
+      }
+
+      const quoteWithSpreads =
+        quotes.find((quote) => quote.spreadProfilePrices?.length) || quotes[0];
+      const spreads = quoteWithSpreads?.spreadProfilePrices || [];
+      if (spreads.length === 0) return null;
+
+      const preferredOrder = ["prime", "standard", "premium", "elite"];
+      const preferred = spreads.find((spread) =>
+        preferredOrder.includes(spread.spreadProfile),
+      );
+      const selected = preferred || spreads[0];
+
+      const bid = selected.bid;
+      const ask = selected.ask;
+      if (typeof bid === "number" && typeof ask === "number") {
+        return (bid + ask) / 2;
+      }
+      console.log("Commodity price fetched:", { bid, ask });
+      return typeof bid === "number"
+        ? bid
+        : typeof ask === "number"
+          ? ask
+          : null;
     } catch (error) {
-      return 1950;
+      console.error("Error fetching commodity price:", error);
+      return null;
     }
   },
 
@@ -378,7 +426,6 @@ export const api = {
       const response = await coingeckoClient.get("/search", {
         params: { query },
       });
-      console.log("Crypto search response:", response.data.coins[0]);
       return response.data?.coins?.slice(0, 10) || [];
     } catch (error) {
       console.error("Error searching crypto:", error);

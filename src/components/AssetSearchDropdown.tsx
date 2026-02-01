@@ -24,11 +24,11 @@ interface AssetSearchDropdownProps {
   placeholder?: string;
 }
 
-const GOLD_OPTIONS: SearchResult[] = [
-  { symbol: "XAU", name: "Gold (Troy Ounce)" },
-  { symbol: "GLD", name: "SPDR Gold Shares ETF" },
-  { symbol: "IAU", name: "iShares Gold Trust" },
-  { symbol: "GOLD", name: "Barrick Gold Corporation" },
+const COMMODITY_OPTIONS: SearchResult[] = [
+  { symbol: "XAU", name: "Gold" },
+  { symbol: "XAG", name: "Silver" },
+  { symbol: "XPT", name: "Platinum" },
+  { symbol: "XPD", name: "Palladium" },
 ];
 
 export function AssetSearchDropdown({
@@ -62,7 +62,7 @@ export function AssetSearchDropdown({
             })),
           );
         } else if (assetType === "gold") {
-          const filtered = GOLD_OPTIONS.filter(
+          const filtered = COMMODITY_OPTIONS.filter(
             (g) =>
               g.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
               g.name.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -119,7 +119,7 @@ export function AssetSearchDropdown({
   const handleFocus = () => {
     setShowResults(true);
     if (assetType === "gold" && query.length < 2) {
-      setResults(GOLD_OPTIONS);
+      setResults(COMMODITY_OPTIONS);
     }
   };
 
@@ -219,6 +219,7 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     fontSize: theme.fontSize.md,
     padding: theme.spacing.md,
+    backgroundColor: theme.colors.surfaceLight,
   },
   loader: {
     marginRight: theme.spacing.md,

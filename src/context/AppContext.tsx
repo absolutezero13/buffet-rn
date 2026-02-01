@@ -7,13 +7,13 @@ import React, {
   ReactNode,
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { api } from "../services/api";
+import { api, AssetType } from "../services/api";
 
 export interface Asset {
   id: string;
   name: string;
   symbol: string;
-  type: "stock" | "etf" | "crypto" | "gold" | "other";
+  type: AssetType;
   quantity: number;
   purchasePrice: number;
   currentPrice: number;
@@ -63,7 +63,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const updatedAssets = await Promise.all(
       assets.map(async (asset) => {
         try {
-          const price = await api.getStockPrice(asset.symbol);
+          const identifier =
+            asset.type === "crypto" && asset.cryptoId
+              ? asset.cryptoId
+              : asset.symbol;
+          const price = await api.getPriceByAssetType(asset.type, identifier);
+          console.log(`Fetched price for ${asset.symbol}:`, price);
           if (price && price > 0) {
             return { ...asset, currentPrice: price };
           }
@@ -81,14 +86,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     loadData();
   }, []);
 
-  // Fetch prices when assets are loaded
   useEffect(() => {
     if (!isLoading && assets.length > 0) {
       refreshPrices();
     }
   }, [isLoading]);
 
-  // Refresh prices every 60 seconds
   useEffect(() => {
     if (isLoading || assets.length === 0) return;
 
@@ -136,14 +139,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     // Fetch current price immediately when adding
     let currentPrice = asset.purchasePrice;
     try {
-      let price;
-      if (asset.type === "crypto" && asset.cryptoId) {
-        price = await api.getCryptoPrice([asset.cryptoId]);
-      } else {
-        price = await api.getStockPrice(asset.symbol);
-        if (price && price > 0) {
-          currentPrice = price;
-        }
+      const identifier =
+        asset.type === "crypto" && asset.cryptoId
+          ? asset.cryptoId
+          : asset.symbol;
+      const price = await api.getPriceByAssetType(asset.type, identifier);
+      if (price && price > 0) {
+        currentPrice = price;
       }
     } catch (error) {
       console.error(`Failed to fetch price for ${asset.symbol}:`, error);

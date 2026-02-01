@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     fontWeight: theme.fontWeight.medium,
   },
   inputContainer: {
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.surfaceLight,
     borderRadius: theme.borderRadius.md,
     borderWidth: 1,
     borderColor: theme.colors.glassBorder,

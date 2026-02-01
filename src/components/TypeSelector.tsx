@@ -14,11 +14,9 @@ interface TypeSelectorProps {
 }
 
 const types = [
-  { id: "stock", label: "Stock", emoji: "📈" },
-  { id: "etf", label: "ETF", emoji: "📊" },
+  { id: "stock-etf", label: "Stock & ETF", emoji: "📈" },
   { id: "crypto", label: "Crypto", emoji: "🪙" },
-  { id: "gold", label: "Gold", emoji: "🥇" },
-  { id: "other", label: "Other", emoji: "💎" },
+  { id: "gold", label: "Commodities", emoji: "🥇" },
 ];
 
 export function TypeSelector({ selected, onSelect }: TypeSelectorProps) {
@@ -70,7 +68,7 @@ const styles = StyleSheet.create({
   },
   typeButton: {
     alignItems: "center",
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.surfaceLight,
     borderRadius: theme.borderRadius.md,
     borderWidth: 1,
     borderColor: theme.colors.glassBorder,
@@ -88,7 +86,7 @@ const styles = StyleSheet.create({
   },
   typeLabel: {
     color: theme.colors.textMuted,
-    fontSize: theme.fontSize.sm,
+    fontSize: theme.fontSize.xs,
   },
   typeLabelActive: {
     color: theme.colors.primary,

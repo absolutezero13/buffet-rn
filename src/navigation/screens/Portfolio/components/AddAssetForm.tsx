@@ -62,7 +62,7 @@ export function AddAssetForm({
               type === "crypto"
                 ? "Search cryptocurrency..."
                 : type === "gold"
-                  ? "Search gold assets..."
+                  ? "Search commodities..."
                   : "Search stocks & ETFs..."
             }
           />
