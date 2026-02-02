@@ -24,6 +24,33 @@ export const styles = StyleSheet.create({
     backgroundColor: theme.colors.primary,
     marginHorizontal: 4,
   },
+  currencyOptions: {
+    flexDirection: "row",
+    gap: theme.spacing.md,
+    justifyContent: "center",
+  },
+  currencyOption: {
+    minWidth: 80,
+    alignItems: "center",
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg,
+    borderRadius: theme.borderRadius.lg,
+    borderWidth: 2,
+    borderColor: theme.colors.glassBorder,
+    backgroundColor: theme.colors.surfaceLight,
+  },
+  currencyOptionActive: {
+    borderColor: theme.colors.primary,
+    backgroundColor: theme.colors.glass,
+  },
+  currencyOptionText: {
+    color: theme.colors.textMuted,
+    fontSize: theme.fontSize.md,
+    fontWeight: theme.fontWeight.semibold,
+  },
+  currencyOptionTextActive: {
+    color: theme.colors.primary,
+  },
   buttons: {
     flexDirection: "row",
     paddingHorizontal: theme.spacing.xl,

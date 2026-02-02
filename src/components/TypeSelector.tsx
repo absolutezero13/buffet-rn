@@ -17,6 +17,7 @@ const types = [
   { id: "stock-etf", label: "Stock & ETF", emoji: "📈" },
   { id: "crypto", label: "Crypto", emoji: "🪙" },
   { id: "gold", label: "Commodities", emoji: "🥇" },
+  { id: "cash", label: "Cash", emoji: "💵" },
 ];
 
 export function TypeSelector({ selected, onSelect }: TypeSelectorProps) {

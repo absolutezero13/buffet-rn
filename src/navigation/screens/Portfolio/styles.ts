@@ -53,12 +53,14 @@ export const styles = StyleSheet.create({
   emptyEmoji: {
     fontSize: 48,
     marginBottom: theme.spacing.md,
+    textAlign: "center",
   },
   emptyTitle: {
     color: theme.colors.text,
     fontSize: theme.fontSize.lg,
     fontWeight: theme.fontWeight.semibold,
     marginBottom: theme.spacing.sm,
+    textAlign: "center",
   },
   emptyText: {
     color: theme.colors.textMuted,
@@ -93,6 +95,40 @@ export const styles = StyleSheet.create({
   dropdownContainer: {
     zIndex: 100,
     elevation: 100,
+  },
+  currencySelector: {
+    marginBottom: theme.spacing.md,
+  },
+  currencyLabel: {
+    color: theme.colors.textSecondary,
+    fontSize: theme.fontSize.sm,
+    marginBottom: theme.spacing.xs,
+    fontWeight: theme.fontWeight.medium,
+  },
+  currencyOptions: {
+    flexDirection: "row",
+    gap: theme.spacing.sm,
+  },
+  currencyOption: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: theme.spacing.md,
+    borderRadius: theme.borderRadius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.glassBorder,
+    backgroundColor: theme.colors.surfaceLight,
+  },
+  currencyOptionActive: {
+    borderColor: theme.colors.primary,
+    backgroundColor: theme.colors.glass,
+  },
+  currencyOptionText: {
+    color: theme.colors.textMuted,
+    fontSize: theme.fontSize.sm,
+    fontWeight: theme.fontWeight.medium,
+  },
+  currencyOptionTextActive: {
+    color: theme.colors.primary,
   },
   addButton: {
     marginTop: theme.spacing.md,

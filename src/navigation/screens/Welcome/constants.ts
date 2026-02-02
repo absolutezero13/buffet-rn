@@ -18,6 +18,13 @@ export const SLIDES = [
       "Chat with our AI assistant to get personalized investment advice and market analysis.",
   },
   {
+    id: "currency",
+    emoji: "💱",
+    title: "Choose Your Currency",
+    description:
+      "Select your preferred currency for displaying portfolio values and prices.",
+  },
+  {
     emoji: "🚀",
     title: "Ready to Start?",
     description:

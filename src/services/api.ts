@@ -1,4 +1,5 @@
 import axios from "axios";
+import { CurrencyCode } from "../navigation/constants";
 
 const TWELVE_DATA_API_KEY = "80e10fa0a0104fc3a4ec0ed6737734e2";
 const TWELVE_DATA_BASE = "https://api.twelvedata.com";
@@ -75,7 +76,7 @@ export interface TwelveDataPrice {
   price: string;
 }
 
-export type AssetType = "stock" | "etf" | "crypto" | "gold" | "other";
+export type AssetType = "stock" | "etf" | "crypto" | "gold" | "cash" | "other";
 interface SwissquoteBboQuote {
   spreadProfilePrices: Array<{
     spreadProfile: string;
@@ -119,7 +120,51 @@ export interface PriceHistoryPoint {
   timestamp: number;
 }
 
+interface ExchangeRateResponse {
+  result?: number;
+  info?: {
+    rate?: number;
+  };
+}
+
 export const api = {
+  convertCurrency: async (
+    amount: number,
+    from: CurrencyCode,
+    to: CurrencyCode,
+  ): Promise<number | null> => {
+    if (from === to) return amount;
+    try {
+      const response = await axios.get<ExchangeRateResponse>(
+        "https://api.exchangerate.host/convert",
+        {
+          params: {
+            from,
+            to,
+            amount,
+          },
+        },
+      );
+
+      const result = response.data?.result;
+      if (typeof result === "number") return result;
+
+      const rate = response.data?.info?.rate;
+      return typeof rate === "number" ? rate * amount : null;
+    } catch (error) {
+      console.error("Error converting currency:", error);
+      return null;
+    }
+  },
+
+  getFxRate: async (
+    from: CurrencyCode,
+    to: CurrencyCode,
+  ): Promise<number | null> => {
+    if (from === to) return 1;
+    return api.convertCurrency(1, from, to);
+  },
+
   // Get real-time stock quote using Twelve Data
   getStockQuote: async (symbol: string): Promise<StockQuote | null> => {
     try {
@@ -147,12 +192,19 @@ export const api = {
   },
 
   // Get real-time price only (lighter endpoint)
-  getStockPrice: async (symbol: string): Promise<number | null> => {
+  getStockPrice: async (
+    symbol: string,
+    baseCurrency: CurrencyCode = "USD",
+  ): Promise<number | null> => {
     try {
       const response = await twelveDataClient.get<TwelveDataPrice>("/price", {
         params: { symbol: symbol.toUpperCase() },
       });
-      return parseFloat(response.data.price);
+      const price = parseFloat(response.data.price);
+      if (!price || baseCurrency === "USD") return price;
+
+      const converted = await api.convertCurrency(price, "USD", baseCurrency);
+      return typeof converted === "number" ? converted : price;
     } catch (error) {
       console.error("Error fetching stock price from Twelve Data:", error);
       return null;
@@ -162,16 +214,18 @@ export const api = {
   getPriceByAssetType: async (
     assetType: AssetType,
     identifier: string,
+    baseCurrency: CurrencyCode = "USD",
   ): Promise<number | null> => {
     switch (assetType) {
       case "stock":
       case "etf":
-        return api.getStockPrice(identifier);
+        return api.getStockPrice(identifier, baseCurrency);
       case "crypto":
-        const price = await api.getCryptoPrice([identifier]);
-        return price;
+        return api.getCryptoPrice(identifier, baseCurrency);
       case "gold":
-        return api.getCommodityPrice(identifier);
+        return api.getCommodityPrice(identifier, baseCurrency);
+      case "cash":
+        return api.getFxRate(identifier as CurrencyCode, baseCurrency);
       default:
         return null;
     }
@@ -191,41 +245,37 @@ export const api = {
     }
   },
 
-  getCryptoPrice: async (ids: string[]): Promise<number | null> => {
+  getCryptoPrice: async (
+    coinId: string,
+    baseCurrency: CurrencyCode = "USD",
+  ): Promise<number | null> => {
     try {
-      // const response = await coingeckoClient.get<CryptoPrice>("/simple/price", {
-      //   params: {
-      //     ids: ids.join(","),
-      //     vs_currencies: "usd",
-      //     include_24hr_change: true,
-      //   },
-      // });
-
-      const response = await fetch(
-        `https://api.coingecko.com/api/v3/coins/ethereum?localization=false&tickers=false&market_data=true`,
-        {
-          headers: {
-            "x-cg-demo-api-key": COINGECKO_API_KEY,
-            "Accept-Encoding": "identity",
-          },
+      const response = await coingeckoClient.get("/simple/price", {
+        params: {
+          ids: coinId,
+          vs_currencies: baseCurrency.toLowerCase(),
+          include_24hr_change: true,
         },
-      );
-      const data = await response.json();
+      });
 
-      const price = data.market_data.current_price.usd;
-
-      return price;
+      const price = response.data?.[coinId]?.[baseCurrency.toLowerCase()];
+      return typeof price === "number" ? price : null;
     } catch (error) {
       console.error("Error fetching crypto price:", error);
       return null;
     }
   },
 
-  getGoldPrice: async (): Promise<number | null> => {
-    return api.getCommodityPrice("XAU");
+  getGoldPrice: async (
+    baseCurrency: CurrencyCode = "USD",
+  ): Promise<number | null> => {
+    return api.getCommodityPrice("XAU", baseCurrency);
   },
 
-  getCommodityPrice: async (symbol: string): Promise<number | null> => {
+  getCommodityPrice: async (
+    symbol: string,
+    baseCurrency: CurrencyCode = "USD",
+  ): Promise<number | null> => {
     try {
       const instrument = symbol.toUpperCase();
       const response = await axios.get<SwissquoteBboQuote[]>(
@@ -251,14 +301,18 @@ export const api = {
       const bid = selected.bid;
       const ask = selected.ask;
       if (typeof bid === "number" && typeof ask === "number") {
-        return (bid + ask) / 2;
+        const mid = (bid + ask) / 2;
+        if (baseCurrency === "USD") return mid;
+        const converted = await api.convertCurrency(mid, "USD", baseCurrency);
+        return typeof converted === "number" ? converted : mid;
       }
       console.log("Commodity price fetched:", { bid, ask });
-      return typeof bid === "number"
-        ? bid
-        : typeof ask === "number"
-          ? ask
-          : null;
+      const raw =
+        typeof bid === "number" ? bid : typeof ask === "number" ? ask : null;
+      if (raw === null) return null;
+      if (baseCurrency === "USD") return raw;
+      const converted = await api.convertCurrency(raw, "USD", baseCurrency);
+      return typeof converted === "number" ? converted : raw;
     } catch (error) {
       console.error("Error fetching commodity price:", error);
       return null;
@@ -269,13 +323,14 @@ export const api = {
   getCryptoHistory: async (
     coinId: string,
     days: number,
+    baseCurrency: CurrencyCode = "USD",
   ): Promise<PriceHistoryPoint[]> => {
     try {
       const response = await coingeckoClient.get(
         `/coins/${coinId}/market_chart`,
         {
           params: {
-            vs_currency: "usd",
+            vs_currency: baseCurrency.toLowerCase(),
             days: days,
           },
         },
@@ -302,6 +357,7 @@ export const api = {
   getStockHistory: async (
     symbol: string,
     days: number,
+    baseCurrency: CurrencyCode = "USD",
   ): Promise<PriceHistoryPoint[]> => {
     try {
       // Determine interval based on days requested
@@ -342,11 +398,17 @@ export const api = {
         return [];
       }
 
+      const usdToBaseRate =
+        baseCurrency === "USD"
+          ? 1
+          : (await api.getFxRate("USD", baseCurrency)) || 1;
+
       return data.values.map((item) => {
         const timestamp = new Date(item.datetime).getTime();
+        const rawPrice = parseFloat(item.close);
         return {
           timestamp,
-          price: parseFloat(item.close),
+          price: rawPrice * usdToBaseRate,
           date: new Date(timestamp).toLocaleDateString("en-US", {
             month: "short",
             day: "numeric",

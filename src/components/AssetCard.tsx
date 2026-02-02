@@ -9,7 +9,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { GlassCard } from "./GlassCard";
 import { theme } from "../theme";
-import { Asset } from "../context/AppContext";
+import { Asset, useApp } from "../context/AppContext";
 
 interface AssetCardProps {
   asset: Asset;
@@ -23,6 +23,7 @@ export function AssetCard({ asset, onDelete }: AssetCardProps) {
   const gainLoss = totalValue - totalCost;
   const gainLossPercent = ((gainLoss / totalCost) * 100).toFixed(2);
   const isPositive = gainLoss >= 0;
+  const currency = useApp().baseCurrency;
 
   const getTypeLabel = () => {
     switch (asset.type) {
@@ -34,6 +35,8 @@ export function AssetCard({ asset, onDelete }: AssetCardProps) {
         return "🪙";
       case "gold":
         return "🥇";
+      case "cash":
+        return "💵";
       default:
         return "💎";
     }

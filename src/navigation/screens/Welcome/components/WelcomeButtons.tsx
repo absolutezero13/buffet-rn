@@ -20,14 +20,6 @@ export function WelcomeButtons({
 
   return (
     <View style={styles.buttons}>
-      {!isLastSlide && (
-        <Button
-          title="Skip"
-          variant="ghost"
-          onPress={onSkip}
-          style={styles.skipButton}
-        />
-      )}
       <Button
         title={isLastSlide ? "Get Started" : "Next"}
         onPress={onNext}

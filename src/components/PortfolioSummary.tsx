@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { theme } from "../theme";
+import { useApp } from "../context/AppContext";
 
 interface PortfolioSummaryProps {
   totalValue: number;
@@ -14,6 +15,7 @@ export function PortfolioSummary({
   totalGainLoss,
   assetCount,
 }: PortfolioSummaryProps) {
+  const curreny = useApp().baseCurrency;
   const isPositive = totalGainLoss >= 0;
   const gainLossPercent =
     totalValue > 0
@@ -44,8 +46,9 @@ export function PortfolioSummary({
                   },
                 ]}
               >
-                {isPositive ? "+" : ""}${totalGainLoss.toFixed(2)} (
                 {isPositive ? "+" : ""}
+                {curreny}
+                {totalGainLoss.toFixed(2)} ({isPositive ? "+" : ""}
                 {gainLossPercent}%)
               </Text>
             </View>

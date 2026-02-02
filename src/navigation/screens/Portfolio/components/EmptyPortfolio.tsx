@@ -9,7 +9,7 @@ interface EmptyPortfolioProps {
 
 export function EmptyPortfolio({ onAddAsset }: EmptyPortfolioProps) {
   return (
-    <GlassCard effect="regular" style={styles.emptyCard}>
+    <GlassCard style={styles.emptyCard}>
       <Text style={styles.emptyEmoji}>📭</Text>
       <Text style={styles.emptyTitle}>No Assets Yet</Text>
       <Text style={styles.emptyText}>

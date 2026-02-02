@@ -7,7 +7,7 @@ import {
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useApp } from "../context/AppContext";
 import { theme } from "../theme";
-import { Portfolio, Chat, Welcome, AssetDetail } from "./screens";
+import { Portfolio, Chat, Settings, Welcome, AssetDetail } from "./screens";
 
 const Tabs = createNativeBottomTabNavigator();
 
@@ -34,6 +34,14 @@ function MainTabs() {
         options={{
           title: "AI Chat",
           tabBarIcon: () => ({ sfSymbol: "sparkles" }),
+        }}
+      />
+      <Tabs.Screen
+        name="Settings"
+        component={Settings}
+        options={{
+          title: "Settings",
+          tabBarIcon: () => ({ sfSymbol: "gearshape" }),
         }}
       />
     </Tabs.Navigator>

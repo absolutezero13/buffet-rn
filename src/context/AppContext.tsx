@@ -8,6 +8,7 @@ import React, {
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { api, AssetType } from "../services/api";
+import { CurrencyCode, CurrencyOption } from "../navigation/constants";
 
 export interface Asset {
   id: string;
@@ -38,6 +39,9 @@ interface AppContextType {
   clearChat: () => void;
   hasOnboarded: boolean;
   setHasOnboarded: (value: boolean) => void;
+  userCurrency: CurrencyOption | null;
+  setUserCurrency: (currency: CurrencyOption | null) => void;
+  resetApp: () => Promise<void>;
   totalValue: number;
   totalGainLoss: number;
 }
@@ -48,12 +52,14 @@ const STORAGE_KEYS = {
   ASSETS: "buffet_ai_assets",
   ONBOARDED: "buffet_ai_onboarded",
   CHAT: "buffet_ai_chat",
+  BASE_CURRENCY: "buffet_ai_base_currency",
 };
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [hasOnboarded, setHasOnboarded] = useState(false);
+  const [userCurrency, setUserCurrency] = useState<CurrencyOption | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Fetch real-time prices for all assets
@@ -67,7 +73,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
             asset.type === "crypto" && asset.cryptoId
               ? asset.cryptoId
               : asset.symbol;
-          const price = await api.getPriceByAssetType(asset.type, identifier);
+          const price = await api.getPriceByAssetType(
+            asset.type,
+            identifier,
+            userCurrency?.id ?? "USD",
+          );
           console.log(`Fetched price for ${asset.symbol}:`, price);
           if (price && price > 0) {
             return { ...asset, currentPrice: price };
@@ -80,7 +90,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     );
 
     setAssets(updatedAssets);
-  }, [assets]);
+  }, [assets, userCurrency]);
 
   useEffect(() => {
     loadData();
@@ -117,17 +127,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [hasOnboarded, isLoading]);
 
+  useEffect(() => {
+    if (!isLoading) {
+      AsyncStorage.setItem(
+        STORAGE_KEYS.BASE_CURRENCY,
+        JSON.stringify(userCurrency),
+      );
+    }
+  }, [userCurrency, isLoading]);
+
   const loadData = async () => {
     try {
-      const [assetsData, onboardedData, chatData] = await Promise.all([
-        AsyncStorage.getItem(STORAGE_KEYS.ASSETS),
-        AsyncStorage.getItem(STORAGE_KEYS.ONBOARDED),
-        AsyncStorage.getItem(STORAGE_KEYS.CHAT),
-      ]);
+      const [assetsData, onboardedData, chatData, baseCurrencyData] =
+        await Promise.all([
+          AsyncStorage.getItem(STORAGE_KEYS.ASSETS),
+          AsyncStorage.getItem(STORAGE_KEYS.ONBOARDED),
+          AsyncStorage.getItem(STORAGE_KEYS.CHAT),
+          AsyncStorage.getItem(STORAGE_KEYS.BASE_CURRENCY),
+        ]);
 
       if (assetsData) setAssets(JSON.parse(assetsData));
       if (onboardedData) setHasOnboarded(JSON.parse(onboardedData));
       if (chatData) setChatMessages(JSON.parse(chatData));
+      if (baseCurrencyData) {
+        setUserCurrency(JSON.parse(baseCurrencyData));
+      }
     } catch (error) {
       console.error("Error loading data:", error);
     } finally {
@@ -143,7 +167,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
         asset.type === "crypto" && asset.cryptoId
           ? asset.cryptoId
           : asset.symbol;
-      const price = await api.getPriceByAssetType(asset.type, identifier);
+      const price = await api.getPriceByAssetType(
+        asset.type,
+        identifier,
+        userCurrency?.id ?? "USD",
+      );
       if (price && price > 0) {
         currentPrice = price;
       }
@@ -155,6 +183,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       ...asset,
       id: Date.now().toString(),
       currentPrice,
+      purchasePrice:
+        asset.type === "cash" && currentPrice > 0
+          ? currentPrice
+          : asset.purchasePrice,
     };
     setAssets((prev) => [...prev, newAsset]);
   };
@@ -189,6 +221,23 @@ export function AppProvider({ children }: { children: ReactNode }) {
     AsyncStorage.removeItem(STORAGE_KEYS.CHAT);
   };
 
+  const resetApp = async () => {
+    try {
+      await AsyncStorage.multiRemove([
+        STORAGE_KEYS.ASSETS,
+        STORAGE_KEYS.ONBOARDED,
+        STORAGE_KEYS.CHAT,
+        STORAGE_KEYS.BASE_CURRENCY,
+      ]);
+    } catch (error) {
+      console.error("Error clearing app data:", error);
+    } finally {
+      setAssets([]);
+      setChatMessages([]);
+      setHasOnboarded(false);
+    }
+  };
+
   const totalValue = assets.reduce(
     (sum, asset) => sum + asset.currentPrice * asset.quantity,
     0,
@@ -216,6 +265,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
         clearChat,
         hasOnboarded,
         setHasOnboarded,
+        userCurrency,
+        setUserCurrency,
+        resetApp,
         totalValue,
         totalGainLoss,
       }}

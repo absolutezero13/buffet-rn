@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { View, FlatList, Animated } from "react-native";
+import { View, FlatList, Animated, Text, TouchableOpacity } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { theme } from "../../../theme";
 import { useApp } from "../../../context/AppContext";
@@ -7,9 +7,10 @@ import { OnboardingSlide } from "../../../components";
 import { PaginationDots, WelcomeButtons } from "./components";
 import { SLIDES } from "./constants";
 import { styles } from "./styles";
+import { currencyOptions } from "../../constants";
 
 export function Welcome() {
-  const { setHasOnboarded } = useApp();
+  const { setHasOnboarded, userCurrency, setUserCurrency } = useApp();
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollX = useRef(new Animated.Value(0)).current;
   const flatListRef = useRef<FlatList>(null);
@@ -31,6 +32,33 @@ export function Welcome() {
       setCurrentIndex(viewableItems[0].index);
     }
   }).current;
+
+  const renderCurrencySelector = () => (
+    <View style={styles.currencyOptions}>
+      {currencyOptions.map((option) => {
+        const isActive = option.id === userCurrency?.id;
+        return (
+          <TouchableOpacity
+            key={option.id}
+            style={[
+              styles.currencyOption,
+              isActive && styles.currencyOptionActive,
+            ]}
+            onPress={() => setUserCurrency(option)}
+          >
+            <Text
+              style={[
+                styles.currencyOptionText,
+                isActive && styles.currencyOptionTextActive,
+              ]}
+            >
+              {option.label}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
 
   return (
     <View style={styles.container}>
@@ -58,7 +86,9 @@ export function Welcome() {
             emoji={item.emoji}
             title={item.title}
             description={item.description}
-          />
+          >
+            {item.id === "currency" && renderCurrencySelector()}
+          </OnboardingSlide>
         )}
         keyExtractor={(_, index) => index.toString()}
       />

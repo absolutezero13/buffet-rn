@@ -21,12 +21,16 @@ export function Portfolio() {
     totalValue,
     totalGainLoss,
     refreshPrices,
+    baseCurrency,
   } = useApp();
   const sheetRef = useRef<TrueSheet>(null);
   const [selectedAsset, setSelectedAsset] = useState<SearchResult | null>(null);
   const [type, setType] = useState("stock");
   const [quantity, setQuantity] = useState("");
   const [purchasePrice, setPurchasePrice] = useState("");
+  const [cashCurrency, setCashCurrency] = useState<"USD" | "EUR" | "GBP">(
+    baseCurrency,
+  );
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleRefresh = async () => {
@@ -40,21 +44,33 @@ export function Portfolio() {
     setType("stock");
     setQuantity("");
     setPurchasePrice("");
+    setCashCurrency(baseCurrency);
   };
 
   const handleAddAsset = () => {
-    if (!selectedAsset?.symbol || !quantity || !purchasePrice) {
+    if (type === "cash") {
+      if (!quantity) {
+        Alert.alert("Missing Fields", "Please enter a cash amount");
+        return;
+      }
+    } else if (!selectedAsset?.symbol || !quantity || !purchasePrice) {
       Alert.alert("Missing Fields", "Please fill in all fields");
       return;
     }
 
+    const isCash = type === "cash";
+    const assetSymbol = isCash ? cashCurrency : selectedAsset?.symbol || "";
+    const assetName = isCash
+      ? `Cash (${cashCurrency})`
+      : selectedAsset?.name || "";
+
     addAsset({
-      name: selectedAsset.name,
-      symbol: selectedAsset.symbol,
-      type: type as "stock" | "etf" | "crypto" | "gold" | "other",
+      name: assetName,
+      symbol: assetSymbol,
+      type: type as "stock" | "etf" | "crypto" | "gold" | "cash" | "other",
       quantity: parseFloat(quantity),
-      purchasePrice: parseFloat(purchasePrice),
-      cryptoId: selectedAsset.id,
+      purchasePrice: isCash ? 1 : parseFloat(purchasePrice),
+      cryptoId: isCash ? undefined : selectedAsset?.id,
     });
 
     resetForm();
@@ -132,10 +148,13 @@ export function Portfolio() {
           type={type}
           quantity={quantity}
           purchasePrice={purchasePrice}
+          baseCurrency={baseCurrency}
+          cashCurrency={cashCurrency}
           onSelectAsset={setSelectedAsset}
           onTypeChange={setType}
           onQuantityChange={setQuantity}
           onPurchasePriceChange={setPurchasePrice}
+          onCashCurrencyChange={setCashCurrency}
           onSubmit={handleAddAsset}
           onClose={handleCloseSheet}
         />

@@ -9,12 +9,14 @@ interface OnboardingSlideProps {
   emoji: string;
   title: string;
   description: string;
+  children?: React.ReactNode;
 }
 
 export function OnboardingSlide({
   emoji,
   title,
   description,
+  children,
 }: OnboardingSlideProps) {
   return (
     <View style={styles.slide}>
@@ -25,6 +27,7 @@ export function OnboardingSlide({
       <Text style={styles.emoji}>{emoji}</Text>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.description}>{description}</Text>
+      {children && <View style={styles.customContent}>{children}</View>}
     </View>
   );
 }
@@ -60,5 +63,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 24,
     paddingHorizontal: theme.spacing.lg,
+  },
+  customContent: {
+    marginTop: theme.spacing.xxl,
+    width: "100%",
+    alignItems: "center",
   },
 });
