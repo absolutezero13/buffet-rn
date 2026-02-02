@@ -10,9 +10,25 @@ class AssetApi {
 
   async getUserAssets(): Promise<Asset[]> {
     const storedAssets = await AsyncStorage.getItem(STORAGE_KEYS.ASSETS);
-
+    await this.getUserCurrency();
+    console.log("Stored Assets:", storedAssets);
+    console.log("getUserAssets user store", useUserStore.getState());
     if (storedAssets) {
       const assets = JSON.parse(storedAssets) as Asset[];
+
+      assets.forEach(async (asset, index) => {
+        if (asset.type && asset.symbol) {
+          const price = await api.getPriceByAssetType(
+            asset.type,
+            asset.symbol,
+            "USD",
+          );
+
+          assets[index].currentPrice =
+            (price ?? 0) * useUserStore.getState().conversionRate;
+        }
+      });
+
       useUserAssets.setState({ userAssets: assets });
       return assets;
     }
@@ -40,8 +56,12 @@ class AssetApi {
       currentPrice: price,
     };
 
-    useUserAssets.setState({ userAssets: [...userAssets, newAsset] });
-    await AsyncStorage.setItem(STORAGE_KEYS.ASSETS, JSON.stringify(userAssets));
+    const updatedAssets = [...userAssets, newAsset];
+    useUserAssets.setState({ userAssets: updatedAssets });
+    await AsyncStorage.setItem(
+      STORAGE_KEYS.ASSETS,
+      JSON.stringify(updatedAssets),
+    );
   }
 
   async deletAsset(id: string): Promise<void> {
