@@ -2,9 +2,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import { View, Text, ScrollView, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
-import { useApp } from "../../../context/AppContext";
 import { Button } from "../../../components";
-import { api, PriceHistoryPoint } from "../../../services/api";
+import { api } from "../../../services/api";
 import {
   AssetHeader,
   PriceChart,
@@ -12,6 +11,10 @@ import {
   HoldingsCard,
 } from "./components";
 import { styles } from "./styles";
+import { PriceHistoryPoint } from "../../../services/types";
+import useUserAssets from "../../../store/useUserAssets";
+import { assetApi } from "../../../services/assetApi";
+import useUserStore from "../../../store/useUserStore";
 
 type RouteParams = {
   AssetDetail: {
@@ -29,7 +32,8 @@ const timeRanges = [
 export function AssetDetail() {
   const navigation = useNavigation();
   const route = useRoute<RouteProp<RouteParams, "AssetDetail">>();
-  const { assets, deleteAsset, baseCurrency } = useApp();
+  const { userAssets: assets } = useUserAssets();
+  const { conversionRate } = useUserStore();
   const [selectedRange, setSelectedRange] = useState(1);
   const [chartData, setChartData] = useState<
     { value: number; label: string; date: string }[]
@@ -96,21 +100,17 @@ export function AssetDetail() {
       let history: PriceHistoryPoint[] = [];
       const days = timeRanges[selectedRange].days;
 
-      if (asset.type === "crypto" && asset.cryptoId) {
-        history = await api.getCryptoHistory(
-          asset.cryptoId,
-          days,
-          baseCurrency,
-        );
+      if (asset.type === "crypto" && asset.symbol) {
+        history = await api.getCryptoHistory(asset.symbol, days);
       } else if (asset.type === "stock" || asset.type === "etf") {
-        history = await api.getStockHistory(asset.symbol, days, baseCurrency);
+        history = await api.getStockHistory(asset.symbol, days);
       } else if (asset.type === "cash") {
         history = [];
       }
 
       if (history.length > 0) {
-        const firstPrice = history[0].price;
-        const lastPrice = history[history.length - 1].price;
+        const firstPrice = history[0].price * conversionRate;
+        const lastPrice = history[history.length - 1].price * conversionRate;
         const changeAmount = lastPrice - firstPrice;
         const changePercent = (changeAmount / firstPrice) * 100;
         setPriceChange({ amount: changeAmount, percent: changePercent });
@@ -122,7 +122,7 @@ export function AssetDetail() {
         );
 
         const formattedData = sampledHistory.map((point, index) => ({
-          value: point.price,
+          value: point.price * conversionRate,
           label:
             index % Math.ceil(sampledHistory.length / 5) === 0
               ? point.date
@@ -175,7 +175,7 @@ export function AssetDetail() {
           text: "Delete",
           style: "destructive",
           onPress: () => {
-            deleteAsset(asset.id);
+            assetApi.deletAsset(asset.id);
             navigation.goBack();
           },
         },

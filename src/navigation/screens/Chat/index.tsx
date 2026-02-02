@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { View, FlatList, KeyboardAvoidingView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useApp } from "../../../context/AppContext";
 import { ChatMessage } from "../../../components";
 import {
   ChatHeader,
@@ -11,16 +10,11 @@ import {
 } from "./components";
 import { generateAIResponse } from "./utils";
 import { styles } from "./styles";
+import useUserAssets from "../../../store/useUserAssets";
 
 export function Chat() {
-  const {
-    chatMessages,
-    addChatMessage,
-    clearChat,
-    assets,
-    totalValue,
-    totalGainLoss,
-  } = useApp();
+  const { userAssets: assets } = useUserAssets();
+  const [chatMessages, setChatMessages] = useState([]);
   const [inputText, setInputText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const flatListRef = useRef<FlatList>(null);
@@ -36,19 +30,27 @@ export function Chat() {
   const handleSend = () => {
     if (!inputText.trim()) return;
 
-    addChatMessage({ role: "user", content: inputText.trim() });
+    // addChatMessage({ role: "user", content: inputText.trim() });
+    setChatMessages((prev) => [
+      ...prev,
+      { role: "user", content: inputText.trim() },
+    ]);
+
     const messageToProcess = inputText;
     setInputText("");
     setIsTyping(true);
 
     setTimeout(
       () => {
-        const response = generateAIResponse(messageToProcess, {
-          assets,
-          totalValue,
-          totalGainLoss,
-        });
-        addChatMessage({ role: "assistant", content: response });
+        // const response = generateAIResponse(messageToProcess, {
+        //   assets,
+        //   totalValue,
+        //   totalGainLoss,
+        // });
+        setChatMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: response },
+        ]);
         setIsTyping(false);
       },
       1000 + Math.random() * 1000,
@@ -59,6 +61,9 @@ export function Chat() {
     setInputText(suggestion);
   };
 
+  const clearChat = () => {
+    setChatMessages([]);
+  };
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       <ChatHeader hasMessages={chatMessages.length > 0} onClear={clearChat} />

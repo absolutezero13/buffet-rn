@@ -23,3 +23,8 @@ export const currencyOptions: CurrencyOption[] = [
     symbol: "£",
   },
 ];
+
+export const STORAGE_KEYS = {
+  ASSETS: "USER_ASSETS",
+  USER: "USER",
+};

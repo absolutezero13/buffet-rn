@@ -4,12 +4,17 @@ import * as SplashScreen from "expo-splash-screen";
 import * as React from "react";
 import { StatusBar } from "react-native";
 import { Navigation } from "./navigation";
-import { AppProvider } from "./context/AppContext";
 import { theme } from "./theme";
+import { assetApi } from "./services/assetApi";
 
 Asset.loadAsync([...NavigationAssets]);
 
 SplashScreen.preventAutoHideAsync();
+
+const initApp = async () => {
+  await assetApi.getUserAssets();
+  await assetApi.getUserCurrency();
+};
 
 export function App() {
   React.useEffect(() => {
@@ -17,12 +22,12 @@ export function App() {
   }, []);
 
   return (
-    <AppProvider>
+    <>
       <StatusBar
         barStyle="light-content"
         backgroundColor={theme.colors.background}
       />
       <Navigation />
-    </AppProvider>
+    </>
   );
 }

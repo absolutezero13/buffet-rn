@@ -30,7 +30,7 @@ export function GlassCard({
         interactive={interactive}
         tintColor={tintColor}
       >
-        <View style={styles.content}>{children}</View>
+        {children}
       </LiquidGlassView>
     );
   }
@@ -43,7 +43,7 @@ export function GlassCard({
         end={{ x: 1, y: 1 }}
         style={styles.gradient}
       >
-        <View style={styles.content}>{children}</View>
+        {children}
       </LinearGradient>
     </View>
   );
@@ -53,6 +53,7 @@ const styles = StyleSheet.create({
   liquidGlass: {
     borderRadius: theme.borderRadius.lg,
     overflow: "hidden",
+    padding: theme.spacing.md,
   },
   fallbackContainer: {
     borderRadius: theme.borderRadius.lg,
@@ -63,8 +64,5 @@ const styles = StyleSheet.create({
   },
   gradient: {
     flex: 1,
-  },
-  content: {
-    padding: theme.spacing.md,
   },
 });

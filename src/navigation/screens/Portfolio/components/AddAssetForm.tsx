@@ -14,6 +14,7 @@ import {
   SearchResult,
 } from "../../../../components";
 import { styles } from "../styles";
+import { currencyOptions } from "../../../constants";
 
 interface AddAssetFormProps {
   selectedAsset: SearchResult | null;
@@ -46,8 +47,6 @@ export function AddAssetForm({
   onSubmit,
   onClose,
 }: AddAssetFormProps) {
-  const cashOptions: Array<"USD" | "EUR" | "GBP"> = ["USD", "EUR", "GBP"];
-
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -71,20 +70,20 @@ export function AddAssetForm({
           <View style={styles.currencySelector}>
             <Text style={styles.currencyLabel}>Currency</Text>
             <View style={styles.currencyOptions}>
-              {cashOptions.map((option) => {
-                const isActive = option === cashCurrency;
+              {currencyOptions.map((option) => {
+                const isActive = option.id === cashCurrency;
                 return (
                   <TouchableOpacity
-                    key={option}
+                    key={option.id}
                     style={[
                       styles.currencyOption,
                       isActive && styles.currencyOptionActive,
                     ]}
                     onPress={() => {
-                      onCashCurrencyChange(option);
+                      onCashCurrencyChange(option.id);
                       onSelectAsset({
-                        symbol: option,
-                        name: `Cash (${option})`,
+                        symbol: option.id,
+                        name: `Cash (${option.id})`,
                       });
                     }}
                   >
@@ -94,7 +93,7 @@ export function AddAssetForm({
                         isActive && styles.currencyOptionTextActive,
                       ]}
                     >
-                      {option}
+                      {option.id}
                     </Text>
                   </TouchableOpacity>
                 );

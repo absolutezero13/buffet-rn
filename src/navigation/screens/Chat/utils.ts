@@ -1,4 +1,4 @@
-import { Asset } from "../../../context/AppContext";
+import { Asset } from "../../../services/types";
 
 const AI_RESPONSES = [
   "Based on Warren Buffett's principles, focus on companies with strong fundamentals and competitive advantages.",

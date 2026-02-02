@@ -2,16 +2,17 @@ import React, { useRef, useState } from "react";
 import { View, FlatList, Animated, Text, TouchableOpacity } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { theme } from "../../../theme";
-import { useApp } from "../../../context/AppContext";
 import { OnboardingSlide } from "../../../components";
 import { PaginationDots, WelcomeButtons } from "./components";
 import { SLIDES } from "./constants";
 import { styles } from "./styles";
-import { currencyOptions } from "../../constants";
+import { currencyOptions, STORAGE_KEYS } from "../../constants";
+import useUserStore from "../../../store/useUserStore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export function Welcome() {
-  const { setHasOnboarded, userCurrency, setUserCurrency } = useApp();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [currency, setUserCurrency] = useState(currencyOptions[0]);
   const scrollX = useRef(new Animated.Value(0)).current;
   const flatListRef = useRef<FlatList>(null);
 
@@ -19,12 +20,20 @@ export function Welcome() {
     if (currentIndex < SLIDES.length - 1) {
       flatListRef.current?.scrollToIndex({ index: currentIndex + 1 });
     } else {
-      setHasOnboarded(true);
+      useUserStore.setState({ hasOnboarded: true, userCurrency: currency });
+      AsyncStorage.setItem(
+        STORAGE_KEYS.USER,
+        JSON.stringify({ hasOnboarded: true, currency }),
+      );
     }
   };
 
   const handleSkip = () => {
-    setHasOnboarded(true);
+    useUserStore.setState({ hasOnboarded: true, userCurrency: currency });
+    AsyncStorage.setItem(
+      STORAGE_KEYS.USER,
+      JSON.stringify({ hasOnboarded: true }),
+    );
   };
 
   const onViewableItemsChanged = useRef(({ viewableItems }: any) => {
@@ -36,7 +45,7 @@ export function Welcome() {
   const renderCurrencySelector = () => (
     <View style={styles.currencyOptions}>
       {currencyOptions.map((option) => {
-        const isActive = option.id === userCurrency?.id;
+        const isActive = option.id === currency?.id;
         return (
           <TouchableOpacity
             key={option.id}

@@ -2,7 +2,6 @@ import React, { useState, useRef } from "react";
 import { View, ScrollView, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TrueSheet } from "@lodev09/react-native-true-sheet";
-import { useApp } from "../../../context/AppContext";
 import { AssetCard, PortfolioSummary, SearchResult } from "../../../components";
 import {
   PortfolioHeader,
@@ -12,30 +11,27 @@ import {
 } from "./components";
 import { styles } from "./styles";
 import { theme } from "../../../theme";
+import { CurrencyCode } from "../../constants";
+import { assetApi } from "../../../services/assetApi";
+import useUserStore from "../../../store/useUserStore";
+import useUserAssets from "../../../store/useUserAssets";
 
 export function Portfolio() {
-  const {
-    assets,
-    addAsset,
-    deleteAsset,
-    totalValue,
-    totalGainLoss,
-    refreshPrices,
-    baseCurrency,
-  } = useApp();
+  const { userAssets: assets } = useUserAssets();
+  const { userCurrency } = useUserStore();
   const sheetRef = useRef<TrueSheet>(null);
   const [selectedAsset, setSelectedAsset] = useState<SearchResult | null>(null);
   const [type, setType] = useState("stock");
   const [quantity, setQuantity] = useState("");
   const [purchasePrice, setPurchasePrice] = useState("");
-  const [cashCurrency, setCashCurrency] = useState<"USD" | "EUR" | "GBP">(
-    baseCurrency,
+  const [cashCurrency, setCashCurrency] = useState<CurrencyCode>(
+    userCurrency?.id || "USD",
   );
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await refreshPrices();
+    // await refreshPrices();
     setIsRefreshing(false);
   };
 
@@ -44,7 +40,7 @@ export function Portfolio() {
     setType("stock");
     setQuantity("");
     setPurchasePrice("");
-    setCashCurrency(baseCurrency);
+    setCashCurrency(userCurrency?.id || "USD");
   };
 
   const handleAddAsset = () => {
@@ -64,13 +60,14 @@ export function Portfolio() {
       ? `Cash (${cashCurrency})`
       : selectedAsset?.name || "";
 
-    addAsset({
+    assetApi.addAsset({
       name: assetName,
-      symbol: assetSymbol,
+      symbol:
+        type === "crypto" ? (selectedAsset?.id ?? "unknows") : assetSymbol,
       type: type as "stock" | "etf" | "crypto" | "gold" | "cash" | "other",
       quantity: parseFloat(quantity),
       purchasePrice: isCash ? 1 : parseFloat(purchasePrice),
-      cryptoId: isCash ? undefined : selectedAsset?.id,
+      purchaseCurrency: userCurrency?.id || "USD",
     });
 
     resetForm();
@@ -89,9 +86,23 @@ export function Portfolio() {
   const handleDeleteAsset = (id: string, name: string) => {
     Alert.alert("Delete Asset", `Are you sure you want to delete ${name}?`, [
       { text: "Cancel", style: "cancel" },
-      { text: "Delete", style: "destructive", onPress: () => deleteAsset(id) },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: () => assetApi.deletAsset(id),
+      },
     ]);
   };
+
+  const totalValue = assets.reduce(
+    (sum, asset) => sum + asset.currentPrice * asset.quantity,
+    0,
+  );
+  const totalGainLoss = assets.reduce((sum, asset) => {
+    const totalCost = asset.purchasePrice * asset.quantity;
+    const totalCurrentValue = asset.currentPrice * asset.quantity;
+    return sum + (totalCurrentValue - totalCost);
+  }, 0);
 
   return (
     <>
@@ -148,7 +159,7 @@ export function Portfolio() {
           type={type}
           quantity={quantity}
           purchasePrice={purchasePrice}
-          baseCurrency={baseCurrency}
+          baseCurrency={userCurrency?.id || "USD"}
           cashCurrency={cashCurrency}
           onSelectAsset={setSelectedAsset}
           onTypeChange={setType}

@@ -5,9 +5,9 @@ import {
   StaticParamList,
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { useApp } from "../context/AppContext";
 import { theme } from "../theme";
 import { Portfolio, Chat, Settings, Welcome, AssetDetail } from "./screens";
+import useUserStore from "../store/useUserStore";
 
 const Tabs = createNativeBottomTabNavigator();
 
@@ -77,7 +77,7 @@ const OnboardingNavigation = createStaticNavigation(OnboardingStack);
 const AppNavigation = createStaticNavigation(AppStack);
 
 export function Navigation() {
-  const { hasOnboarded } = useApp();
+  const { hasOnboarded } = useUserStore();
 
   if (!hasOnboarded) {
     return <OnboardingNavigation />;

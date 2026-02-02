@@ -28,14 +28,12 @@ export const styles = StyleSheet.create({
     marginTop: theme.spacing.xs,
   },
   card: {
-    padding: theme.spacing.lg,
     marginBottom: theme.spacing.md,
   },
   sectionTitle: {
     color: theme.colors.text,
     fontSize: theme.fontSize.lg,
     fontWeight: theme.fontWeight.semibold,
-    marginBottom: theme.spacing.md,
   },
   sectionDescription: {
     color: theme.colors.textMuted,
@@ -54,6 +52,7 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.glassBorder,
     backgroundColor: theme.colors.surfaceLight,
+    marginTop: 12,
   },
   currencyOptionActive: {
     borderColor: theme.colors.primary,
@@ -68,6 +67,11 @@ export const styles = StyleSheet.create({
     color: theme.colors.primary,
   },
   signOutButton: {
+    marginTop: theme.spacing.sm,
+  },
+  currency: {
+    color: theme.colors.text,
+    fontSize: theme.fontSize.md,
     marginTop: theme.spacing.sm,
   },
 });

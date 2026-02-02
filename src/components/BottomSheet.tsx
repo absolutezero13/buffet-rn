@@ -18,6 +18,7 @@ export const BottomSheet = forwardRef<TrueSheet, BottomSheetProps>(
         detents={["auto"]}
         cornerRadius={theme.borderRadius.xl}
         {...props}
+        blurTint="system-thick-material-dark"
       >
         <View style={styles.container}>
           {title && (
