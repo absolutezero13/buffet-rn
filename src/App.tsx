@@ -26,7 +26,7 @@ const initApp = async () => {
 export function App() {
   React.useEffect(() => {
     initApp().then(() => {
-      SplashScreen.hideAsync();
+      setTimeout(() => SplashScreen.hideAsync(), 500);
     });
   }, []);
 
