@@ -6,10 +6,10 @@ import { styles } from "./styles";
 import CurrencyBottomSheet, {
   globalCurrencyBottomSheetRef,
 } from "./components/CurrencyBottomSheet";
-import useUserStore from "../../../store/useUserStore";
+import useCurrencyStore from "../../../store/useCurrencyStore";
 
 export function Settings() {
-  const { userCurrency } = useUserStore();
+  const { userCurrency } = useCurrencyStore();
 
   const handleSignOut = () => {
     Alert.alert(

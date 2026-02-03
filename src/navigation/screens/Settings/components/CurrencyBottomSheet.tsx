@@ -5,12 +5,12 @@ import { Text, TouchableOpacity } from "react-native";
 import { styles } from "../styles";
 import { TrueSheet } from "@lodev09/react-native-true-sheet";
 import { Button } from "../../../../components";
-import useUserStore from "../../../../store/useUserStore";
+import useCurrencyStore from "../../../../store/useCurrencyStore";
 
 export const globalCurrencyBottomSheetRef = createRef<TrueSheet>();
 
 const CurrencyBottomSheet = () => {
-  const { userCurrency } = useUserStore();
+  const { userCurrency, setUserCurrency } = useCurrencyStore();
   const [selectedCurrency, setSelectedCurrency] = useState(userCurrency?.id);
 
   return (
@@ -42,12 +42,13 @@ const CurrencyBottomSheet = () => {
       })}
 
       <Button
-        onPress={() => {
-          useUserStore.setState({
-            userCurrency: currencyOptions.find(
-              (option) => option.id === selectedCurrency,
-            )!,
-          });
+        onPress={async () => {
+          const currency = currencyOptions.find(
+            (option) => option.id === selectedCurrency,
+          );
+          if (currency) {
+            await setUserCurrency(currency);
+          }
           globalCurrencyBottomSheetRef.current?.dismiss();
         }}
         title="Confirm"

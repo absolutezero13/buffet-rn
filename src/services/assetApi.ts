@@ -2,8 +2,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Asset } from "./types";
 import useUserAssets from "../store/useUserAssets";
 import { api } from "./api";
-import { CurrencyOption, STORAGE_KEYS } from "../navigation/constants";
-import useUserStore from "../store/useUserStore";
+import { STORAGE_KEYS } from "../navigation/constants";
+import useCurrencyStore from "../store/useCurrencyStore";
 
 class AssetApi {
   constructor() {}
@@ -11,10 +11,14 @@ class AssetApi {
   async getUserAssets(): Promise<Asset[]> {
     const storedAssets = await AsyncStorage.getItem(STORAGE_KEYS.ASSETS);
     console.log("getUserAssets storedAssets", storedAssets);
-    await this.getUserCurrency();
+
+    // Initialize currency store (will fetch rates if needed)
+    await useCurrencyStore.getState().initializeCurrency();
+
     if (storedAssets) {
       const assets = JSON.parse(storedAssets) as Asset[];
 
+      // Always fetch prices in USD
       const pricePromises = assets.map(async (asset) => {
         if (asset.type && asset.symbol) {
           return api.getPriceByAssetType(asset.type, asset.symbol, "USD");
@@ -23,6 +27,7 @@ class AssetApi {
 
       const prices = await Promise.all(pricePromises);
 
+      // Store prices in USD - conversion happens in UI
       const updatedAssets = assets.map((asset, index) => ({
         ...asset,
         currentPrice: prices[index] || asset.currentPrice,
@@ -41,22 +46,34 @@ class AssetApi {
 
   async addAsset(asset: Omit<Asset, "currentPrice" | "id">): Promise<void> {
     const { userAssets } = useUserAssets.getState();
+    const { userCurrency, convertToUSD } = useCurrencyStore.getState();
 
-    const price = await api.getPriceByAssetType(
+    // Always fetch price in USD
+    const priceInUSD = await api.getPriceByAssetType(
       asset.type,
       asset.symbol,
       "USD",
     );
 
-    if (!price) {
-      console.error("Something went wrong with getting the price", price);
+    if (!priceInUSD && priceInUSD !== 0) {
+      console.error("Something went wrong with getting the price", priceInUSD);
       return;
     }
+
+    // Convert purchase price to USD for storage if user entered in their currency
+    // This ensures all stored prices are in USD
+    const purchasePriceInUSD = convertToUSD(
+      asset.purchasePrice,
+      asset.purchaseCurrency as "USD" | "EUR" | "GBP",
+    );
 
     const newAsset: Asset = {
       ...asset,
       id: asset.symbol,
-      currentPrice: price,
+      currentPrice: priceInUSD,
+      // Store purchase price in USD along with original currency for reference
+      purchasePrice: purchasePriceInUSD,
+      purchaseCurrency: "USD", // Always store in USD
     };
 
     const updatedAssets = [...userAssets, newAsset];
@@ -78,28 +95,31 @@ class AssetApi {
     );
   }
 
-  async getUserCurrency(): Promise<CurrencyOption | null> {
-    const userStore = await AsyncStorage.getItem(STORAGE_KEYS.USER);
+  async refreshPrices(): Promise<void> {
+    const { userAssets } = useUserAssets.getState();
 
-    const currency = userStore
-      ? (JSON.parse(userStore).currency as CurrencyOption)
-      : null;
-    useUserStore.setState({
-      userCurrency: currency,
+    if (userAssets.length === 0) return;
+
+    // Fetch all prices in USD
+    const pricePromises = userAssets.map(async (asset) => {
+      if (asset.type && asset.symbol) {
+        return api.getPriceByAssetType(asset.type, asset.symbol, "USD");
+      }
+      return null;
     });
 
-    let rate: number | null = 1;
-    if (currency) {
-      rate = await api.getCurrencyRate("USD", currency.id);
-    }
+    const prices = await Promise.all(pricePromises);
 
-    useUserStore.setState({
-      conversionRate: rate ?? 1,
-    });
+    const updatedAssets = userAssets.map((asset, index) => ({
+      ...asset,
+      currentPrice: prices[index] ?? asset.currentPrice,
+    }));
 
-    console.log("getUserCurrency", currency, rate);
-
-    return currency;
+    useUserAssets.setState({ userAssets: updatedAssets });
+    await AsyncStorage.setItem(
+      STORAGE_KEYS.ASSETS,
+      JSON.stringify(updatedAssets),
+    );
   }
 }
 

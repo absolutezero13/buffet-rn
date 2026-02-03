@@ -16,11 +16,10 @@ SplashScreen.preventAutoHideAsync();
 
 const initApp = async () => {
   await assetApi.getUserAssets();
-  await assetApi.getUserCurrency();
-
   const userStore = await AsyncStorage.getItem(STORAGE_KEYS.USER);
-
-  useUserStore.setState(JSON.parse(userStore || "{}"));
+  useUserStore.setState(
+    userStore ? JSON.parse(userStore) : { hasOnboarded: false },
+  );
 };
 
 export function App() {

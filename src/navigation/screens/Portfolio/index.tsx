@@ -13,12 +13,15 @@ import { styles } from "./styles";
 import { theme } from "../../../theme";
 import { CurrencyCode } from "../../constants";
 import { assetApi } from "../../../services/assetApi";
-import useUserStore from "../../../store/useUserStore";
+import useCurrencyStore from "../../../store/useCurrencyStore";
 import useUserAssets from "../../../store/useUserAssets";
+import { useCurrency } from "../../../hooks";
 
 export function Portfolio() {
   const { userAssets: assets } = useUserAssets();
-  const { userCurrency } = useUserStore();
+  const { userCurrency } = useCurrencyStore();
+  const { getAssetCurrentValue, getAssetTotalCost } = useCurrency();
+
   const sheetRef = useRef<TrueSheet>(null);
   const [selectedAsset, setSelectedAsset] = useState<SearchResult | null>(null);
   const [type, setType] = useState("stock");
@@ -94,14 +97,15 @@ export function Portfolio() {
     ]);
   };
 
+  // Calculate totals in user's currency
   const totalValue = assets.reduce(
-    (sum, asset) => sum + asset.currentPrice * asset.quantity,
+    (sum, asset) => sum + getAssetCurrentValue(asset),
     0,
   );
   const totalGainLoss = assets.reduce((sum, asset) => {
-    const totalCost = asset.purchasePrice * asset.quantity;
-    const totalCurrentValue = asset.currentPrice * asset.quantity;
-    return sum + (totalCurrentValue - totalCost);
+    const currentValue = getAssetCurrentValue(asset);
+    const totalCost = getAssetTotalCost(asset);
+    return sum + (currentValue - totalCost);
   }, 0);
 
   return (

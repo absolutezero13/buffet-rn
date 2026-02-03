@@ -14,7 +14,7 @@ import { styles } from "./styles";
 import { PriceHistoryPoint } from "../../../services/types";
 import useUserAssets from "../../../store/useUserAssets";
 import { assetApi } from "../../../services/assetApi";
-import useUserStore from "../../../store/useUserStore";
+import { useCurrency } from "../../../hooks";
 
 type RouteParams = {
   AssetDetail: {
@@ -33,7 +33,14 @@ export function AssetDetail() {
   const navigation = useNavigation();
   const route = useRoute<RouteProp<RouteParams, "AssetDetail">>();
   const { userAssets: assets } = useUserAssets();
-  const { conversionRate } = useUserStore();
+  const {
+    toUserCurrency,
+    getAssetCurrentValue,
+    getAssetTotalCost,
+    getAssetGainLoss,
+    getAssetPurchasePrice,
+    getAssetCurrentPrice,
+  } = useCurrency();
   const [selectedRange, setSelectedRange] = useState(1);
   const [chartData, setChartData] = useState<
     { value: number; label: string; date: string }[]
@@ -53,13 +60,15 @@ export function AssetDetail() {
   const generateFallbackData = useCallback(() => {
     if (!asset) return;
 
+    const currentPriceInUserCurrency = getAssetCurrentPrice(asset);
     const days = timeRanges[selectedRange].days;
     const data = [];
-    let price = asset.currentPrice * (0.85 + Math.random() * 0.15);
+    let price = currentPriceInUserCurrency * (0.85 + Math.random() * 0.15);
 
     for (let i = days; i >= 0; i--) {
-      const change = (Math.random() - 0.48) * (asset.currentPrice * 0.03);
-      price = Math.max(price + change, asset.currentPrice * 0.5);
+      const change =
+        (Math.random() - 0.48) * (currentPriceInUserCurrency * 0.03);
+      price = Math.max(price + change, currentPriceInUserCurrency * 0.5);
       const date = new Date();
       date.setDate(date.getDate() - i);
       data.push({
@@ -78,7 +87,7 @@ export function AssetDetail() {
       });
     }
 
-    data[data.length - 1].value = asset.currentPrice;
+    data[data.length - 1].value = currentPriceInUserCurrency;
 
     const firstPrice = data[0].value;
     const lastPrice = data[data.length - 1].value;
@@ -88,7 +97,7 @@ export function AssetDetail() {
     });
 
     setChartData(data);
-  }, [asset, selectedRange]);
+  }, [asset, selectedRange, getAssetCurrentPrice]);
 
   const fetchPriceHistory = useCallback(async () => {
     if (!asset) return;
@@ -109,8 +118,9 @@ export function AssetDetail() {
       }
 
       if (history.length > 0) {
-        const firstPrice = history[0].price * conversionRate;
-        const lastPrice = history[history.length - 1].price * conversionRate;
+        // Convert prices from USD to user currency
+        const firstPrice = toUserCurrency(history[0].price);
+        const lastPrice = toUserCurrency(history[history.length - 1].price);
         const changeAmount = lastPrice - firstPrice;
         const changePercent = (changeAmount / firstPrice) * 100;
         setPriceChange({ amount: changeAmount, percent: changePercent });
@@ -122,7 +132,7 @@ export function AssetDetail() {
         );
 
         const formattedData = sampledHistory.map((point, index) => ({
-          value: point.price * conversionRate,
+          value: toUserCurrency(point.price),
           label:
             index % Math.ceil(sampledHistory.length / 5) === 0
               ? point.date
@@ -140,7 +150,7 @@ export function AssetDetail() {
     } finally {
       setIsLoading(false);
     }
-  }, [asset, selectedRange, generateFallbackData]);
+  }, [asset, selectedRange, generateFallbackData, toUserCurrency]);
 
   useEffect(() => {
     fetchPriceHistory();
@@ -194,10 +204,13 @@ export function AssetDetail() {
     );
   }
 
-  const totalValue = asset.currentPrice * asset.quantity;
-  const totalCost = asset.purchasePrice * asset.quantity;
-  const gainLoss = totalValue - totalCost;
-  const isPositive = gainLoss >= 0;
+  const totalValue = asset ? getAssetCurrentValue(asset) : 0;
+  const totalCost = asset ? getAssetTotalCost(asset) : 0;
+  const { gainLoss, isPositive } = asset
+    ? getAssetGainLoss(asset)
+    : { gainLoss: 0, isPositive: true };
+  const purchasePriceDisplay = asset ? getAssetPurchasePrice(asset) : 0;
+  const currentPriceDisplay = asset ? getAssetCurrentPrice(asset) : 0;
   const isPriceChangePositive = priceChange
     ? priceChange.amount >= 0
     : isPositive;
@@ -227,7 +240,7 @@ export function AssetDetail() {
           timeRanges={timeRanges}
           isPriceChangePositive={isPriceChangePositive}
           assetName={asset.name}
-          currentPrice={asset.currentPrice}
+          currentPrice={currentPriceDisplay}
           selectedPoint={selectedPoint}
           onRangeChange={setSelectedRange}
           onRetry={fetchPriceHistory}
@@ -236,13 +249,13 @@ export function AssetDetail() {
         <PriceStats
           maxValue={maxValue}
           minValue={minValue}
-          currentPrice={asset.currentPrice}
+          currentPrice={currentPriceDisplay}
         />
 
         <HoldingsCard
           quantity={asset.quantity}
-          purchasePrice={asset.purchasePrice}
-          currentPrice={asset.currentPrice}
+          purchasePrice={purchasePriceDisplay}
+          currentPrice={currentPriceDisplay}
           totalCost={totalCost}
           totalValue={totalValue}
           gainLoss={gainLoss}

@@ -10,8 +10,7 @@ import { useNavigation } from "@react-navigation/native";
 import { GlassCard } from "./GlassCard";
 import { theme } from "../theme";
 import { Asset } from "../services/types";
-import { assetApi } from "../services/assetApi";
-import useUserStore from "../store/useUserStore";
+import { useCurrency } from "../hooks";
 
 interface AssetCardProps {
   asset: Asset;
@@ -19,13 +18,21 @@ interface AssetCardProps {
 }
 
 export function AssetCard({ asset, onDelete }: AssetCardProps) {
-  const { userCurrency: currency } = useUserStore();
+  const {
+    currencySymbol,
+    getAssetCurrentValue,
+    getAssetTotalCost,
+    getAssetGainLoss,
+    getAssetPurchasePrice,
+    getAssetCurrentPrice,
+  } = useCurrency();
   const navigation = useNavigation();
-  const totalValue = asset.currentPrice * asset.quantity;
-  const totalCost = asset.purchasePrice * asset.quantity;
-  const gainLoss = totalValue - totalCost;
-  const gainLossPercent = ((gainLoss / totalCost) * 100).toFixed(2);
-  const isPositive = gainLoss >= 0;
+
+  const totalValue = getAssetCurrentValue(asset);
+  const totalCost = getAssetTotalCost(asset);
+  const { gainLoss, gainLossPercent, isPositive } = getAssetGainLoss(asset);
+  const purchasePriceDisplay = getAssetPurchasePrice(asset);
+  const currentPriceDisplay = getAssetCurrentPrice(asset);
 
   const getTypeLabel = () => {
     switch (asset.type) {
@@ -72,15 +79,15 @@ export function AssetCard({ asset, onDelete }: AssetCardProps) {
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Avg. Cost</Text>
             <Text style={styles.detailValue}>
-              {currency?.symbol}
-              {asset.purchasePrice.toFixed(2)}
+              {currencySymbol}
+              {purchasePriceDisplay.toFixed(2)}
             </Text>
           </View>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Current Price</Text>
             <Text style={styles.detailValue}>
-              {currency?.symbol}
-              {asset.currentPrice.toFixed(2)}
+              {currencySymbol}
+              {currentPriceDisplay.toFixed(2)}
             </Text>
           </View>
         </View>
@@ -89,7 +96,7 @@ export function AssetCard({ asset, onDelete }: AssetCardProps) {
           <View>
             <Text style={styles.totalLabel}>Total Value</Text>
             <Text style={styles.totalValue}>
-              {currency?.symbol}
+              {currencySymbol}
               {totalValue.toFixed(2)}
             </Text>
           </View>
@@ -105,7 +112,7 @@ export function AssetCard({ asset, onDelete }: AssetCardProps) {
               ]}
             >
               {isPositive ? "+" : ""}
-              {currency?.symbol}
+              {currencySymbol}
               {gainLoss.toFixed(2)}
             </Text>
             <Text
@@ -119,7 +126,7 @@ export function AssetCard({ asset, onDelete }: AssetCardProps) {
               ]}
             >
               ({isPositive ? "+" : ""}
-              {gainLossPercent}%)
+              {gainLossPercent.toFixed(2)}%)
             </Text>
           </View>
         </View>

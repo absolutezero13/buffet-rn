@@ -8,6 +8,7 @@ import { SLIDES } from "./constants";
 import { styles } from "./styles";
 import { currencyOptions, STORAGE_KEYS } from "../../constants";
 import useUserStore from "../../../store/useUserStore";
+import useCurrencyStore from "../../../store/useCurrencyStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export function Welcome() {
@@ -16,20 +17,23 @@ export function Welcome() {
   const scrollX = useRef(new Animated.Value(0)).current;
   const flatListRef = useRef<FlatList>(null);
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentIndex < SLIDES.length - 1) {
       flatListRef.current?.scrollToIndex({ index: currentIndex + 1 });
     } else {
-      useUserStore.setState({ hasOnboarded: true, userCurrency: currency });
+      useUserStore.setState({ hasOnboarded: true });
+      await useCurrencyStore.getState().setUserCurrency(currency);
       AsyncStorage.setItem(
         STORAGE_KEYS.USER,
-        JSON.stringify({ hasOnboarded: true, currency }),
+        JSON.stringify({ hasOnboarded: true }),
       );
     }
   };
 
-  const handleSkip = () => {
-    useUserStore.setState({ hasOnboarded: true, userCurrency: currency });
+  const handleSkip = async () => {
+    useUserStore.setState({ hasOnboarded: true });
+    // Set default currency (USD)
+    await useCurrencyStore.getState().setUserCurrency(currencyOptions[0]);
     AsyncStorage.setItem(
       STORAGE_KEYS.USER,
       JSON.stringify({ hasOnboarded: true }),

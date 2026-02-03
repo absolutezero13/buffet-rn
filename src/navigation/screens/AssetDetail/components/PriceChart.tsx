@@ -4,6 +4,7 @@ import { LineChart } from "react-native-gifted-charts";
 import { theme } from "../../../../theme";
 import { Button } from "../../../../components";
 import { styles, CHART_WIDTH } from "../styles";
+import useCurrencyStore from "../../../../store/useCurrencyStore";
 
 interface ChartDataPoint {
   value: number;
@@ -41,6 +42,8 @@ export function PriceChart({
   onRangeChange,
   onRetry,
 }: PriceChartProps) {
+  const { userCurrency } = useCurrencyStore();
+  const symbol = userCurrency.symbol;
   const minValue =
     chartData.length > 0 ? Math.min(...chartData.map((d) => d.value)) : 0;
   const chartColor = isPriceChangePositive
@@ -81,7 +84,7 @@ export function PriceChart({
           <View style={styles.chartOverlay}>
             <Text style={styles.chartOverlayName}>{assetName}</Text>
             <Text style={styles.chartOverlayPrice}>
-              $
+              {symbol}
               {selectedPoint
                 ? selectedPoint.price.toLocaleString("en-US", {
                     minimumFractionDigits: 2,
@@ -143,7 +146,8 @@ export function PriceChart({
                 return (
                   <View style={styles.tooltipContainer}>
                     <Text style={styles.tooltipPrice}>
-                      ${items[0]?.value?.toFixed(2)}
+                      {symbol}
+                      {items[0]?.value?.toFixed(2)}
                     </Text>
                     {point && (
                       <Text style={styles.tooltipDate}>{point.date}</Text>
