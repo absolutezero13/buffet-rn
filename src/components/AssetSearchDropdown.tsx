@@ -19,7 +19,7 @@ export interface SearchResult {
 
 interface AssetSearchDropdownProps {
   assetType: string;
-  onSelect: (result: SearchResult) => void;
+  onSelect: (result: SearchResult | null) => void;
   selectedValue?: SearchResult | null;
   placeholder?: string;
 }
@@ -42,60 +42,59 @@ export function AssetSearchDropdown({
   const [isLoading, setIsLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
 
-  const searchAssets = useCallback(
-    async (searchQuery: string) => {
-      if (searchQuery.length < 2) {
-        setResults([]);
-        return;
-      }
+  console.log("results:", results);
+  const searchAssets = async (searchQuery: string) => {
+    console.log("Starting asset search for query:", searchQuery);
+    if (searchQuery.length < 2) {
+      setResults([]);
+      return;
+    }
 
-      setIsLoading(true);
-      try {
-        if (assetType === "crypto") {
-          const cryptoResults = await api.searchCrypto(searchQuery);
-          console.log("Crypto search results:", cryptoResults);
-          setResults(
-            cryptoResults.map((c) => ({
-              symbol: c.symbol.toUpperCase(),
-              name: c.name,
-              id: c.id,
-            })),
-          );
-        } else if (assetType === "gold") {
-          const filtered = COMMODITY_OPTIONS.filter(
-            (g) =>
-              g.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              g.name.toLowerCase().includes(searchQuery.toLowerCase()),
-          );
-          setResults(filtered);
-        } else {
-          const stockResults = await api.searchSymbol(searchQuery);
-          setResults(
-            stockResults.map((s) => ({
-              symbol: s.symbol,
-              name: s.description,
-            })),
-          );
-        }
-        setShowResults(true);
-      } catch (error) {
-        setResults([]);
-      } finally {
-        setIsLoading(false);
+    console.log("Searching for assets with query:", searchQuery);
+    setIsLoading(true);
+    try {
+      if (assetType === "crypto") {
+        console.log("Performing crypto search for query:", searchQuery);
+        const cryptoResults = await api.searchCrypto(searchQuery);
+        console.log("Crypto search results:", cryptoResults);
+        setResults(
+          cryptoResults.map((c) => ({
+            symbol: c.symbol.toUpperCase(),
+            name: c.name,
+            id: c.id,
+          })),
+        );
+      } else if (assetType === "gold") {
+        const filtered = COMMODITY_OPTIONS.filter(
+          (g) =>
+            g.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            g.name.toLowerCase().includes(searchQuery.toLowerCase()),
+        );
+        setResults(filtered);
+      } else {
+        const stockResults = await api.searchSymbol(searchQuery);
+        setResults(
+          stockResults.map((s) => ({
+            symbol: s.symbol,
+            name: s.description,
+          })),
+        );
       }
+      setShowResults(true);
+    } catch (error) {
+      setResults([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const debounceSearch = useCallback(
+    (text: string) => {
+      setQuery(text);
+      searchAssets(text);
     },
-    [assetType],
+    [selectedValue],
   );
-
-  useEffect(() => {
-    const debounceTimer = setTimeout(() => {
-      if (query && !selectedValue) {
-        searchAssets(query);
-      }
-    }, 300);
-
-    return () => clearTimeout(debounceTimer);
-  }, [query, searchAssets, selectedValue]);
 
   useEffect(() => {
     setQuery("");
@@ -113,7 +112,7 @@ export function AssetSearchDropdown({
   const handleClear = () => {
     setQuery("");
     setResults([]);
-    onSelect({ symbol: "", name: "" });
+    onSelect(null);
   };
 
   const handleFocus = () => {
@@ -128,16 +127,12 @@ export function AssetSearchDropdown({
       <Text style={styles.label}>Asset</Text>
       <View style={styles.inputContainer}>
         <RNTextInput
+          editable={!selectedValue}
           style={styles.input}
           placeholder={placeholder}
           placeholderTextColor={theme.colors.textMuted}
           value={query}
-          onChangeText={(text) => {
-            setQuery(text);
-            if (selectedValue) {
-              onSelect({ symbol: "", name: "" });
-            }
-          }}
+          onChangeText={debounceSearch}
           onFocus={handleFocus}
           onBlur={() => {
             setTimeout(() => setShowResults(false), 50);
@@ -157,7 +152,7 @@ export function AssetSearchDropdown({
         )}
       </View>
 
-      {showResults && results.length > 0 && (
+      {showResults && results.length > 0 && !selectedValue && (
         <View style={styles.dropdown}>
           <ScrollView
             keyboardShouldPersistTaps="handled"

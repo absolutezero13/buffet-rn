@@ -56,7 +56,7 @@ export function AssetDetail() {
   } | null>(null);
 
   const asset = assets.find((a) => a.id === route.params?.assetId);
-  console.log("Selected asset:", asset);
+
   const generateFallbackData = useCallback(() => {
     if (!asset) return;
 
@@ -102,17 +102,19 @@ export function AssetDetail() {
   const fetchPriceHistory = useCallback(async () => {
     if (!asset) return;
 
-    setIsLoading(true);
     setSelectedPoint(null);
 
     try {
       let history: PriceHistoryPoint[] = [];
       const days = timeRanges[selectedRange].days;
-
+      console.log("Fetching history for", asset, "for", days, "days");
       if (asset.type === "crypto" && asset.symbol) {
         history = await api.getCryptoHistory(asset.symbol, days);
       } else if (asset.type === "stock" || asset.type === "etf") {
         history = await api.getStockHistory(asset.symbol, days);
+      } else if (asset.type === "gold") {
+        history = await api.getCommodityHistory(asset.symbol, days);
+        console.log("Fetched gold history:", history);
       } else if (asset.type === "cash") {
         history = [];
       }
@@ -142,7 +144,10 @@ export function AssetDetail() {
 
         setChartData(formattedData);
       } else {
-        generateFallbackData();
+        Alert.alert(
+          "No Data",
+          "Price history data is not available for this asset.",
+        );
       }
     } catch (error) {
       console.error("Error fetching price history:", error);

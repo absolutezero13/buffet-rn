@@ -27,4 +27,6 @@ export const currencyOptions: CurrencyOption[] = [
 export const STORAGE_KEYS = {
   ASSETS: "USER_ASSETS",
   USER: "USER",
+  ALPACA_ASSETS: "ALPACA_ASSETS",
+  COINGECKO_COINS: "COINGECKO_COINS",
 };

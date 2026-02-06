@@ -1,27 +1,45 @@
 import axios from "axios";
-import { CurrencyCode } from "../navigation/constants";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { CurrencyCode, STORAGE_KEYS } from "../navigation/constants";
 import {
-  ExchangeRateResponse,
   StockQuote,
-  TwelveDataPrice,
-  TwelveDataQuote,
   AssetType,
   PriceHistoryPoint,
-  TwelveDataStockSearch,
-  TwelveDataTimeSeries,
   SwissquoteBboQuote,
+  YahooFinanceChartResponse,
+  AlpacaBar,
+  AlpacaBarsResponse,
+  AlpacaLatestBarsResponse,
+  AlpacaAsset,
+  CoinGeckoCoin,
 } from "./types";
 
-const TWELVE_DATA_API_KEY = "80e10fa0a0104fc3a4ec0ed6737734e2";
+const ALPACA_API_KEY = "PK7RQA5AOQBRNX5KOJUZMF2JCH";
+const ALPACA_SECRET_KEY = "GFJmUTRiSnJeREsPy5XNRc1S3jT1qF3gCrVptHCif9SL";
 const COINGECKO_API_KEY = "CG-u6N8ZTM5Xg4HjkXCcDuVN2wt";
 
-const TWELVE_DATA_BASE = "https://api.twelvedata.com";
+const ALPACA_DATA_BASE = "https://data.alpaca.markets";
+const ALPACA_PAPER_API_BASE = "https://paper-api.alpaca.markets";
 const COINGECKO_BASE = "https://api.coingecko.com/api/v3";
 const SWISSQUOTE_BASE = "https://forex-data-feed.swissquote.com";
+const YAHOO_FINANCE_BASE = "https://query1.finance.yahoo.com/v8/finance";
 
-const twelveDataClient = axios.create({
-  baseURL: TWELVE_DATA_BASE,
-  params: { apikey: TWELVE_DATA_API_KEY },
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
+const alpacaDataClient = axios.create({
+  baseURL: ALPACA_DATA_BASE,
+  headers: {
+    "APCA-API-KEY-ID": ALPACA_API_KEY,
+    "APCA-API-SECRET-KEY": ALPACA_SECRET_KEY,
+  },
+});
+
+const alpacaPaperClient = axios.create({
+  baseURL: ALPACA_PAPER_API_BASE,
+  headers: {
+    "APCA-API-KEY-ID": ALPACA_API_KEY,
+    "APCA-API-SECRET-KEY": ALPACA_SECRET_KEY,
+  },
 });
 
 const coingeckoClient = axios.create({
@@ -33,6 +51,11 @@ const coingeckoClient = axios.create({
 });
 
 class Api {
+  private cachedAssets: { data: AlpacaAsset[]; timestamp: number } | null =
+    null;
+  private cachedCoins: { data: CoinGeckoCoin[]; timestamp: number } | null =
+    null;
+
   constructor() {}
 
   getCurrencyRate = async (
@@ -44,33 +67,49 @@ class Api {
         return 1;
       }
 
-      const response = await twelveDataClient.get<ExchangeRateResponse>(
-        "/exchange_rate",
+      // Use Yahoo Finance for currency conversion (Alpaca doesn't support forex)
+      const symbol = `${from}${to}=X`;
+      const response = await axios.get<YahooFinanceChartResponse>(
+        `${YAHOO_FINANCE_BASE}/chart/${symbol}`,
         {
-          params: { symbol: `${from}/${to}` },
+          params: {
+            interval: "1d",
+            range: "1d",
+          },
         },
       );
       console.log("Currency conversion response:", response.data);
 
-      const rate = response.data?.rate;
-      return rate;
+      const result = response.data?.chart?.result?.[0];
+      if (result?.meta?.regularMarketPrice) {
+        return result.meta.regularMarketPrice;
+      }
+      return null;
     } catch (error) {
       console.error("Error converting currency:", error);
       return null;
     }
   };
+
   getStockPrice = async (symbol: string): Promise<number | null> => {
     try {
-      const response = await twelveDataClient.get<TwelveDataPrice>("/price", {
-        params: { symbol: symbol.toUpperCase() },
-      });
+      const response = await alpacaDataClient.get<AlpacaLatestBarsResponse>(
+        "/v2/stocks/bars/latest",
+        {
+          params: {
+            symbols: symbol.toUpperCase(),
+            feed: "iex",
+          },
+        },
+      );
 
       console.log("Stock price response:", response.data);
-      const price = parseFloat(response.data.price);
+      const bar = response.data.bars?.[symbol.toUpperCase()];
+      const price = bar?.c; // c = close price
 
-      return price;
+      return price && price > 0 ? price : null;
     } catch (error) {
-      console.error("Error fetching stock price from Twelve Data:", error);
+      console.error("Error fetching stock price from Alpaca:", error);
       return null;
     }
   };
@@ -100,16 +139,20 @@ class Api {
     }
   };
 
-  getStockQuoteFull = async (
-    symbol: string,
-  ): Promise<TwelveDataQuote | null> => {
+  getStockQuoteFull = async (symbol: string): Promise<AlpacaBar | null> => {
     try {
-      const response = await twelveDataClient.get<TwelveDataQuote>("/quote", {
-        params: { symbol: symbol.toUpperCase() },
-      });
-      return response.data;
+      const response = await alpacaDataClient.get<AlpacaLatestBarsResponse>(
+        "/v2/stocks/bars/latest",
+        {
+          params: {
+            symbols: symbol.toUpperCase(),
+            feed: "iex",
+          },
+        },
+      );
+      return response.data.bars?.[symbol.toUpperCase()] || null;
     } catch (error) {
-      console.error("Error fetching full stock quote from Twelve Data:", error);
+      console.error("Error fetching full stock quote from Alpaca:", error);
       return null;
     }
   };
@@ -208,55 +251,124 @@ class Api {
     }
   };
 
+  getCommodityHistory = async (
+    symbol: string,
+    days: number,
+  ): Promise<PriceHistoryPoint[]> => {
+    try {
+      // Map days to Yahoo Finance range parameter
+      let range = "1mo";
+      if (days <= 7) {
+        range = "5d";
+      } else if (days <= 30) {
+        range = "1mo";
+      } else if (days <= 90) {
+        range = "3mo";
+      } else if (days <= 365) {
+        range = "1y";
+      } else {
+        range = "5y";
+      }
+
+      // Determine interval based on range
+      let interval = "1d";
+      if (days <= 1) {
+        interval = "1h";
+      } else if (days <= 7) {
+        interval = "1d";
+      }
+
+      const response = await axios.get<YahooFinanceChartResponse>(
+        `${YAHOO_FINANCE_BASE}/chart/${symbol}`,
+        {
+          params: {
+            interval,
+            range,
+          },
+        },
+      );
+
+      const result = response.data?.chart?.result?.[0];
+      if (!result || response.data?.chart?.error) {
+        console.error("Yahoo Finance error:", response.data?.chart?.error);
+        return [];
+      }
+
+      const timestamps = result.timestamp || [];
+      const closes = result.indicators?.quote?.[0]?.close || [];
+
+      const history: PriceHistoryPoint[] = [];
+      for (let i = 0; i < timestamps.length; i++) {
+        const timestamp = timestamps[i] * 1000; // Convert to milliseconds
+        const price = closes[i];
+
+        // Skip null/undefined prices
+        if (price == null) continue;
+
+        history.push({
+          timestamp,
+          price,
+          date: new Date(timestamp).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+          }),
+        });
+      }
+
+      return history;
+    } catch (error) {
+      console.error(
+        "Error fetching commodity history from Yahoo Finance:",
+        error,
+      );
+      return [];
+    }
+  };
+
   getStockHistory = async (
     symbol: string,
     days: number,
   ): Promise<PriceHistoryPoint[]> => {
     try {
-      // Determine interval based on days requested
-      let interval = "1day";
-      let outputsize = days;
+      // Calculate start and end dates
+      const end = new Date();
+      const start = new Date();
+      start.setDate(start.getDate() - days);
 
+      // Determine timeframe based on days requested
+      let timeframe = "1Day";
       if (days <= 1) {
-        interval = "1h";
-        outputsize = 24;
-      } else if (days <= 7) {
-        interval = "1day";
-        outputsize = days;
-      } else if (days <= 30) {
-        interval = "1day";
-        outputsize = days;
-      } else if (days <= 90) {
-        interval = "1day";
-        outputsize = days;
-      } else {
-        interval = "1week";
-        outputsize = Math.ceil(days / 7);
+        timeframe = "1Hour";
+      } else if (days > 365) {
+        timeframe = "1Week";
       }
 
-      const response = await twelveDataClient.get<TwelveDataTimeSeries>(
-        "/time_series",
+      const response = await alpacaDataClient.get<AlpacaBarsResponse>(
+        "/v2/stocks/bars",
         {
           params: {
-            symbol: symbol.toUpperCase(),
-            interval,
-            outputsize: Math.min(outputsize, 5000), // API limit
-            order: "ASC",
+            symbols: symbol.toUpperCase(),
+            timeframe,
+            start: start.toISOString(),
+            end: end.toISOString(),
+            feed: "iex",
+            adjustment: "raw",
+            sort: "asc",
           },
         },
       );
+      console.log("Stock history response:", response.data);
 
-      const data = response.data;
-      if (data.status !== "ok" || !data.values) {
+      const bars = response.data.bars?.[symbol.toUpperCase()] || [];
+      if (!bars.length) {
         return [];
       }
 
-      return data.values.map((item) => {
-        const timestamp = new Date(item.datetime).getTime();
-        const rawPrice = parseFloat(item.close);
+      return bars.map((bar) => {
+        const timestamp = new Date(bar.t).getTime();
         return {
           timestamp,
-          price: rawPrice,
+          price: bar.c,
           date: new Date(timestamp).toLocaleDateString("en-US", {
             month: "short",
             day: "numeric",
@@ -264,31 +376,96 @@ class Api {
         };
       });
     } catch (error) {
-      console.error("Error fetching stock history from Twelve Data:", error);
+      console.error("Error fetching stock history from Alpaca:", error);
       return [];
     }
+  };
+
+  // Cache for assets in memory (after loading from storage)
+
+  private fetchAndCacheAssets = async (): Promise<AlpacaAsset[]> => {
+    try {
+      console.log("Fetching assets from Alpaca...");
+      const response = await alpacaPaperClient.get<AlpacaAsset[]>(
+        "/v2/assets",
+        {
+          params: {
+            status: "active",
+            asset_class: "us_equity",
+          },
+        },
+      );
+
+      const assets = response.data;
+      console.log(`Fetched ${assets.length} assets from Alpaca`);
+
+      const cacheData = { data: assets, timestamp: Date.now() };
+
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.ALPACA_ASSETS,
+        JSON.stringify(cacheData),
+      );
+
+      this.cachedAssets = cacheData;
+      return assets;
+    } catch (error) {
+      console.error("Error fetching assets from Alpaca:", error);
+      return [];
+    }
+  };
+
+  getAlpacaAssets = async (): Promise<AlpacaAsset[]> => {
+    const now = Date.now();
+
+    // Return from memory cache if available and fresh
+    if (this.cachedAssets && now - this.cachedAssets.timestamp < ONE_DAY_MS) {
+      return this.cachedAssets.data;
+    }
+
+    // Try to load from storage
+    try {
+      const stored = await AsyncStorage.getItem(STORAGE_KEYS.ALPACA_ASSETS);
+      if (stored) {
+        const cacheData = JSON.parse(stored) as {
+          data: AlpacaAsset[];
+          timestamp: number;
+        };
+        if (now - cacheData.timestamp < ONE_DAY_MS) {
+          this.cachedAssets = cacheData;
+          console.log(`Loaded ${cacheData.data.length} assets from storage`);
+          return cacheData.data;
+        }
+      }
+    } catch (error) {
+      console.error("Error loading assets from storage:", error);
+    }
+
+    // Fetch from API
+    return this.fetchAndCacheAssets();
   };
 
   searchSymbol = async (
     query: string,
   ): Promise<{ symbol: string; description: string }[]> => {
     try {
-      const response = await twelveDataClient.get<TwelveDataStockSearch>(
-        "/symbol_search",
-        {
-          params: {
-            symbol: query.toUpperCase(),
-          },
-        },
-      );
+      const assets = await this.getAlpacaAssets();
 
-      const stocks = response.data?.data || [];
-      return stocks.slice(0, 10).map((stock) => ({
-        symbol: stock.symbol,
-        description: `${stock.instrument_name} (${stock.exchange})`,
+      const queryUpper = query.toUpperCase();
+      const filtered = assets
+        .filter(
+          (asset) =>
+            asset.tradable &&
+            (asset.symbol.includes(queryUpper) ||
+              asset.name.toUpperCase().includes(queryUpper)),
+        )
+        .slice(0, 10);
+
+      return filtered.map((asset) => ({
+        symbol: asset.symbol,
+        description: `${asset.name} (${asset.exchange})`,
       }));
     } catch (error) {
-      console.error("Error searching symbol from Twelve Data:", error);
+      console.error("Error searching symbol from Alpaca:", error);
       return [];
     }
   };
@@ -297,14 +474,84 @@ class Api {
     query: string,
   ): Promise<{ id: string; symbol: string; name: string }[]> => {
     try {
-      const response = await coingeckoClient.get("/search", {
-        params: { query },
-      });
-      return response.data?.coins?.slice(0, 10) || [];
+      const coins = await this.getCoinGeckoCoins();
+      console.log(`searchCrypto coins "${coins}"`);
+
+      const queryLower = query.toLowerCase();
+
+      const startsWithFiltered = coins.filter(
+        (coin) =>
+          coin.name.toLowerCase().startsWith(queryLower) ||
+          coin.symbol.toLowerCase().startsWith(queryLower),
+      );
+
+      const generalFiltered = coins
+        .filter(
+          (coin) =>
+            coin.symbol.toLowerCase().includes(queryLower) ||
+            coin.name.toLowerCase().includes(queryLower),
+        )
+        .slice(0, 10);
+
+      return [...startsWithFiltered, ...generalFiltered].slice(0, 10);
     } catch (error) {
       console.error("Error searching crypto:", error);
       return [];
     }
+  };
+
+  private fetchAndCacheCoins = async (): Promise<CoinGeckoCoin[]> => {
+    try {
+      console.log("Fetching coins from CoinGecko...");
+      const response =
+        await coingeckoClient.get<CoinGeckoCoin[]>("/coins/list");
+
+      const coins = response.data;
+      console.log(`Fetched ${coins.length} coins from CoinGecko`);
+
+      const cacheData = { data: coins, timestamp: Date.now() };
+
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.COINGECKO_COINS,
+        JSON.stringify(cacheData),
+      );
+
+      this.cachedCoins = cacheData;
+      return coins;
+    } catch (error) {
+      console.error("Error fetching coins from CoinGecko:", error);
+      return [];
+    }
+  };
+
+  getCoinGeckoCoins = async (): Promise<CoinGeckoCoin[]> => {
+    const now = Date.now();
+
+    // Return from memory cache if available and fresh
+    if (this.cachedCoins && now - this.cachedCoins.timestamp < ONE_DAY_MS) {
+      return this.cachedCoins.data;
+    }
+
+    // Try to load from storage
+    try {
+      const stored = await AsyncStorage.getItem(STORAGE_KEYS.COINGECKO_COINS);
+      if (stored) {
+        const cacheData = JSON.parse(stored) as {
+          data: CoinGeckoCoin[];
+          timestamp: number;
+        };
+        if (now - cacheData.timestamp < ONE_DAY_MS) {
+          this.cachedCoins = cacheData;
+          console.log(`Loaded ${cacheData.data.length} coins from storage`);
+          return cacheData.data;
+        }
+      }
+    } catch (error) {
+      console.error("Error loading coins from storage:", error);
+    }
+
+    // Fetch from API
+    return this.fetchAndCacheCoins();
   };
 
   getMultipleStockQuotes = async (
@@ -313,43 +560,32 @@ class Api {
     const results = new Map<string, StockQuote>();
 
     try {
-      // Twelve Data supports batch requests with comma-separated symbols
-      const response = await twelveDataClient.get("/quote", {
-        params: { symbol: symbols.map((s) => s.toUpperCase()).join(",") },
-      });
+      // Alpaca supports batch requests with comma-separated symbols
+      const response = await alpacaDataClient.get<AlpacaLatestBarsResponse>(
+        "/v2/stocks/bars/latest",
+        {
+          params: {
+            symbols: symbols.map((s) => s.toUpperCase()).join(","),
+            feed: "iex",
+          },
+        },
+      );
 
-      const data = response.data;
+      const bars = response.data.bars || {};
 
-      // Handle single symbol response
-      if (data.symbol) {
-        const quote: StockQuote = {
-          c: parseFloat(data.close),
-          d: parseFloat(data.change),
-          dp: parseFloat(data.percent_change),
-          h: parseFloat(data.high),
-          l: parseFloat(data.low),
-          o: parseFloat(data.open),
-          pc: parseFloat(data.previous_close),
-          t: data.timestamp,
-        };
-        results.set(data.symbol, quote);
-      } else {
-        // Handle multiple symbols response
-        for (const symbol of Object.keys(data)) {
-          const item = data[symbol];
-          if (item && item.close) {
-            const quote: StockQuote = {
-              c: parseFloat(item.close),
-              d: parseFloat(item.change),
-              dp: parseFloat(item.percent_change),
-              h: parseFloat(item.high),
-              l: parseFloat(item.low),
-              o: parseFloat(item.open),
-              pc: parseFloat(item.previous_close),
-              t: item.timestamp,
-            };
-            results.set(symbol, quote);
-          }
+      for (const [symbol, bar] of Object.entries(bars)) {
+        if (bar && bar.c > 0) {
+          const quote: StockQuote = {
+            c: bar.c,
+            d: 0, // Alpaca doesn't provide change in latest bar
+            dp: 0, // Alpaca doesn't provide percent change in latest bar
+            h: bar.h,
+            l: bar.l,
+            o: bar.o,
+            pc: bar.o, // Use open as previous close approximation
+            t: bar.t,
+          };
+          results.set(symbol, quote);
         }
       }
     } catch (error) {
@@ -360,5 +596,5 @@ class Api {
   };
 }
 
-export { twelveDataClient };
+export { alpacaDataClient, alpacaPaperClient };
 export const api = new Api();

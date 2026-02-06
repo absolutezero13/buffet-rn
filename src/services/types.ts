@@ -1,69 +1,48 @@
-// Type for interval options
-export type TwelveDataInterval =
-  | "1min"
-  | "5min"
-  | "15min"
-  | "30min"
-  | "45min"
-  | "1h"
-  | "2h"
-  | "4h"
-  | "1day"
-  | "1week"
-  | "1month";
+// Alpaca Markets API types
+export interface AlpacaBar {
+  t: string; // Timestamp (RFC-3339)
+  o: number; // Open price
+  h: number; // High price
+  l: number; // Low price
+  c: number; // Close price
+  v: number; // Volume
+  n: number; // Number of trades
+  vw: number; // Volume weighted average price
+}
 
-export interface TwelveDataQuote {
+export interface AlpacaBarsResponse {
+  bars: Record<string, AlpacaBar[]>;
+  next_page_token: string | null;
+}
+
+export interface AlpacaLatestBar {
+  symbol: string;
+  bar: AlpacaBar;
+}
+
+export interface AlpacaLatestBarsResponse {
+  bars: Record<string, AlpacaBar>;
+}
+
+export interface AlpacaAsset {
+  id: string;
+  class: string;
+  exchange: string;
   symbol: string;
   name: string;
-  exchange: string;
-  mic_code: string;
-  currency: string;
-  datetime: string;
-  timestamp: number;
-  open: string;
-  high: string;
-  low: string;
-  close: string;
-  volume: string;
-  previous_close: string;
-  change: string;
-  percent_change: string;
-  average_volume: string;
-  is_market_open: boolean;
-  fifty_two_week: {
-    low: string;
-    high: string;
-    low_change: string;
-    high_change: string;
-    low_change_percent: string;
-    high_change_percent: string;
-    range: string;
-  };
-}
-
-export interface TwelveDataTimeSeries {
-  meta: {
-    symbol: string;
-    interval: string;
-    currency: string;
-    exchange_timezone: string;
-    exchange: string;
-    mic_code: string;
-    type: string;
-  };
-  values: Array<{
-    datetime: string;
-    open: string;
-    high: string;
-    low: string;
-    close: string;
-    volume: string;
-  }>;
   status: string;
+  tradable: boolean;
+  marginable: boolean;
+  shortable: boolean;
+  easy_to_borrow: boolean;
+  fractionable: boolean;
 }
 
-export interface TwelveDataPrice {
-  price: string;
+// CoinGecko API types
+export interface CoinGeckoCoin {
+  id: string;
+  symbol: string;
+  name: string;
 }
 
 export type AssetType = "stock" | "etf" | "crypto" | "gold" | "cash" | "other";
@@ -76,24 +55,36 @@ export interface SwissquoteBboQuote {
   }>;
   ts: number;
 }
-export interface TwelveDataStockSearch {
-  data: Array<{
-    symbol: string;
-    instrument_name: string;
-    exchange: string;
-    mic_code: string;
-    exchange_timezone: string;
-    instrument_type: string;
-    country: string;
-    currency: string;
-    access: {
-      global: string;
-      plan: string;
-    };
-  }>;
+
+export interface YahooFinanceChartResponse {
+  chart: {
+    result: Array<{
+      meta: {
+        currency: string;
+        symbol: string;
+        regularMarketPrice: number;
+        fiftyTwoWeekHigh: number;
+        fiftyTwoWeekLow: number;
+      };
+      timestamp: number[];
+      indicators: {
+        quote: Array<{
+          low: number[];
+          volume: number[];
+          open: number[];
+          high: number[];
+          close: number[];
+        }>;
+        adjclose?: Array<{
+          adjclose: number[];
+        }>;
+      };
+    }>;
+    error: null | { code: string; description: string };
+  };
 }
 
-// Legacy interface for backward compatibility
+// Stock quote interface (compatible with Alpaca bar data)
 export interface StockQuote {
   c: number; // Current price (close)
   d: number; // Change
@@ -102,18 +93,12 @@ export interface StockQuote {
   l: number; // Low
   o: number; // Open
   pc: number; // Previous close
-  t: number; // Timestamp
+  t: string; // Timestamp (RFC-3339)
 }
 
 export interface PriceHistoryPoint {
   date: string;
   price: number;
-  timestamp: number;
-}
-
-export interface ExchangeRateResponse {
-  rate: number;
-  symbol: string;
   timestamp: number;
 }
 

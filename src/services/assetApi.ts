@@ -46,7 +46,7 @@ class AssetApi {
 
   async addAsset(asset: Omit<Asset, "currentPrice" | "id">): Promise<void> {
     const { userAssets } = useUserAssets.getState();
-    const { userCurrency, convertToUSD } = useCurrencyStore.getState();
+    const { convertToUSD } = useCurrencyStore.getState();
 
     // Always fetch price in USD
     const priceInUSD = await api.getPriceByAssetType(
@@ -67,16 +67,44 @@ class AssetApi {
       asset.purchaseCurrency as "USD" | "EUR" | "GBP",
     );
 
-    const newAsset: Asset = {
-      ...asset,
-      id: asset.symbol,
-      currentPrice: priceInUSD,
-      // Store purchase price in USD along with original currency for reference
-      purchasePrice: purchasePriceInUSD,
-      purchaseCurrency: "USD", // Always store in USD
-    };
+    // Check if the asset already exists in the portfolio (same symbol and type)
+    const existingAssetIndex = userAssets.findIndex(
+      (a) => a.symbol === asset.symbol && a.type === asset.type,
+    );
 
-    const updatedAssets = [...userAssets, newAsset];
+    let updatedAssets: Asset[];
+
+    if (existingAssetIndex !== -1) {
+      // Asset exists - update quantity and calculate weighted average purchase price
+      const existingAsset = userAssets[existingAssetIndex];
+      const totalQuantity = existingAsset.quantity + asset.quantity;
+      const weightedAvgPurchasePrice =
+        (existingAsset.purchasePrice * existingAsset.quantity +
+          purchasePriceInUSD * asset.quantity) /
+        totalQuantity;
+
+      const updatedAsset: Asset = {
+        ...existingAsset,
+        quantity: totalQuantity,
+        purchasePrice: weightedAvgPurchasePrice,
+        currentPrice: priceInUSD,
+      };
+
+      updatedAssets = [...userAssets];
+      updatedAssets[existingAssetIndex] = updatedAsset;
+    } else {
+      // New asset - create new entry
+      const newAsset: Asset = {
+        ...asset,
+        id: asset.symbol,
+        currentPrice: priceInUSD,
+        purchasePrice: purchasePriceInUSD,
+        purchaseCurrency: "USD", // Always store in USD
+      };
+
+      updatedAssets = [...userAssets, newAsset];
+    }
+
     useUserAssets.setState({ userAssets: updatedAssets });
     await AsyncStorage.setItem(
       STORAGE_KEYS.ASSETS,
