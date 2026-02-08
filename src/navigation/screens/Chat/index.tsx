@@ -8,17 +8,23 @@ import {
   TypingIndicator,
   ChatInput,
 } from "./components";
-import { generateAIResponse } from "./utils";
 import { styles } from "./styles";
 import useUserAssets from "../../../store/useUserAssets";
+import { useBottomTabBarHeight } from "react-native-bottom-tabs";
+import {
+  chatApi,
+  ChatMessage as GeminiMessage,
+} from "../../../services/chatApi";
 
 export function Chat() {
   const { userAssets: assets } = useUserAssets();
-  const [chatMessages, setChatMessages] = useState([]);
+  const [chatMessages, setChatMessages] = useState<
+    { id: string; role: "user" | "assistant"; content: string }[]
+  >([]);
+  const [chatHistory, setChatHistory] = useState<GeminiMessage[]>([]);
   const [inputText, setInputText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const flatListRef = useRef<FlatList>(null);
-
   useEffect(() => {
     if (chatMessages.length > 0) {
       setTimeout(() => {
@@ -27,34 +33,49 @@ export function Chat() {
     }
   }, [chatMessages]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!inputText.trim()) return;
 
-    // addChatMessage({ role: "user", content: inputText.trim() });
+    const userMessage = inputText.trim();
+    const userMessageId = Date.now().toString();
+
     setChatMessages((prev) => [
       ...prev,
-      { role: "user", content: inputText.trim() },
+      { id: userMessageId, role: "user", content: userMessage },
     ]);
 
-    const messageToProcess = inputText;
     setInputText("");
     setIsTyping(true);
 
-    setTimeout(
-      () => {
-        // const response = generateAIResponse(messageToProcess, {
-        //   assets,
-        //   totalValue,
-        //   totalGainLoss,
-        // });
-        setChatMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: response },
-        ]);
-        setIsTyping(false);
-      },
-      1000 + Math.random() * 1000,
-    );
+    try {
+      const reply = await chatApi.sendMessage(userMessage, chatHistory);
+
+      const assistantMessageId = (Date.now() + 1).toString();
+      setChatMessages((prev) => [
+        ...prev,
+        { id: assistantMessageId, role: "assistant", content: reply },
+      ]);
+
+      // Update history for next request
+      setChatHistory((prev) => [
+        ...prev,
+        { role: "user", parts: [{ text: userMessage }] },
+        { role: "model", parts: [{ text: reply }] },
+      ]);
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      const errorMessageId = (Date.now() + 1).toString();
+      setChatMessages((prev) => [
+        ...prev,
+        {
+          id: errorMessageId,
+          role: "assistant",
+          content: "Sorry, I couldn't process your request. Please try again.",
+        },
+      ]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const handleSuggestionPress = (suggestion: string) => {
@@ -63,6 +84,7 @@ export function Chat() {
 
   const clearChat = () => {
     setChatMessages([]);
+    setChatHistory([]);
   };
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>

@@ -1,8 +1,13 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { theme } from "../theme";
-import { ChatMessage as ChatMessageType } from "../context/AppContext";
 import { GlassCard } from "./GlassCard";
+
+export interface ChatMessageType {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+}
 
 interface ChatMessageProps {
   message: ChatMessageType;

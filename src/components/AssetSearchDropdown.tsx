@@ -15,6 +15,7 @@ export interface SearchResult {
   symbol: string;
   name: string;
   id?: string;
+  yahoofinanceId?: string;
 }
 
 interface AssetSearchDropdownProps {
@@ -24,11 +25,11 @@ interface AssetSearchDropdownProps {
   placeholder?: string;
 }
 
-const COMMODITY_OPTIONS: SearchResult[] = [
-  { symbol: "XAU", name: "Gold" },
-  { symbol: "XAG", name: "Silver" },
-  { symbol: "XPT", name: "Platinum" },
-  { symbol: "XPD", name: "Palladium" },
+export const COMMODITY_OPTIONS: SearchResult[] = [
+  { symbol: "XAU", name: "Gold", yahoofinanceId: "GC=F" },
+  { symbol: "XAG", name: "Silver", yahoofinanceId: "SI=F" },
+  { symbol: "XPT", name: "Platinum", yahoofinanceId: "PL=F" },
+  { symbol: "XPD", name: "Palladium", yahoofinanceId: "PA=F" },
 ];
 
 export function AssetSearchDropdown({
@@ -51,6 +52,7 @@ export function AssetSearchDropdown({
     }
 
     console.log("Searching for assets with query:", searchQuery);
+    console.log("Asset type:", assetType);
     setIsLoading(true);
     try {
       if (assetType === "crypto") {
@@ -93,7 +95,7 @@ export function AssetSearchDropdown({
       setQuery(text);
       searchAssets(text);
     },
-    [selectedValue],
+    [selectedValue, assetType],
   );
 
   useEffect(() => {

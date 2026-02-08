@@ -1,5 +1,11 @@
 import React from "react";
-import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ActivityIndicator,
+  Pressable,
+} from "react-native";
 import { LineChart } from "react-native-gifted-charts";
 import { theme } from "../../../../theme";
 import { Button } from "../../../../components";
@@ -97,6 +103,9 @@ export function PriceChart({
             </Text>
           </View>
           <LineChart
+            onPress={() => {
+              console.log("press");
+            }}
             data={chartData}
             width={CHART_WIDTH}
             height={200}
@@ -109,22 +118,20 @@ export function PriceChart({
                 : "rgba(255, 71, 87, 0.25)"
             }
             endFillColor="transparent"
+            bounces={false}
             startOpacity={1}
             endOpacity={0}
             initialSpacing={0}
+            xAxisType="solid"
+            xAxisLabelsHeight={10}
             isAnimated
             endSpacing={0}
             yAxisColor="transparent"
-            xAxisColor="transparent"
             hideRules
             hideYAxisText
             areaChart
             dataPointsColor="transparent"
             animateOnDataChange
-            xAxisLabelTextStyle={{
-              color: theme.colors.textMuted,
-              fontSize: 10,
-            }}
             pointerConfig={{
               pointerStripHeight: 200,
               pointerStripColor: "rgba(255,255,255,0.2)",
@@ -133,10 +140,11 @@ export function PriceChart({
               radius: 8,
               pointerLabelWidth: 120,
               pointerLabelHeight: 50,
-              activatePointersOnLongPress: false,
+              activatePointersOnLongPress: true,
               autoAdjustPointerLabelPosition: true,
               strokeDashArray: [4, 4],
               pointerVanishDelay: 200,
+
               pointerLabelComponent: (items: { value: number }[]) => {
                 const index = chartData.findIndex(
                   (d) => d.value === items[0]?.value,
