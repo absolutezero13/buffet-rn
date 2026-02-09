@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, FlatList, KeyboardAvoidingView, Platform } from "react-native";
+import { View, FlatList, KeyboardAvoidingView, Platform, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ChatMessage } from "../../../components";
+import { ChatMessage, Button } from "../../../components";
 import {
   ChatHeader,
   EmptyChat,
@@ -14,6 +14,8 @@ import {
   ChatMessage as GeminiMessage,
 } from "../../../services/chatApi";
 import { useBottomTabBarHeight } from "react-native-bottom-tabs";
+import useSubscriptionStore from "../../../store/useSubscriptionStore";
+import { revenueCatService } from "../../../services/revenueCatService";
 
 export function Chat() {
   const [chatMessages, setChatMessages] = useState<
@@ -24,6 +26,7 @@ export function Chat() {
   const [isTyping, setIsTyping] = useState(false);
   const flatListRef = useRef<FlatList>(null);
   const bottomTabHeight = useBottomTabBarHeight();
+  const { isSubscribed } = useSubscriptionStore();
   useEffect(() => {
     if (chatMessages.length > 0) {
       setTimeout(() => {
@@ -85,6 +88,42 @@ export function Chat() {
     setChatMessages([]);
     setChatHistory([]);
   };
+
+  const handleSubscribe = async () => {
+    try {
+      const offering = await revenueCatService.getOfferings();
+      if (offering?.availablePackages.length) {
+        await revenueCatService.purchase(offering.availablePackages[0]);
+      }
+    } catch (error: any) {
+      if (!error.userCancelled) {
+        console.error("Purchase failed:", error);
+      }
+    }
+  };
+
+  if (!isSubscribed) {
+    return (
+      <SafeAreaView style={styles.container} edges={["top"]}>
+        <ChatHeader hasMessages={false} onClear={clearChat} />
+        <View style={styles.lockedContainer}>
+          <Text style={styles.lockedEmoji}>🔒</Text>
+          <Text style={styles.lockedTitle}>AI Chat is a Pro Feature</Text>
+          <Text style={styles.lockedText}>
+            Subscribe to Buffet AI Pro to unlock the AI chatbot and get
+            personalized investment advice.
+          </Text>
+          <Button
+            title="Subscribe to Pro"
+            onPress={handleSubscribe}
+            fullWidth
+            size="large"
+          />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       <ChatHeader hasMessages={chatMessages.length > 0} onClear={clearChat} />

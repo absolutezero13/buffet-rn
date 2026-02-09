@@ -130,4 +130,28 @@ export const styles = StyleSheet.create({
   inputSafeArea: {
     height: 34,
   },
+  lockedContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: theme.spacing.xl,
+  },
+  lockedEmoji: {
+    fontSize: 64,
+    marginBottom: theme.spacing.lg,
+  },
+  lockedTitle: {
+    color: theme.colors.text,
+    fontSize: theme.fontSize.xl,
+    fontWeight: theme.fontWeight.bold,
+    textAlign: "center",
+    marginBottom: theme.spacing.sm,
+  },
+  lockedText: {
+    color: theme.colors.textSecondary,
+    fontSize: theme.fontSize.md,
+    textAlign: "center",
+    lineHeight: 22,
+    marginBottom: theme.spacing.xl,
+  },
 });

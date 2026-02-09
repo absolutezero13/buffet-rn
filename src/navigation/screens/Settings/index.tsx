@@ -15,16 +15,28 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { STORAGE_KEYS } from "../../constants";
 import useUserAssets from "../../../store/useUserAssets";
 import useUserStore from "../../../store/useUserStore";
+import useSubscriptionStore from "../../../store/useSubscriptionStore";
+import { revenueCatService } from "../../../services/revenueCatService";
 
 export function Settings() {
   const { userCurrency } = useCurrencyStore();
   const { weightUnit } = useWeightUnitStore();
+  const { isSubscribed } = useSubscriptionStore();
 
   const clearUser = () => {
     AsyncStorage.removeItem(STORAGE_KEYS.USER);
     AsyncStorage.removeItem(STORAGE_KEYS.ASSETS);
     useUserAssets.setState({ userAssets: [] });
     useUserStore.setState({ hasOnboarded: false });
+  };
+
+  const handleRestorePurchases = async () => {
+    try {
+      await revenueCatService.restorePurchases();
+      Alert.alert("Success", "Purchases restored successfully.");
+    } catch (error) {
+      Alert.alert("Error", "Could not restore purchases. Please try again.");
+    }
   };
 
   const handleSignOut = () => {
@@ -94,6 +106,21 @@ export function Settings() {
               <Text style={styles.currency}>{weightUnit?.fullName}</Text>
             </GlassCard>
           </Pressable>
+
+          <GlassCard effect="clear" style={styles.card}>
+            <Text style={styles.sectionTitle}>Subscription</Text>
+            <Text style={styles.sectionDescription}>
+              {isSubscribed
+                ? "You have an active Pro subscription."
+                : "Subscribe to unlock AI Chat and historical charts."}
+            </Text>
+            <Button
+              title="Restore Purchases"
+              variant="ghost"
+              onPress={handleRestorePurchases}
+              fullWidth
+            />
+          </GlassCard>
 
           <GlassCard effect="clear" style={styles.card}>
             <Text style={styles.sectionTitle}>Manage Account</Text>
