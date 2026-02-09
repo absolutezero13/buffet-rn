@@ -39,6 +39,7 @@ export const styles = StyleSheet.create({
     color: theme.colors.textMuted,
     fontSize: theme.fontSize.sm,
     marginBottom: theme.spacing.md,
+    marginTop: theme.spacing.xs,
   },
   currencyOptions: {
     flexDirection: "row",

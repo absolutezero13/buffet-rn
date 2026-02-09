@@ -62,7 +62,7 @@ export const styles = StyleSheet.create({
     marginRight: theme.spacing.md,
   },
   nextButton: {
-    flex: 2,
+    flex: 1,
   },
   getStartedButton: {
     flex: 1,

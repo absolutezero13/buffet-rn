@@ -71,7 +71,7 @@ export function Settings() {
           </Pressable>
 
           <GlassCard effect="clear" style={styles.card}>
-            <Text style={styles.sectionTitle}>Account</Text>
+            <Text style={styles.sectionTitle}>Manage Account</Text>
             <Text style={styles.sectionDescription}>
               Signing out will remove all saved data from this device.
             </Text>

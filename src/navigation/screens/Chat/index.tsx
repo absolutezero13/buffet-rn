@@ -9,15 +9,13 @@ import {
   ChatInput,
 } from "./components";
 import { styles } from "./styles";
-import useUserAssets from "../../../store/useUserAssets";
-import { useBottomTabBarHeight } from "react-native-bottom-tabs";
 import {
   chatApi,
   ChatMessage as GeminiMessage,
 } from "../../../services/chatApi";
+import { useBottomTabBarHeight } from "react-native-bottom-tabs";
 
 export function Chat() {
-  const { userAssets: assets } = useUserAssets();
   const [chatMessages, setChatMessages] = useState<
     { id: string; role: "user" | "assistant"; content: string }[]
   >([]);
@@ -25,6 +23,7 @@ export function Chat() {
   const [inputText, setInputText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const flatListRef = useRef<FlatList>(null);
+  const bottomTabHeight = useBottomTabBarHeight();
   useEffect(() => {
     if (chatMessages.length > 0) {
       setTimeout(() => {
@@ -93,7 +92,7 @@ export function Chat() {
       <KeyboardAvoidingView
         style={styles.chatContainer}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={100}
+        keyboardVerticalOffset={-bottomTabHeight}
       >
         <FlatList
           ref={flatListRef}
