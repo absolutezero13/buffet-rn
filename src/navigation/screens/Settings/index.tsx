@@ -27,7 +27,7 @@ export function Settings() {
     AsyncStorage.removeItem(STORAGE_KEYS.USER);
     AsyncStorage.removeItem(STORAGE_KEYS.ASSETS);
     useUserAssets.setState({ userAssets: [] });
-    useUserStore.setState({ hasOnboarded: false });
+    useUserStore.setState({ hasOnboarded: false, onboardingCompleted: false });
   };
 
   const handleRestorePurchases = async () => {

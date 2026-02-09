@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, FlatList, KeyboardAvoidingView, Platform, Text } from "react-native";
+import { View, FlatList, KeyboardAvoidingView, Platform, Text, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ChatMessage, Button } from "../../../components";
 import {
@@ -97,7 +97,7 @@ export function Chat() {
       }
     } catch (error: any) {
       if (!error.userCancelled) {
-        console.error("Purchase failed:", error);
+        Alert.alert("Error", "Purchase failed. Please try again.");
       }
     }
   };

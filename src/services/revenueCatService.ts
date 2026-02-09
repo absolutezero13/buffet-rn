@@ -5,13 +5,13 @@ import Purchases, {
 import { Platform } from "react-native";
 import useSubscriptionStore from "../store/useSubscriptionStore";
 
+// Replace with your RevenueCat API keys
 const API_KEY = Platform.select({
   ios: "YOUR_REVENUECAT_IOS_API_KEY",
   android: "YOUR_REVENUECAT_ANDROID_API_KEY",
 }) as string;
 
 const ENTITLEMENT_ID = "pro";
-const PRODUCT_ID = "buffet.monthly";
 
 function updateSubscriptionStatus(customerInfo: CustomerInfo) {
   const isActive =
