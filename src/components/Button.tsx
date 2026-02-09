@@ -55,20 +55,6 @@ export function Button({
     }
   };
 
-  const getTintColor = (): string | undefined => {
-    if (disabled) return theme.colors.surfaceLighter;
-    switch (variant) {
-      case "secondary":
-        return theme.colors.secondary;
-      case "danger":
-        return theme.colors.danger;
-      case "ghost":
-        return undefined;
-      default:
-        return theme.colors.primary;
-    }
-  };
-
   const getSizeStyles = (): ViewStyle => {
     switch (size) {
       case "small":

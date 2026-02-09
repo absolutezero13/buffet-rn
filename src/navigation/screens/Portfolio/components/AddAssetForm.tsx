@@ -54,7 +54,15 @@ export function AddAssetForm({
     >
       <View style={styles.sheetHeader}>
         <Text style={styles.sheetTitle}>Add Asset</Text>
-        <Button title="✕" variant="ghost" size="small" onPress={onClose} />
+        <Button
+          title="✕"
+          size="small"
+          variant="ghost"
+          onPress={onClose}
+          style={{
+            width: 50,
+          }}
+        />
       </View>
 
       <View style={styles.sheetBody}>

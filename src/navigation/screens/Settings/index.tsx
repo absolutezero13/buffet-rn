@@ -6,7 +6,11 @@ import { styles } from "./styles";
 import CurrencyBottomSheet, {
   globalCurrencyBottomSheetRef,
 } from "./components/CurrencyBottomSheet";
+import WeightUnitBottomSheet, {
+  globalWeightUnitBottomSheetRef,
+} from "./components/WeightUnitBottomSheet";
 import useCurrencyStore from "../../../store/useCurrencyStore";
+import useWeightUnitStore from "../../../store/useWeightUnitStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { STORAGE_KEYS } from "../../constants";
 import useUserAssets from "../../../store/useUserAssets";
@@ -14,6 +18,7 @@ import useUserStore from "../../../store/useUserStore";
 
 export function Settings() {
   const { userCurrency } = useCurrencyStore();
+  const { weightUnit } = useWeightUnitStore();
 
   const clearUser = () => {
     AsyncStorage.removeItem(STORAGE_KEYS.USER);
@@ -70,6 +75,26 @@ export function Settings() {
             </GlassCard>
           </Pressable>
 
+          <Pressable
+            onPress={() => globalWeightUnitBottomSheetRef.current?.present()}
+          >
+            <GlassCard
+              interactive
+              effect="clear"
+              style={{
+                ...styles.card,
+                ...{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                },
+              }}
+            >
+              <Text style={styles.sectionTitle}>Commodity weight unit</Text>
+              <Text style={styles.currency}>{weightUnit?.fullName}</Text>
+            </GlassCard>
+          </Pressable>
+
           <GlassCard effect="clear" style={styles.card}>
             <Text style={styles.sectionTitle}>Manage Account</Text>
             <Text style={styles.sectionDescription}>
@@ -87,6 +112,7 @@ export function Settings() {
       </SafeAreaView>
 
       <CurrencyBottomSheet />
+      <WeightUnitBottomSheet />
     </>
   );
 }

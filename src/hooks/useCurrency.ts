@@ -1,11 +1,23 @@
 import { useCallback, useMemo } from "react";
 import useCurrencyStore from "../store/useCurrencyStore";
-import { CurrencyCode } from "../navigation/constants";
+import useWeightUnitStore from "../store/useWeightUnitStore";
+import { CurrencyCode, COMMODITY_OPTIONS } from "../navigation/constants";
 import { Asset } from "../services/types";
+
+/**
+ * Check if an asset is a commodity (precious metal)
+ */
+const isCommodityAsset = (asset: Asset): boolean => {
+  return (
+    asset.type === "gold" ||
+    COMMODITY_OPTIONS.some((c) => c.symbol === asset.symbol)
+  );
+};
 
 /**
  * Hook for currency conversion and formatting utilities
  * All prices from API are in USD, this hook helps convert them to user's currency
+ * Commodity prices are always in USD per troy ounce - converted to user's weight unit
  */
 export function useCurrency() {
   const {
@@ -16,6 +28,8 @@ export function useCurrency() {
     exchangeRates,
   } = useCurrencyStore();
 
+  const { weightUnit, convertFromOunce, getUnitLabel } = useWeightUnitStore();
+
   /**
    * Format a USD amount in user's currency with symbol
    */
@@ -25,6 +39,31 @@ export function useCurrency() {
       return `${userCurrency.symbol}${converted.toFixed(decimals)}`;
     },
     [userCurrency, convertFromUSD],
+  );
+
+  /**
+   * Format a commodity price (per ounce from API) in user's currency and weight unit
+   * @param pricePerOunceUSD - Price in USD per troy ounce
+   */
+  const formatCommodityPrice = useCallback(
+    (pricePerOunceUSD: number, decimals = 2): string => {
+      const priceInUserCurrency = convertFromUSD(pricePerOunceUSD);
+      const priceInUserUnit = convertFromOunce(priceInUserCurrency);
+      return `${userCurrency.symbol}${priceInUserUnit.toFixed(decimals)}/${getUnitLabel()}`;
+    },
+    [userCurrency, convertFromUSD, convertFromOunce, getUnitLabel],
+  );
+
+  /**
+   * Convert a commodity price from per-ounce USD to user's currency and weight unit
+   * @param pricePerOunceUSD - Price in USD per troy ounce
+   */
+  const convertCommodityPrice = useCallback(
+    (pricePerOunceUSD: number): number => {
+      const priceInUserCurrency = convertFromUSD(pricePerOunceUSD);
+      return convertFromOunce(priceInUserCurrency);
+    },
+    [convertFromUSD, convertFromOunce],
   );
 
   /**
@@ -55,6 +94,7 @@ export function useCurrency() {
   /**
    * Get the display value for an asset (current price in user currency)
    * Asset prices from API are always in USD
+   * Note: For commodities, the total value is still price * quantity (quantity is in the original unit)
    */
   const getAssetCurrentValue = useCallback(
     (asset: Asset): number => {
@@ -106,34 +146,50 @@ export function useCurrency() {
 
   /**
    * Get the purchase price per unit in user's current currency
+   * For commodities, converts to user's weight unit
    */
   const getAssetPurchasePrice = useCallback(
     (asset: Asset): number => {
-      return convertBetweenCurrencies(
+      const priceInUserCurrency = convertBetweenCurrencies(
         asset.purchasePrice,
         asset.purchaseCurrency as CurrencyCode,
         userCurrency.id,
       );
+      // For commodities, convert from per-ounce to user's weight unit
+      if (isCommodityAsset(asset)) {
+        return convertFromOunce(priceInUserCurrency);
+      }
+      return priceInUserCurrency;
     },
-    [userCurrency, convertBetweenCurrencies],
+    [userCurrency, convertBetweenCurrencies, convertFromOunce],
   );
 
   /**
    * Get the current price per unit in user's currency
-   * (API returns prices in USD)
+   * For commodities, converts to user's weight unit
+   * (API returns prices in USD per troy ounce for commodities)
    */
   const getAssetCurrentPrice = useCallback(
     (asset: Asset): number => {
-      return convertFromUSD(asset.currentPrice);
+      const priceInUserCurrency = convertFromUSD(asset.currentPrice);
+      // For commodities, convert from per-ounce to user's weight unit
+      if (isCommodityAsset(asset)) {
+        return convertFromOunce(priceInUserCurrency);
+      }
+      return priceInUserCurrency;
     },
-    [convertFromUSD],
+    [convertFromUSD, convertFromOunce],
   );
 
   return {
     userCurrency,
+    weightUnit,
+    weightUnitLabel: getUnitLabel(),
     currencySymbol: userCurrency.symbol,
     exchangeRates,
     formatPrice,
+    formatCommodityPrice,
+    convertCommodityPrice,
     toUserCurrency,
     convertPurchasePrice,
     getAssetCurrentValue,
@@ -141,5 +197,6 @@ export function useCurrency() {
     getAssetGainLoss,
     getAssetPurchasePrice,
     getAssetCurrentPrice,
+    isCommodityAsset,
   };
 }

@@ -56,8 +56,13 @@ export function AssetCard({ asset, onDelete }: AssetCardProps) {
   };
 
   return (
-    <Pressable onPress={handlePress}>
-      <GlassCard effect="clear" style={styles.container} interactive>
+    <GlassCard
+      tintColor={theme.colors.surfaceLight}
+      effect="clear"
+      style={styles.container}
+      interactive
+    >
+      <Pressable onPress={handlePress}>
         <View style={styles.header}>
           <View style={styles.headerLeft}>
             <Text style={styles.typeEmoji}>{getTypeLabel()}</Text>
@@ -66,9 +71,6 @@ export function AssetCard({ asset, onDelete }: AssetCardProps) {
               <Text style={styles.name}>{asset.name}</Text>
             </View>
           </View>
-          <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
-            <Text style={styles.deleteText}>✕</Text>
-          </TouchableOpacity>
         </View>
 
         <View style={styles.details}>
@@ -130,8 +132,8 @@ export function AssetCard({ asset, onDelete }: AssetCardProps) {
             </Text>
           </View>
         </View>
-      </GlassCard>
-    </Pressable>
+      </Pressable>
+    </GlassCard>
   );
 }
 
@@ -162,18 +164,7 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     fontSize: theme.fontSize.sm,
   },
-  deleteButton: {
-    width: 32,
-    height: 32,
-    borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.colors.glass,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  deleteText: {
-    color: theme.colors.textMuted,
-    fontSize: theme.fontSize.md,
-  },
+
   details: {
     borderTopWidth: 1,
     borderBottomWidth: 1,
