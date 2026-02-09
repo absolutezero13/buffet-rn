@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { theme } from "../theme";
 import { api } from "../services/api";
+import { COMMODITY_OPTIONS } from "../navigation/constants";
 
 export interface SearchResult {
   symbol: string;
@@ -24,13 +25,6 @@ interface AssetSearchDropdownProps {
   selectedValue?: SearchResult | null;
   placeholder?: string;
 }
-
-export const COMMODITY_OPTIONS: SearchResult[] = [
-  { symbol: "XAU", name: "Gold", yahoofinanceId: "GC=F" },
-  { symbol: "XAG", name: "Silver", yahoofinanceId: "SI=F" },
-  { symbol: "XPT", name: "Platinum", yahoofinanceId: "PL=F" },
-  { symbol: "XPD", name: "Palladium", yahoofinanceId: "PA=F" },
-];
 
 export function AssetSearchDropdown({
   assetType,
@@ -223,6 +217,7 @@ const styles = StyleSheet.create({
   },
   clearButton: {
     padding: theme.spacing.md,
+    width: 32,
   },
   clearText: {
     color: theme.colors.textMuted,

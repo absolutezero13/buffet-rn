@@ -7,9 +7,20 @@ import CurrencyBottomSheet, {
   globalCurrencyBottomSheetRef,
 } from "./components/CurrencyBottomSheet";
 import useCurrencyStore from "../../../store/useCurrencyStore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { STORAGE_KEYS } from "../../constants";
+import useUserAssets from "../../../store/useUserAssets";
+import useUserStore from "../../../store/useUserStore";
 
 export function Settings() {
   const { userCurrency } = useCurrencyStore();
+
+  const clearUser = () => {
+    AsyncStorage.removeItem(STORAGE_KEYS.USER);
+    AsyncStorage.removeItem(STORAGE_KEYS.ASSETS);
+    useUserAssets.setState({ userAssets: [] });
+    useUserStore.setState({ hasOnboarded: false });
+  };
 
   const handleSignOut = () => {
     Alert.alert(
@@ -20,7 +31,7 @@ export function Settings() {
         {
           text: "Sign Out",
           style: "destructive",
-          onPress: () => {},
+          onPress: clearUser,
         },
       ],
     );

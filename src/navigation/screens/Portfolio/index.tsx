@@ -152,7 +152,7 @@ export function Portfolio() {
         detents={["auto"]}
         cornerRadius={24}
         onDidDismiss={resetForm}
-        backgroundColor={theme.colors.background}
+        backgroundColor={theme.colors.surface}
         insetAdjustment="never"
         blurOptions={{
           interaction: false,

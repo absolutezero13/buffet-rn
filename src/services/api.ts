@@ -1,5 +1,5 @@
 import axios from "axios";
-import { CurrencyCode } from "../navigation/constants";
+import { COMMODITY_OPTIONS, CurrencyCode } from "../navigation/constants";
 import {
   StockQuote,
   AssetType,
@@ -7,7 +7,6 @@ import {
   AlpacaBar,
   CoinGeckoCoin,
 } from "./types";
-import { COMMODITY_OPTIONS } from "../components/AssetSearchDropdown";
 
 // Backend API base URL
 const API_BASE = "http://127.0.0.1:5001/buffet-ai-x/us-central1/api";

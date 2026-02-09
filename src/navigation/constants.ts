@@ -1,3 +1,5 @@
+import { SearchResult } from "../components";
+
 export type CurrencyCode = "USD" | "EUR" | "GBP";
 
 export type CurrencyOption = {
@@ -24,6 +26,12 @@ export const currencyOptions: CurrencyOption[] = [
   },
 ];
 
+export const COMMODITY_OPTIONS: SearchResult[] = [
+  { symbol: "XAU", name: "Gold", yahoofinanceId: "GC=F" },
+  { symbol: "XAG", name: "Silver", yahoofinanceId: "SI=F" },
+  { symbol: "XPT", name: "Platinum", yahoofinanceId: "PL=F" },
+  { symbol: "XPD", name: "Palladium", yahoofinanceId: "PA=F" },
+];
 export const STORAGE_KEYS = {
   ASSETS: "USER_ASSETS",
   USER: "USER",
