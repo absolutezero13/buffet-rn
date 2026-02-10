@@ -1,6 +1,7 @@
 export { GlassCard } from "./GlassCard";
 export { GlassContainer } from "./GlassContainer";
 export { Button } from "./Button";
+export { IconButton } from "./IconButton";
 export { TextInput } from "./TextInput";
 export { AssetCard } from "./AssetCard";
 export { AssetSearchDropdown } from "./AssetSearchDropdown";

@@ -1,8 +1,10 @@
 import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text } from "react-native";
 import { styles } from "../styles";
 import { LiquidGlassView } from "@callstack/liquid-glass";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { IconButton } from "../../../../components";
+import { theme } from "../../../../theme";
 
 interface AssetHeaderProps {
   symbol: string;
@@ -23,16 +25,12 @@ export function AssetHeader({
       effect="clear"
       style={[styles.header, { paddingTop: top }]}
     >
-      <TouchableOpacity onPress={onBack} style={styles.backButton}>
-        <Text style={styles.backText}>←</Text>
-      </TouchableOpacity>
+      <IconButton icon="arrow-back" size="medium" variant="ghost" onPress={onBack} />
       <View style={styles.headerCenter}>
         <Text style={styles.symbol}>{symbol}</Text>
         <Text style={styles.type}>{typeLabel}</Text>
       </View>
-      <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
-        <Text style={styles.deleteText}>🗑️</Text>
-      </TouchableOpacity>
+      <IconButton icon="delete-outline" size="medium" variant="ghost" onPress={onDelete} iconColor={theme.colors.danger} />
     </LiquidGlassView>
   );
 }

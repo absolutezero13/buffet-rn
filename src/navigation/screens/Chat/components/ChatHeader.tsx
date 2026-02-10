@@ -1,8 +1,9 @@
 import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { Text } from "react-native";
 import { styles } from "../styles";
 import { LiquidGlassView } from "@callstack/liquid-glass";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { IconButton } from "../../../../components";
 
 interface ChatHeaderProps {
   hasMessages: boolean;
@@ -18,9 +19,7 @@ export function ChatHeader({ hasMessages, onClear }: ChatHeaderProps) {
     >
       <Text style={styles.title}>AI Assistant</Text>
       {hasMessages && (
-        <TouchableOpacity onPress={onClear}>
-          <Text style={styles.clearButton}>Clear</Text>
-        </TouchableOpacity>
+        <IconButton icon="delete-outline" size="medium" variant="ghost" onPress={onClear} />
       )}
     </LiquidGlassView>
   );

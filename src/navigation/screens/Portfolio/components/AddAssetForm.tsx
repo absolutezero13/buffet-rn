@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import {
   Button,
+  IconButton,
   TextInput,
   TypeSelector,
   AssetSearchDropdown,
@@ -54,14 +55,11 @@ export function AddAssetForm({
     >
       <View style={styles.sheetHeader}>
         <Text style={styles.sheetTitle}>Add Asset</Text>
-        <Button
-          title="✕"
+        <IconButton
+          icon="close"
           size="small"
           variant="ghost"
           onPress={onClose}
-          style={{
-            width: 50,
-          }}
         />
       </View>
 

@@ -8,6 +8,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 import { theme } from "../theme";
 import { api } from "../services/api";
 import { COMMODITY_OPTIONS } from "../navigation/constants";
@@ -143,7 +144,7 @@ export function AssetSearchDropdown({
         )}
         {query.length > 0 && !isLoading && (
           <TouchableOpacity onPress={handleClear} style={styles.clearButton}>
-            <Text style={styles.clearText}>✕</Text>
+            <MaterialIcons name="close" size={18} color={theme.colors.textMuted} />
           </TouchableOpacity>
         )}
       </View>
@@ -217,11 +218,8 @@ const styles = StyleSheet.create({
   },
   clearButton: {
     padding: theme.spacing.md,
-    width: 32,
-  },
-  clearText: {
-    color: theme.colors.textMuted,
-    fontSize: theme.fontSize.md,
+    alignItems: "center",
+    justifyContent: "center",
   },
   dropdown: {
     position: "absolute",

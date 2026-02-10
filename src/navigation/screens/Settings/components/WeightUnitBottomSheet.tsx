@@ -3,6 +3,7 @@ import { BottomSheet } from "../../../../components/BottomSheet";
 import { weightUnitOptions } from "../../../constants";
 import { Text, TouchableOpacity, View, StyleSheet } from "react-native";
 import { TrueSheet } from "@lodev09/react-native-true-sheet";
+import { MaterialIcons } from "@expo/vector-icons";
 import { Button } from "../../../../components";
 import useWeightUnitStore from "../../../../store/useWeightUnitStore";
 import { theme } from "../../../../theme";
@@ -58,7 +59,7 @@ const WeightUnitBottomSheet = () => {
               </View>
               {isActive && (
                 <View style={localStyles.checkmark}>
-                  <Text style={localStyles.checkmarkText}>✓</Text>
+                  <MaterialIcons name="check" size={18} color={theme.colors.background} />
                 </View>
               )}
             </TouchableOpacity>
@@ -143,11 +144,6 @@ const localStyles = StyleSheet.create({
     backgroundColor: theme.colors.primary,
     alignItems: "center",
     justifyContent: "center",
-  },
-  checkmarkText: {
-    color: theme.colors.background,
-    fontSize: 16,
-    fontWeight: theme.fontWeight.bold,
   },
 });
 

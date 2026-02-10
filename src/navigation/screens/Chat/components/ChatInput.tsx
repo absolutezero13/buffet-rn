@@ -1,16 +1,11 @@
 import React from "react";
-import {
-  View,
-  TextInput as RNTextInput,
-  TouchableOpacity,
-  Text,
-} from "react-native";
+import { View, TextInput as RNTextInput } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { theme } from "../../../../theme";
 import { styles } from "../styles";
 import { useBottomTabBarHeight } from "react-native-bottom-tabs";
-import Animated, { useAnimatedStyle } from "react-native-reanimated";
-import { useKeyboardAnimation } from "react-native-keyboard-controller";
+import { IconButton } from "../../../../components";
+
 interface ChatInputProps {
   value: string;
   onChangeText: (text: string) => void;
@@ -26,15 +21,7 @@ export function ChatInput({
 }: ChatInputProps) {
   const canSend = value.trim() && !isDisabled;
   const tabBarHeight = useBottomTabBarHeight();
-  // const { height } = useKeyboardAnimation();
-  // console.log("Keyboard height:", height);
 
-  // const inputStyle = useAnimatedStyle(
-  //   () => ({
-  //     height,
-  //   }),
-  //   [],
-  // );
   return (
     <View style={styles.inputContainer}>
       <LinearGradient
@@ -50,25 +37,15 @@ export function ChatInput({
           multiline
           maxLength={500}
         />
-        <TouchableOpacity
-          style={[styles.sendButton, !canSend && styles.sendButtonDisabled]}
+        <IconButton
+          icon="arrow-upward"
+          size="small"
+          variant={canSend ? "primary" : "ghost"}
           onPress={onSend}
           disabled={!canSend}
-        >
-          <LinearGradient
-            colors={
-              canSend
-                ? [theme.colors.primary, theme.colors.primaryLight]
-                : [theme.colors.surfaceLighter, theme.colors.surface]
-            }
-            style={styles.sendButtonGradient}
-          >
-            <Text style={styles.sendButtonText}>↑</Text>
-          </LinearGradient>
-        </TouchableOpacity>
+        />
       </LinearGradient>
       <View style={[styles.inputSafeArea, { height: tabBarHeight }]} />
-      {/* <Animated.View style={inputStyle} /> */}
     </View>
   );
 }

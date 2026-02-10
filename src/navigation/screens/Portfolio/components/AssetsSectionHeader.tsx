@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text } from "react-native";
-import { Button } from "../../../../components";
+import { IconButton } from "../../../../components";
 import { styles } from "../styles";
 
 interface AssetsSectionHeaderProps {
@@ -21,15 +21,20 @@ export function AssetsSectionHeader({
       <Text style={styles.sectionTitle}>Your Assets</Text>
       <View style={styles.headerButtons}>
         {hasAssets && (
-          <Button
-            title={isRefreshing ? "⟳" : "↻"}
+          <IconButton
+            icon="refresh"
             size="small"
             variant="secondary"
             onPress={onRefresh}
-            style={styles.refreshButton}
+            disabled={isRefreshing}
           />
         )}
-        <Button title="+ Add" size="small" onPress={onAddAsset} />
+        <IconButton
+          icon="add"
+          size="small"
+          variant="primary"
+          onPress={onAddAsset}
+        />
       </View>
     </View>
   );
