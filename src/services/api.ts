@@ -9,7 +9,7 @@ import {
 } from "./types";
 
 // Backend API base URL
-const API_BASE = "http://127.0.0.1:5001/buffet-ai-x/us-central1/api";
+const API_BASE = "https://api-cq6jajwdtq-uc.a.run.app/";
 
 export const apiClient = axios.create({
   baseURL: API_BASE,

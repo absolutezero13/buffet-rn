@@ -23,6 +23,7 @@ export function Chat() {
   const [inputText, setInputText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const flatListRef = useRef<FlatList>(null);
+
   const bottomTabHeight = useBottomTabBarHeight();
   useEffect(() => {
     if (chatMessages.length > 0) {
@@ -89,17 +90,18 @@ export function Chat() {
   return (
     <>
       <ChatHeader hasMessages={chatMessages.length > 0} onClear={clearChat} />
-      <View style={styles.container}>
+      <KeyboardAvoidingView
+        behavior="padding"
+        style={styles.container}
+        keyboardVerticalOffset={-bottomTabHeight}
+      >
         <View style={styles.chatContainer}>
           <FlatList
             ref={flatListRef}
             data={chatMessages}
             renderItem={({ item }) => <ChatMessage message={item} />}
             keyExtractor={(item) => item.id}
-            contentContainerStyle={[
-              styles.messageList,
-              { paddingBottom: bottomTabHeight + 50 },
-            ]}
+            contentContainerStyle={[styles.messageList, { paddingBottom: 0 }]}
             ListEmptyComponent={
               <EmptyChat onSuggestionPress={handleSuggestionPress} />
             }
@@ -115,7 +117,7 @@ export function Chat() {
             isDisabled={isTyping}
           />
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </>
   );
 }

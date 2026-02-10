@@ -146,7 +146,7 @@ export const styles = StyleSheet.create({
   timeRangeRow: {
     flexDirection: "row",
     justifyContent: "center",
-    marginBottom: theme.spacing.lg,
+    marginTop: theme.spacing.lg,
     gap: theme.spacing.xs,
   },
   timeRangeButton: {

@@ -99,9 +99,6 @@ export const styles = StyleSheet.create({
   inputContainer: {
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm,
-    position: "absolute",
-    bottom: 0,
-    width: "100%",
   },
   inputGradient: {
     flexDirection: "row",

@@ -11,6 +11,7 @@ import { theme } from "../../../../theme";
 import { Button } from "../../../../components";
 import { styles, CHART_WIDTH } from "../styles";
 import useCurrencyStore from "../../../../store/useCurrencyStore";
+import GlassPicker from "../../../../components/GlassPicker";
 
 interface ChartDataPoint {
   value: number;
@@ -58,28 +59,6 @@ export function PriceChart({
 
   return (
     <View style={styles.chartCard}>
-      <View style={styles.timeRangeRow}>
-        {timeRanges.map((range, index) => (
-          <TouchableOpacity
-            key={range.label}
-            style={[
-              styles.timeRangeButton,
-              selectedRange === index && styles.timeRangeButtonActive,
-            ]}
-            onPress={() => onRangeChange(index)}
-          >
-            <Text
-              style={[
-                styles.timeRangeText,
-                selectedRange === index && styles.timeRangeTextActive,
-              ]}
-            >
-              {range.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
       {isLoading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
@@ -166,6 +145,32 @@ export function PriceChart({
             }}
             yAxisOffset={minValue * 0.995}
           />
+          <View style={styles.timeRangeRow}>
+            {/* {timeRanges.map((range, index) => (
+          <TouchableOpacity
+            key={range.label}
+            style={[
+              styles.timeRangeButton,
+              selectedRange === index && styles.timeRangeButtonActive,
+            ]}
+            onPress={() => onRangeChange(index)}
+          >
+            <Text
+              style={[
+                styles.timeRangeText,
+                selectedRange === index && styles.timeRangeTextActive,
+              ]}
+            >
+              {range.label}
+            </Text>
+          </TouchableOpacity>
+        ))} */}
+            <GlassPicker
+              options={timeRanges.map((r) => r.label)}
+              selectedIndex={selectedRange}
+              setSelectedIndex={onRangeChange}
+            />
+          </View>
         </View>
       ) : (
         <View style={styles.noDataContainer}>
