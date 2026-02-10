@@ -1,12 +1,19 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { Text } from "react-native";
 import { styles } from "../styles";
+import { LiquidGlassView } from "@callstack/liquid-glass";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { theme } from "../../../../theme";
 
 export function PortfolioHeader() {
+  const { top } = useSafeAreaInsets();
   return (
-    <View style={styles.header}>
+    <LiquidGlassView
+      effect="clear"
+      style={[styles.header, { paddingTop: top }]}
+    >
       <Text style={styles.title}>Portfolio</Text>
       <Text style={styles.subtitle}>Track your investments</Text>
-    </View>
+    </LiquidGlassView>
   );
 }

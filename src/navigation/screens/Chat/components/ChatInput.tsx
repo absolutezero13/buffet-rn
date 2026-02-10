@@ -9,7 +9,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import { theme } from "../../../../theme";
 import { styles } from "../styles";
 import { useBottomTabBarHeight } from "react-native-bottom-tabs";
-
+import Animated, { useAnimatedStyle } from "react-native-reanimated";
+import { useKeyboardAnimation } from "react-native-keyboard-controller";
 interface ChatInputProps {
   value: string;
   onChangeText: (text: string) => void;
@@ -25,7 +26,15 @@ export function ChatInput({
 }: ChatInputProps) {
   const canSend = value.trim() && !isDisabled;
   const tabBarHeight = useBottomTabBarHeight();
+  const { height } = useKeyboardAnimation();
+  console.log("Keyboard height:", height);
 
+  const inputStyle = useAnimatedStyle(
+    () => ({
+      height,
+    }),
+    [],
+  );
   return (
     <View style={styles.inputContainer}>
       <LinearGradient
@@ -59,6 +68,7 @@ export function ChatInput({
         </TouchableOpacity>
       </LinearGradient>
       <View style={[styles.inputSafeArea, { height: tabBarHeight }]} />
+      <Animated.View style={inputStyle} />
     </View>
   );
 }

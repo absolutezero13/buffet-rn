@@ -4,6 +4,7 @@ import { theme } from "../../../theme";
 const { width } = Dimensions.get("window");
 
 export const CHART_WIDTH = width;
+export const HEADER_HEIGHT = 140;
 
 export const styles = StyleSheet.create({
   container: {
@@ -16,6 +17,14 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.md,
+    position: "absolute",
+    top: -1,
+    left: -1,
+    right: -1,
+    zIndex: 100,
+    borderBottomEndRadius: theme.borderRadius.xxl,
+    borderBottomStartRadius: theme.borderRadius.xxl,
+    height: HEADER_HEIGHT,
   },
   backButton: {
     width: 40,
@@ -54,6 +63,9 @@ export const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+  },
+  contentContainer: {
+    paddingTop: HEADER_HEIGHT,
   },
   notFound: {
     flex: 1,

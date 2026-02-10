@@ -1,5 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, FlatList, KeyboardAvoidingView, Platform, Text, Alert } from "react-native";
+import {
+  View,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  Text,
+  Alert,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ChatMessage, Button } from "../../../components";
 import {
@@ -15,7 +22,6 @@ import {
 } from "../../../services/chatApi";
 import { useBottomTabBarHeight } from "react-native-bottom-tabs";
 import useSubscriptionStore from "../../../store/useSubscriptionStore";
-import { revenueCatService } from "../../../services/revenueCatService";
 
 export function Chat() {
   const [chatMessages, setChatMessages] = useState<
@@ -31,7 +37,7 @@ export function Chat() {
     if (chatMessages.length > 0) {
       setTimeout(() => {
         flatListRef.current?.scrollToEnd({ animated: true });
-      }, 100);
+      }, 200);
     }
   }, [chatMessages]);
 
@@ -89,71 +95,36 @@ export function Chat() {
     setChatHistory([]);
   };
 
-  const handleSubscribe = async () => {
-    try {
-      const offering = await revenueCatService.getOfferings();
-      if (offering?.availablePackages.length) {
-        await revenueCatService.purchase(offering.availablePackages[0]);
-      }
-    } catch (error: any) {
-      if (!error.userCancelled) {
-        Alert.alert("Error", "Purchase failed. Please try again.");
-      }
-    }
-  };
+  return (
+    <>
+      <ChatHeader hasMessages={chatMessages.length > 0} onClear={clearChat} />
+      <View style={styles.container}>
+        <View style={styles.chatContainer}>
+          <FlatList
+            ref={flatListRef}
+            data={chatMessages}
+            renderItem={({ item }) => <ChatMessage message={item} />}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={[
+              styles.messageList,
+              { paddingBottom: bottomTabHeight + 50 },
+            ]}
+            ListEmptyComponent={
+              <EmptyChat onSuggestionPress={handleSuggestionPress} />
+            }
+            showsVerticalScrollIndicator={false}
+          />
 
-  if (!isSubscribed) {
-    return (
-      <SafeAreaView style={styles.container} edges={["top"]}>
-        <ChatHeader hasMessages={false} onClear={clearChat} />
-        <View style={styles.lockedContainer}>
-          <Text style={styles.lockedEmoji}>🔒</Text>
-          <Text style={styles.lockedTitle}>AI Chat is a Pro Feature</Text>
-          <Text style={styles.lockedText}>
-            Subscribe to Buffet AI Pro to unlock the AI chatbot and get
-            personalized investment advice.
-          </Text>
-          <Button
-            title="Subscribe to Pro"
-            onPress={handleSubscribe}
-            fullWidth
-            size="large"
+          {isTyping && <TypingIndicator />}
+
+          <ChatInput
+            value={inputText}
+            onChangeText={setInputText}
+            onSend={handleSend}
+            isDisabled={isTyping}
           />
         </View>
-      </SafeAreaView>
-    );
-  }
-
-  return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
-      <ChatHeader hasMessages={chatMessages.length > 0} onClear={clearChat} />
-
-      <KeyboardAvoidingView
-        style={styles.chatContainer}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={-bottomTabHeight}
-      >
-        <FlatList
-          ref={flatListRef}
-          data={chatMessages}
-          renderItem={({ item }) => <ChatMessage message={item} />}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.messageList}
-          ListEmptyComponent={
-            <EmptyChat onSuggestionPress={handleSuggestionPress} />
-          }
-          showsVerticalScrollIndicator={false}
-        />
-
-        {isTyping && <TypingIndicator />}
-
-        <ChatInput
-          value={inputText}
-          onChangeText={setInputText}
-          onSend={handleSend}
-          isDisabled={isTyping}
-        />
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      </View>
+    </>
   );
 }

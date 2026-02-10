@@ -10,6 +10,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { STORAGE_KEYS } from "./navigation/constants";
 import useUserStore from "./store/useUserStore";
 import { revenueCatService } from "./services/revenueCatService";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 
 Asset.loadAsync([...NavigationAssets]);
 
@@ -41,7 +42,9 @@ export function App() {
         barStyle="light-content"
         backgroundColor={theme.colors.background}
       />
-      <Navigation />
+      <KeyboardProvider>
+        <Navigation />
+      </KeyboardProvider>
     </>
   );
 }

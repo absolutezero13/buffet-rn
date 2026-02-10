@@ -37,6 +37,7 @@ export const theme = {
     md: 12,
     lg: 16,
     xl: 24,
+    xxl: 32,
     full: 9999,
   },
   fontSize: {

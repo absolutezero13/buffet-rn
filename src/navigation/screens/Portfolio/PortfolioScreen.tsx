@@ -110,14 +110,14 @@ export function Portfolio() {
 
   return (
     <>
-      <SafeAreaView style={styles.container} edges={["top"]}>
+      <PortfolioHeader />
+
+      <View style={styles.container}>
         <ScrollView
           style={styles.scrollView}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.contentContainer}
         >
-          <PortfolioHeader />
-
           <PortfolioSummary
             totalValue={totalValue}
             totalGainLoss={totalGainLoss}
@@ -145,7 +145,7 @@ export function Portfolio() {
 
           <View style={styles.bottomPadding} />
         </ScrollView>
-      </SafeAreaView>
+      </View>
 
       <TrueSheet
         ref={sheetRef}
