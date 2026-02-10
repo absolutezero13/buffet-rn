@@ -86,7 +86,7 @@ export function Paywall({ onClose }: PaywallProps) {
         style={styles.gradient}
       />
 
-      <SafeAreaView style={styles.safeArea} edges={["top"]}>
+      <SafeAreaView style={styles.safeArea}>
         <TouchableOpacity style={styles.closeButton} onPress={onClose}>
           <Text style={styles.closeText}>✕</Text>
         </TouchableOpacity>

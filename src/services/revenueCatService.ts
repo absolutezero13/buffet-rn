@@ -7,7 +7,7 @@ import useSubscriptionStore from "../store/useSubscriptionStore";
 
 // Replace with your RevenueCat API keys
 const API_KEY = Platform.select({
-  ios: "YOUR_REVENUECAT_IOS_API_KEY",
+  ios: "appl_rkyexrakCNcyColpHhXLQPBxeXc",
   android: "YOUR_REVENUECAT_ANDROID_API_KEY",
 }) as string;
 
@@ -23,22 +23,26 @@ export const revenueCatService = {
   async initialize() {
     Purchases.configure({ apiKey: API_KEY });
     const customerInfo = await Purchases.getCustomerInfo();
+    console.log("revenueCatService Customer info:", customerInfo);
     updateSubscriptionStatus(customerInfo);
   },
 
   async getOfferings() {
+    console.log("revenueCatService Fetching offerings...");
     const offerings = await Purchases.getOfferings();
+    console.log("revenueCatService Offerings:", offerings);
     return offerings.current;
   },
 
   async purchase(pkg: PurchasesPackage) {
     const { customerInfo } = await Purchases.purchasePackage(pkg);
-    updateSubscriptionStatus(customerInfo);
+    console.log("revenueCatService Purchase customer info:", customerInfo);
     return customerInfo;
   },
 
   async restorePurchases() {
     const customerInfo = await Purchases.restorePurchases();
+
     updateSubscriptionStatus(customerInfo);
     return customerInfo;
   },

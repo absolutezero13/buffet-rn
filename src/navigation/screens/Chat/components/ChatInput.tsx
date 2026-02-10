@@ -26,15 +26,7 @@ export function ChatInput({
 }: ChatInputProps) {
   const canSend = value.trim() && !isDisabled;
   const tabBarHeight = useBottomTabBarHeight();
-  const { height } = useKeyboardAnimation();
-  console.log("Keyboard height:", height);
 
-  const inputStyle = useAnimatedStyle(
-    () => ({
-      height,
-    }),
-    [],
-  );
   return (
     <View style={styles.inputContainer}>
       <LinearGradient
@@ -68,7 +60,6 @@ export function ChatInput({
         </TouchableOpacity>
       </LinearGradient>
       <View style={[styles.inputSafeArea, { height: tabBarHeight }]} />
-      <Animated.View style={inputStyle} />
     </View>
   );
 }
