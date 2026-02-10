@@ -1,6 +1,7 @@
 import { StyleSheet } from "react-native";
 import { theme } from "../../../theme";
 
+export const CHAT_HEADER_HEIGHT = 120;
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -12,6 +13,13 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.md,
+    position: "absolute",
+    width: "100%",
+    zIndex: 10,
+    borderBottomEndRadius: theme.borderRadius.xxl,
+    borderBottomStartRadius: theme.borderRadius.xxl,
+    top: 0,
+    height: CHAT_HEADER_HEIGHT,
   },
   title: {
     color: theme.colors.text,
@@ -29,11 +37,11 @@ export const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.md,
     paddingBottom: theme.spacing.md,
     flexGrow: 1,
+    paddingTop: CHAT_HEADER_HEIGHT + theme.spacing.md,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: "center",
-    paddingTop: theme.spacing.xxl,
   },
   welcomeCard: {
     alignItems: "center",
@@ -91,6 +99,9 @@ export const styles = StyleSheet.create({
   inputContainer: {
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm,
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
   },
   inputGradient: {
     flexDirection: "row",

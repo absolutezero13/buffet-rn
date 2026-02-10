@@ -1095,6 +1095,13 @@
   resolved "https://registry.npmjs.org/@expo/sudo-prompt/-/sudo-prompt-9.3.2.tgz"
   integrity sha512-HHQigo3rQWKMDzYDLkubN5WQOYXJJE2eNqIQC2axC2iO3mHdwnIR7FgZVvHWtBwAdzBgAP0ECp8KqS8TiMKvgw==
 
+"@expo/ui@~0.2.0-beta.9":
+  version "0.2.0-beta.9"
+  resolved "https://registry.yarnpkg.com/@expo/ui/-/ui-0.2.0-beta.9.tgz#a564842d67d95aba277f67d2a3902f5f2e2553d4"
+  integrity sha512-RaBcp0cMe5GykQogJwRZGy4o4JHDLtrr+HaurDPhwPKqVATsV0rR11ysmFe4QX8XWLP/L3od7NOkXUi5ailvaw==
+  dependencies:
+    sf-symbols-typescript "^2.1.0"
+
 "@expo/vector-icons@^15.0.3":
   version "15.0.3"
   resolved "https://registry.npmjs.org/@expo/vector-icons/-/vector-icons-15.0.3.tgz"
@@ -4196,6 +4203,13 @@ react-native-is-edge-to-edge@^1.2.1:
   resolved "https://registry.npmjs.org/react-native-is-edge-to-edge/-/react-native-is-edge-to-edge-1.2.1.tgz"
   integrity sha512-FLbPWl/MyYQWz+KwqOZsSyj2JmLKglHatd3xLZWskXOpRaio4LfEDEz8E/A6uD8QoTHW6Aobw1jbEwK7KMgR7Q==
 
+react-native-keyboard-controller@1.18.5:
+  version "1.18.5"
+  resolved "https://registry.yarnpkg.com/react-native-keyboard-controller/-/react-native-keyboard-controller-1.18.5.tgz#ae12131f2019c574178479d2c55784f55e08bb68"
+  integrity sha512-wbYN6Tcu3G5a05dhRYBgjgd74KqoYWuUmroLpigRg9cXy5uYo7prTMIvMgvLtARQtUF7BOtFggUnzgoBOgk0TQ==
+  dependencies:
+    react-native-is-edge-to-edge "^1.2.1"
+
 react-native-reanimated@~4.1.1:
   version "4.1.6"
   resolved "https://registry.npmjs.org/react-native-reanimated/-/react-native-reanimated-4.1.6.tgz"
@@ -5091,7 +5105,7 @@ yocto-queue@^0.1.0:
   resolved "https://registry.npmjs.org/yocto-queue/-/yocto-queue-0.1.0.tgz"
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
 
-zustand@^5.0.11:
+zustand@5.0.11:
   version "5.0.11"
   resolved "https://registry.yarnpkg.com/zustand/-/zustand-5.0.11.tgz#99f912e590de1ca9ce6c6d1cab6cdb1f034ab494"
   integrity sha512-fdZY+dk7zn/vbWNCYmzZULHRrss0jx5pPFiOuMZ/5HJN6Yv3u+1Wswy/4MpZEkEGhtNH+pwxZB8OKgUBPzYAGg==

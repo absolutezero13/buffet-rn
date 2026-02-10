@@ -14,7 +14,7 @@ import {
   ChatMessage as GeminiMessage,
 } from "../../../services/chatApi";
 import { useBottomTabBarHeight } from "react-native-bottom-tabs";
-
+import Animated from "react-native-reanimated";
 export function Chat() {
   const [chatMessages, setChatMessages] = useState<
     { id: string; role: "user" | "assistant"; content: string }[]
@@ -28,7 +28,7 @@ export function Chat() {
     if (chatMessages.length > 0) {
       setTimeout(() => {
         flatListRef.current?.scrollToEnd({ animated: true });
-      }, 100);
+      }, 200);
     }
   }, [chatMessages]);
 
@@ -85,36 +85,37 @@ export function Chat() {
     setChatMessages([]);
     setChatHistory([]);
   };
+
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
+    <>
       <ChatHeader hasMessages={chatMessages.length > 0} onClear={clearChat} />
+      <View style={styles.container}>
+        <View style={styles.chatContainer}>
+          <FlatList
+            ref={flatListRef}
+            data={chatMessages}
+            renderItem={({ item }) => <ChatMessage message={item} />}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={[
+              styles.messageList,
+              { paddingBottom: bottomTabHeight + 50 },
+            ]}
+            ListEmptyComponent={
+              <EmptyChat onSuggestionPress={handleSuggestionPress} />
+            }
+            showsVerticalScrollIndicator={false}
+          />
 
-      <KeyboardAvoidingView
-        style={styles.chatContainer}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={-bottomTabHeight}
-      >
-        <FlatList
-          ref={flatListRef}
-          data={chatMessages}
-          renderItem={({ item }) => <ChatMessage message={item} />}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.messageList}
-          ListEmptyComponent={
-            <EmptyChat onSuggestionPress={handleSuggestionPress} />
-          }
-          showsVerticalScrollIndicator={false}
-        />
+          {isTyping && <TypingIndicator />}
 
-        {isTyping && <TypingIndicator />}
-
-        <ChatInput
-          value={inputText}
-          onChangeText={setInputText}
-          onSend={handleSend}
-          isDisabled={isTyping}
-        />
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+          <ChatInput
+            value={inputText}
+            onChangeText={setInputText}
+            onSend={handleSend}
+            isDisabled={isTyping}
+          />
+        </View>
+      </View>
+    </>
   );
 }

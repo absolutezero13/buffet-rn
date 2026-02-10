@@ -239,6 +239,8 @@ PODS:
     - ExpoModulesCore
   - ExpoSystemUI (6.0.9):
     - ExpoModulesCore
+  - ExpoUI (0.2.0-beta.9):
+    - ExpoModulesCore
   - EXUpdatesInterface (2.0.0):
     - ExpoModulesCore
   - FBLazyVector (0.81.4)
@@ -1593,6 +1595,51 @@ PODS:
     - ReactNativeDependencies
     - SwiftUIIntrospect (~> 1.0)
     - Yoga
+  - react-native-keyboard-controller (1.18.5):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - react-native-keyboard-controller/common (= 1.18.5)
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
+  - react-native-keyboard-controller/common (1.18.5):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - react-native-safe-area-context (5.6.2):
     - hermes-engine
     - RCTRequired
@@ -2336,6 +2383,7 @@ DEPENDENCIES:
   - ExpoModulesCore (from `../node_modules/expo-modules-core`)
   - ExpoSplashScreen (from `../node_modules/expo-splash-screen/ios`)
   - ExpoSystemUI (from `../node_modules/expo-system-ui/ios`)
+  - "ExpoUI (from `../node_modules/@expo/ui/ios`)"
   - EXUpdatesInterface (from `../node_modules/expo-updates-interface/ios`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
@@ -2375,6 +2423,7 @@ DEPENDENCIES:
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
   - react-native-bottom-tabs (from `../node_modules/react-native-bottom-tabs`)
+  - react-native-keyboard-controller (from `../node_modules/react-native-keyboard-controller`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-oscompat (from `../node_modules/react-native/ReactCommon/oscompat`)
@@ -2455,6 +2504,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-splash-screen/ios"
   ExpoSystemUI:
     :path: "../node_modules/expo-system-ui/ios"
+  ExpoUI:
+    :path: "../node_modules/@expo/ui/ios"
   EXUpdatesInterface:
     :path: "../node_modules/expo-updates-interface/ios"
   FBLazyVector:
@@ -2532,6 +2583,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/microtasks"
   react-native-bottom-tabs:
     :path: "../node_modules/react-native-bottom-tabs"
+  react-native-keyboard-controller:
+    :path: "../node_modules/react-native-keyboard-controller"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   React-NativeModulesApple:
@@ -2631,6 +2684,7 @@ SPEC CHECKSUMS:
   ExpoModulesCore: 77496909fd3c800f97f7f2007dd26aeac4bb3798
   ExpoSplashScreen: 72fbc6dd9d6404dd9d0725a56c9ac1383bc0b14f
   ExpoSystemUI: 4611247a411f231229f7e04449856035bd18ba21
+  ExpoUI: ca221e95d94df2662b9184ee8abd606106d1ead8
   EXUpdatesInterface: 1436757deb0d574b84bba063bd024c315e0ec08b
   FBLazyVector: 9e0cd874afd81d9a4d36679daca991b58b260d42
   hermes-engine: 35c763d57c9832d0eef764316ca1c4d043581394
@@ -2669,6 +2723,7 @@ SPEC CHECKSUMS:
   React-Mapbuffer: 823a2c0e0d1826c784f808174626d5229f59be17
   React-microtasksnativemodule: 70cdf4826e52c7bcf98bc55255c3e30b5455d318
   react-native-bottom-tabs: 484fe90c49d4d7d547d15ae78f4de75492a395fa
+  react-native-keyboard-controller: 5587bad7f102125e2020720c4e37e0b58ff5e52e
   react-native-safe-area-context: 53f796cb6c814661bbe99fbdfd0585d07b996cdd
   React-NativeModulesApple: e653919faff1f76eadf02373bda26c085bf348e3
   React-oscompat: 73db7dbc80edef36a9d6ed3c6c4e1724ead4236d

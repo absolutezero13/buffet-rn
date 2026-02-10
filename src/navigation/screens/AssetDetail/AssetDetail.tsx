@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { View, Text, ScrollView, Alert } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { Button } from "../../../components";
 import { api } from "../../../services/api";
@@ -200,12 +199,12 @@ export function AssetDetail() {
 
   if (!asset) {
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
         <View style={styles.notFound}>
           <Text style={styles.notFoundText}>Asset not found</Text>
           <Button title="Go Back" onPress={() => navigation.goBack()} />
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
@@ -226,49 +225,51 @@ export function AssetDetail() {
     chartData.length > 0 ? Math.max(...chartData.map((d) => d.value)) : 0;
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
+    <>
       <AssetHeader
         symbol={asset.symbol}
         typeLabel={getTypeLabel()}
         onBack={() => navigation.goBack()}
         onDelete={handleDelete}
       />
+      <View style={styles.container}>
+        <ScrollView
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.contentContainer}
+        >
+          <PriceChart
+            chartData={chartData}
+            isLoading={isLoading}
+            selectedRange={selectedRange}
+            timeRanges={timeRanges}
+            isPriceChangePositive={isPriceChangePositive}
+            assetName={asset.name}
+            currentPrice={currentPriceDisplay}
+            selectedPoint={selectedPoint}
+            onRangeChange={setSelectedRange}
+            onRetry={fetchPriceHistory}
+          />
 
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-      >
-        <PriceChart
-          chartData={chartData}
-          isLoading={isLoading}
-          selectedRange={selectedRange}
-          timeRanges={timeRanges}
-          isPriceChangePositive={isPriceChangePositive}
-          assetName={asset.name}
-          currentPrice={currentPriceDisplay}
-          selectedPoint={selectedPoint}
-          onRangeChange={setSelectedRange}
-          onRetry={fetchPriceHistory}
-        />
+          <PriceStats
+            maxValue={maxValue}
+            minValue={minValue}
+            currentPrice={currentPriceDisplay}
+          />
 
-        <PriceStats
-          maxValue={maxValue}
-          minValue={minValue}
-          currentPrice={currentPriceDisplay}
-        />
+          <HoldingsCard
+            quantity={asset.quantity}
+            purchasePrice={purchasePriceDisplay}
+            currentPrice={currentPriceDisplay}
+            totalCost={totalCost}
+            totalValue={totalValue}
+            gainLoss={gainLoss}
+            isPositive={isPositive}
+          />
 
-        <HoldingsCard
-          quantity={asset.quantity}
-          purchasePrice={purchasePriceDisplay}
-          currentPrice={currentPriceDisplay}
-          totalCost={totalCost}
-          totalValue={totalValue}
-          gainLoss={gainLoss}
-          isPositive={isPositive}
-        />
-
-        <View style={styles.bottomPadding} />
-      </ScrollView>
-    </SafeAreaView>
+          <View style={styles.bottomPadding} />
+        </ScrollView>
+      </View>
+    </>
   );
 }

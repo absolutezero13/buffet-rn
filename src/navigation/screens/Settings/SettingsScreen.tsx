@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, ScrollView, Alert, Pressable } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button, GlassCard } from "../../../components";
 import { styles } from "./styles";
 import CurrencyBottomSheet, {
@@ -15,11 +15,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { STORAGE_KEYS } from "../../constants";
 import useUserAssets from "../../../store/useUserAssets";
 import useUserStore from "../../../store/useUserStore";
+import { LiquidGlassView } from "@callstack/liquid-glass";
 
 export function Settings() {
   const { userCurrency } = useCurrencyStore();
   const { weightUnit } = useWeightUnitStore();
-
+  const { top } = useSafeAreaInsets();
   const clearUser = () => {
     AsyncStorage.removeItem(STORAGE_KEYS.USER);
     AsyncStorage.removeItem(STORAGE_KEYS.ASSETS);
@@ -44,17 +45,19 @@ export function Settings() {
 
   return (
     <>
-      <SafeAreaView style={styles.container} edges={["top"]}>
+      <LiquidGlassView
+        effect="clear"
+        style={[styles.header, { paddingTop: top }]}
+      >
+        <Text style={styles.title}>Settings</Text>
+        <Text style={styles.subtitle}>Manage your preferences</Text>
+      </LiquidGlassView>
+      <View style={styles.container}>
         <ScrollView
           style={styles.scrollView}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.contentContainer}
         >
-          <View style={styles.header}>
-            <Text style={styles.title}>Settings</Text>
-            <Text style={styles.subtitle}>Manage your preferences</Text>
-          </View>
-
           <Pressable
             onPress={() => globalCurrencyBottomSheetRef.current?.present()}
           >
@@ -109,7 +112,7 @@ export function Settings() {
             />
           </GlassCard>
         </ScrollView>
-      </SafeAreaView>
+      </View>
 
       <CurrencyBottomSheet />
       <WeightUnitBottomSheet />

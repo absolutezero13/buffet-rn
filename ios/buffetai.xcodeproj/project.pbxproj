@@ -21,7 +21,7 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = buffetai/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = buffetai/Info.plist; sourceTree = "<group>"; };
 		320A023FCD205B8BB743583D /* libPods-buffetai.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-buffetai.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		7BA46121DC2DEBF140DA22C6 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = buffetai/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		7BA46121DC2DEBF140DA22C6 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = buffetai/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		9F407DB0AC26E924B4154003 /* Pods-buffetai.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-buffetai.release.xcconfig"; path = "Target Support Files/Pods-buffetai/Pods-buffetai.release.xcconfig"; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = buffetai/SplashScreen.storyboard; sourceTree = "<group>"; };
 		AF5DBDCE38291C46FAF46746 /* Pods-buffetai.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-buffetai.debug.xcconfig"; path = "Target Support Files/Pods-buffetai/Pods-buffetai.debug.xcconfig"; sourceTree = "<group>"; };
@@ -128,7 +128,6 @@
 				AF5DBDCE38291C46FAF46746 /* Pods-buffetai.debug.xcconfig */,
 				9F407DB0AC26E924B4154003 /* Pods-buffetai.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -347,6 +346,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = buffetai/buffetai.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = W53HFNRZHA;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -383,6 +383,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = buffetai/buffetai.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = W53HFNRZHA;
 				INFOPLIST_FILE = buffetai/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (

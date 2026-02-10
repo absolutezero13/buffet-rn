@@ -1,12 +1,14 @@
 import { StyleSheet } from "react-native";
 import { theme } from "../../../theme";
 
+export const PORTFOLIO_HEADER_HEIGHT = 140;
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
   },
   contentContainer: {
+    paddingTop: PORTFOLIO_HEADER_HEIGHT + theme.spacing.md,
     paddingBottom: theme.spacing.xxl,
   },
   scrollView: {
@@ -14,8 +16,15 @@ export const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.md,
   },
   header: {
-    marginTop: theme.spacing.md,
-    marginBottom: theme.spacing.lg,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.md,
+    position: "absolute",
+    width: "100%",
+    zIndex: 10,
+    borderBottomEndRadius: theme.borderRadius.xxl,
+    borderBottomStartRadius: theme.borderRadius.xxl,
+    top: 0,
+    height: PORTFOLIO_HEADER_HEIGHT,
   },
   title: {
     color: theme.colors.text,

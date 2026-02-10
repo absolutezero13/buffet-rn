@@ -55,7 +55,6 @@ const WeightUnitBottomSheet = () => {
                 >
                   {option.id}
                 </Text>
-                <Text style={localStyles.unitName}>{option.fullName}</Text>
               </View>
               {isActive && (
                 <View style={localStyles.checkmark}>

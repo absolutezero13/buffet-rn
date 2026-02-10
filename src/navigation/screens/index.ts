@@ -1,5 +1,5 @@
-export { AssetDetail } from "./AssetDetail";
-export { Chat } from "./Chat";
-export { Portfolio } from "./Portfolio";
-export { Settings } from "./Settings";
+export { AssetDetail } from "./AssetDetail/AssetDetail";
+export { Chat } from "./Chat/ChatScreen";
+export { Portfolio } from "./Portfolio/PortfolioScreen";
+export { Settings } from "./Settings/SettingsScreen";
 export { Welcome } from "./Welcome";
