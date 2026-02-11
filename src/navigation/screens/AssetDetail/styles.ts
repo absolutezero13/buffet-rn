@@ -11,6 +11,10 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.background,
   },
+  assetImage: {
+    width: 32,
+    height: 32,
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",

@@ -17,10 +17,11 @@ import {
 } from "../../../../components";
 import { styles } from "../styles";
 import { currencyOptions } from "../../../constants";
+import { AssetType } from "../../../../services/types";
 
 interface AddAssetFormProps {
   selectedAsset: SearchResult | null;
-  type: string;
+  type: AssetType;
   quantity: string;
   purchasePrice: string;
   baseCurrency: "USD" | "EUR" | "GBP";

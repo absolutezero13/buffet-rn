@@ -8,17 +8,23 @@ import {
 } from "react-native";
 import { theme } from "../theme";
 import Animated, { LinearTransition } from "react-native-reanimated";
+import { AssetType } from "../services/types";
+import { Image } from "expo-image";
+import { getAssetTypeImage } from "../navigation/constants";
 
 interface TypeSelectorProps {
-  selected: string;
-  onSelect: (type: string) => void;
+  selected: AssetType;
+  onSelect: (type: AssetType) => void;
 }
 
-const types = [
-  { id: "stock", label: "Stock & ETF", emoji: "📈" },
-  { id: "crypto", label: "Crypto", emoji: "🪙" },
-  { id: "gold", label: "Commodities", emoji: "🥇" },
-  { id: "cash", label: "Cash", emoji: "💵" },
+const types: {
+  id: AssetType;
+  label: string;
+}[] = [
+  { id: "stock", label: "Stock & ETF" },
+  { id: "crypto", label: "Crypto" },
+  { id: "gold", label: "Commodities" },
+  { id: "cash", label: "Cash" },
 ];
 
 export function TypeSelector({ selected, onSelect }: TypeSelectorProps) {
@@ -40,7 +46,11 @@ export function TypeSelector({ selected, onSelect }: TypeSelectorProps) {
             ]}
             onPress={() => onSelect(type.id)}
           >
-            <Text style={styles.typeEmoji}>{type.emoji}</Text>
+            <Image
+              source={getAssetTypeImage(type.id)}
+              style={styles.typeEmoji}
+              contentFit="contain"
+            />
             <Text
               style={[
                 styles.typeLabel,
@@ -83,13 +93,16 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.md,
     paddingHorizontal: theme.spacing.lg,
     marginRight: theme.spacing.sm,
+    width: 125,
+    height: 100,
   },
   typeButtonActive: {
     borderColor: theme.colors.primary,
     backgroundColor: theme.colors.glass,
   },
   typeEmoji: {
-    fontSize: 24,
+    width: 48,
+    height: 48,
     marginBottom: theme.spacing.xs,
   },
   typeLabel: {

@@ -11,6 +11,8 @@ import { GlassCard } from "./GlassCard";
 import { theme } from "../theme";
 import { Asset } from "../services/types";
 import { useCurrency } from "../hooks";
+import { Image } from "expo-image";
+import { getAssetTypeImage } from "../navigation/constants";
 
 interface AssetCardProps {
   asset: Asset;
@@ -34,23 +36,6 @@ export function AssetCard({ asset, onDelete }: AssetCardProps) {
   const purchasePriceDisplay = getAssetPurchasePrice(asset);
   const currentPriceDisplay = getAssetCurrentPrice(asset);
 
-  const getTypeLabel = () => {
-    switch (asset.type) {
-      case "stock":
-        return "📈";
-      case "etf":
-        return "📊";
-      case "crypto":
-        return "🪙";
-      case "gold":
-        return "🥇";
-      case "cash":
-        return "💵";
-      default:
-        return "💎";
-    }
-  };
-
   const handlePress = () => {
     navigation.navigate("AssetDetail", { assetId: asset.id } as never);
   };
@@ -65,7 +50,10 @@ export function AssetCard({ asset, onDelete }: AssetCardProps) {
       <Pressable onPress={handlePress}>
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <Text style={styles.typeEmoji}>{getTypeLabel()}</Text>
+            <Image
+              source={getAssetTypeImage(asset.type)}
+              style={styles.typeEmoji}
+            />
             <View>
               <Text style={styles.symbol}>{asset.symbol.toUpperCase()}</Text>
               <Text style={styles.name}>{asset.name}</Text>
@@ -152,7 +140,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   typeEmoji: {
-    fontSize: 32,
+    width: 32,
+    height: 32,
     marginRight: theme.spacing.md,
   },
   symbol: {

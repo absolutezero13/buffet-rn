@@ -15,6 +15,7 @@ import useUserAssets from "../../../store/useUserAssets";
 import { assetApi } from "../../../services/assetApi";
 import { useCurrency } from "../../../hooks";
 import useSubscriptionStore from "../../../store/useSubscriptionStore";
+import { getAssetTypeImage } from "../../constants";
 
 type RouteParams = {
   AssetDetail: {
@@ -163,29 +164,17 @@ export function AssetDetail() {
     } finally {
       setIsLoading(false);
     }
-  }, [asset, selectedRange, generateFallbackData, toUserCurrency, isSubscribed]);
+  }, [
+    asset,
+    selectedRange,
+    generateFallbackData,
+    toUserCurrency,
+    isSubscribed,
+  ]);
 
   useEffect(() => {
     fetchPriceHistory();
   }, [fetchPriceHistory]);
-
-  const getTypeLabel = () => {
-    if (!asset) return "";
-    switch (asset.type) {
-      case "stock":
-        return "📈 Stock";
-      case "etf":
-        return "📊 ETF";
-      case "crypto":
-        return "🪙 Crypto";
-      case "gold":
-        return "🥇 Gold";
-      case "cash":
-        return "💵 Cash";
-      default:
-        return "💎 Other";
-    }
-  };
 
   const handleDelete = () => {
     if (!asset) return;
@@ -237,7 +226,7 @@ export function AssetDetail() {
     <>
       <AssetHeader
         symbol={asset.symbol}
-        typeLabel={getTypeLabel()}
+        image={getAssetTypeImage(asset.type)}
         onBack={() => navigation.goBack()}
         onDelete={handleDelete}
       />

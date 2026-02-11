@@ -1,4 +1,5 @@
 import { SearchResult } from "../components";
+import { AssetType } from "../services/types";
 
 export type CurrencyCode = "USD" | "EUR" | "GBP";
 
@@ -61,4 +62,21 @@ export const STORAGE_KEYS = {
   USER: "USER",
   ALPACA_ASSETS: "ALPACA_ASSETS",
   COINGECKO_COINS: "COINGECKO_COINS",
+};
+
+export const getAssetTypeImage = (type: AssetType) => {
+  switch (type) {
+    case "stock":
+      return require("../assets/stock.png");
+    case "etf":
+      return require("../assets/stock.png");
+    case "crypto":
+      return require("../assets/crypto.png");
+    case "gold":
+      return require("../assets/gold.png");
+    case "cash":
+      return require("../assets/cash.png");
+    default:
+      return require("../assets/cash.png");
+  }
 };
