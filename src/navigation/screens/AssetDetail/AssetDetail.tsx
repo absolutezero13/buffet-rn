@@ -51,6 +51,7 @@ export function AssetDetail() {
     price: number;
     date: string;
   } | null>(null);
+  const [scrollEnabled, setScrollEnabled] = useState(true);
   const [priceChange, setPriceChange] = useState<{
     amount: number;
     percent: number;
@@ -245,6 +246,7 @@ export function AssetDetail() {
           style={styles.scrollView}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.contentContainer}
+          scrollEnabled={scrollEnabled}
         >
           <PriceChart
             chartData={chartData}
@@ -259,6 +261,7 @@ export function AssetDetail() {
             onRetry={fetchPriceHistory}
             isSubscribed={isSubscribed}
             onPaywallPress={() => navigation.navigate("Paywall" as never)}
+            onChartInteraction={setScrollEnabled}
           />
 
           <PriceStats

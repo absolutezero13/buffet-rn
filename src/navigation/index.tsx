@@ -96,7 +96,11 @@ const OnboardingNavigation = createStaticNavigation(OnboardingStack);
 const AppNavigation = createStaticNavigation(AppStack);
 
 export function Navigation() {
-  const { hasOnboarded } = useUserStore();
+  const { hasOnboarded, isInitialized } = useUserStore();
+
+  if (!isInitialized) {
+    return null;
+  }
 
   if (!hasOnboarded) {
     return <OnboardingNavigation />;

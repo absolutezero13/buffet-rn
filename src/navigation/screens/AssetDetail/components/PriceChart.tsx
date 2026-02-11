@@ -39,6 +39,7 @@ interface PriceChartProps {
   onRetry: () => void;
   isSubscribed?: boolean;
   onPaywallPress?: () => void;
+  onChartInteraction?: (scrollEnabled: boolean) => void;
 }
 
 export function PriceChart({
@@ -54,6 +55,7 @@ export function PriceChart({
   onRetry,
   isSubscribed = true,
   onPaywallPress,
+  onChartInteraction,
 }: PriceChartProps) {
   const { userCurrency } = useCurrencyStore();
   const symbol = userCurrency.symbol;
@@ -71,7 +73,12 @@ export function PriceChart({
           <Text style={styles.loadingText}>Loading price data...</Text>
         </View>
       ) : chartData.length > 0 ? (
-        <View style={styles.chartContainer}>
+        <View
+          style={styles.chartContainer}
+          onTouchStart={() => onChartInteraction?.(false)}
+          onTouchEnd={() => onChartInteraction?.(true)}
+          onTouchCancel={() => onChartInteraction?.(true)}
+        >
           <View style={styles.chartOverlay}>
             <Text style={styles.chartOverlayName}>{assetName}</Text>
             <Text style={styles.chartOverlayPrice}>

@@ -18,6 +18,9 @@ class AssetApi {
       const assets = JSON.parse(storedAssets) as Asset[];
 
       const pricePromises = assets.map(async (asset) => {
+        if (asset.type === "cash") {
+          return 1;
+        }
         if (asset.type && asset.symbol) {
           return api.getPriceByAssetType(asset.type, asset.symbol, "USD");
         }
@@ -45,12 +48,19 @@ class AssetApi {
     const { userAssets } = useUserAssets.getState();
     const { convertToUSD } = useCurrencyStore.getState();
 
-    // Always fetch price in USD
-    const priceInUSD = await api.getPriceByAssetType(
-      asset.type,
-      asset.symbol,
-      "USD",
-    );
+    let priceInUSD: number | null;
+
+    if (asset.type === "cash") {
+      // Cash doesn't need a price fetch — its value is always 1 unit of its currency
+      priceInUSD = 1;
+    } else {
+      // Always fetch price in USD
+      priceInUSD = await api.getPriceByAssetType(
+        asset.type,
+        asset.symbol,
+        "USD",
+      );
+    }
 
     if (!priceInUSD && priceInUSD !== 0) {
       console.error("Something went wrong with getting the price", priceInUSD);
@@ -127,6 +137,9 @@ class AssetApi {
 
     // Fetch all prices in USD
     const pricePromises = userAssets.map(async (asset) => {
+      if (asset.type === "cash") {
+        return 1;
+      }
       if (asset.type && asset.symbol) {
         return api.getPriceByAssetType(asset.type, asset.symbol, "USD");
       }

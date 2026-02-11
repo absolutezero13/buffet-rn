@@ -21,7 +21,7 @@ const initApp = async () => {
   await assetApi.getUserAssets();
   const userStore = await AsyncStorage.getItem(STORAGE_KEYS.USER);
   useUserStore.setState(
-    userStore ? JSON.parse(userStore) : { hasOnboarded: false },
+    userStore ? { ...JSON.parse(userStore), isInitialized: true } : { hasOnboarded: false, isInitialized: true },
   );
   try {
     await revenueCatService.initialize();

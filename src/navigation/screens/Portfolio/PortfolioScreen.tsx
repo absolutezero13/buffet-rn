@@ -34,7 +34,7 @@ export function Portfolio() {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    // await refreshPrices();
+    await assetApi.refreshPrices();
     setIsRefreshing(false);
   };
 
