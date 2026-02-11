@@ -31,11 +31,6 @@ const markDownRules: RenderRules = {
       {children}
     </Text>
   ),
-  list_item: (node, children) => (
-    <View key={node.key} style={styles.listItem}>
-      {children}
-    </View>
-  ),
   bullet_list: (node, children) => (
     <View key={node.key} style={styles.bulletList}>
       {children}

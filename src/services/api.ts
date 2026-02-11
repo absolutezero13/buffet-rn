@@ -224,6 +224,7 @@ class Api {
         params: { query },
       });
 
+      console.log("searchSymbol response:", response.data);
       return response.data?.results || [];
     } catch (error) {
       console.error("Error searching symbol:", error);

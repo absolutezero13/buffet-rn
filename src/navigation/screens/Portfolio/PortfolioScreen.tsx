@@ -1,8 +1,12 @@
 import React, { useState, useRef } from "react";
 import { View, ScrollView, Alert } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { TrueSheet } from "@lodev09/react-native-true-sheet";
-import { AssetCard, PortfolioSummary, SearchResult } from "../../../components";
+import {
+  AssetCard,
+  PortfolioSummary,
+  SearchResult,
+  BisonLoader,
+} from "../../../components";
 import {
   PortfolioHeader,
   EmptyPortfolio,
@@ -16,26 +20,23 @@ import { assetApi } from "../../../services/assetApi";
 import useCurrencyStore from "../../../store/useCurrencyStore";
 import useUserAssets from "../../../store/useUserAssets";
 import { useCurrency } from "../../../hooks";
+import { AssetType } from "../../../services/types";
 
 export function Portfolio() {
-  const { userAssets: assets } = useUserAssets();
+  const { userAssets: assets, isLoading } = useUserAssets();
   const { userCurrency } = useCurrencyStore();
   const { getAssetCurrentValue, getAssetTotalCost } = useCurrency();
 
   const sheetRef = useRef<TrueSheet>(null);
   const [selectedAsset, setSelectedAsset] = useState<SearchResult | null>(null);
-  const [type, setType] = useState("stock");
+  const [type, setType] = useState<AssetType>("stock");
   const [quantity, setQuantity] = useState("");
   const [purchasePrice, setPurchasePrice] = useState("");
   const [cashCurrency, setCashCurrency] = useState<CurrencyCode>(
     userCurrency?.id || "USD",
   );
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
   const handleRefresh = async () => {
-    setIsRefreshing(true);
     await assetApi.refreshPrices();
-    setIsRefreshing(false);
   };
 
   const resetForm = () => {
@@ -46,7 +47,7 @@ export function Portfolio() {
     setCashCurrency(userCurrency?.id || "USD");
   };
 
-  const handleAddAsset = () => {
+  const handleAddAsset = async () => {
     if (type === "cash") {
       if (!quantity) {
         Alert.alert("Missing Fields", "Please enter a cash amount");
@@ -63,7 +64,10 @@ export function Portfolio() {
       ? `Cash (${cashCurrency})`
       : selectedAsset?.name || "";
 
-    assetApi.addAsset({
+    resetForm();
+    sheetRef.current?.dismiss();
+
+    await assetApi.addAsset({
       name: assetName,
       symbol:
         type === "crypto" ? (selectedAsset?.id ?? "unknows") : assetSymbol,
@@ -72,9 +76,6 @@ export function Portfolio() {
       purchasePrice: isCash ? 1 : parseFloat(purchasePrice),
       purchaseCurrency: userCurrency?.id || "USD",
     });
-
-    resetForm();
-    sheetRef.current?.dismiss();
   };
 
   const openAddSheet = () => {
@@ -111,6 +112,7 @@ export function Portfolio() {
   return (
     <>
       <PortfolioHeader />
+      {isLoading && <BisonLoader />}
 
       <View style={styles.container}>
         <ScrollView
@@ -126,7 +128,7 @@ export function Portfolio() {
 
           <AssetsSectionHeader
             hasAssets={assets.length > 0}
-            isRefreshing={isRefreshing}
+            isRefreshing={isLoading}
             onRefresh={handleRefresh}
             onAddAsset={openAddSheet}
           />

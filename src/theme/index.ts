@@ -18,6 +18,7 @@ export const theme = {
     textMuted: "#475569",
     border: "#1E3A5F",
     overlay: "rgba(5, 10, 20, 0.95)",
+    overlayLight: "rgba(5, 10, 20, 0.5)",
     glass: "rgba(255, 255, 255, 0.05)",
     glassBorder: "rgba(255, 255, 255, 0.1)",
     glassHighlight: "rgba(255, 255, 255, 0.15)",

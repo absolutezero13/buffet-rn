@@ -12,4 +12,5 @@ export { ChatMessage } from "./ChatMessage";
 export type { ChatMessageType } from "./ChatMessage";
 export { OnboardingSlide } from "./OnboardingSlide";
 export { StreamingText } from "./StreamingText";
+export { BisonLoader } from "./BisonLoader";
 export { isLiquidGlassSupported } from "@callstack/liquid-glass";
