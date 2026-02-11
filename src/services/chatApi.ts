@@ -19,7 +19,7 @@ class ChatApi {
   async sendMessage(
     message: string,
     history: ChatMessage[] = [],
-  ): Promise<string> {
+  ): Promise<string | Error> {
     try {
       const response = await apiClient.post<ChatResponse>("/chat", {
         message,
@@ -28,7 +28,7 @@ class ChatApi {
       return response.data.reply;
     } catch (error) {
       console.error("Chat API error:", error);
-      throw new Error("Failed to get AI response");
+      return new Error("Failed to send message");
     }
   }
 }

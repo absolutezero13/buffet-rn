@@ -1,6 +1,7 @@
 import Purchases, {
   PurchasesPackage,
   CustomerInfo,
+  PURCHASES_ERROR_CODE,
 } from "react-native-purchases";
 import { Platform } from "react-native";
 import useSubscriptionStore from "../store/useSubscriptionStore";
@@ -35,9 +36,24 @@ export const revenueCatService = {
   },
 
   async purchase(pkg: PurchasesPackage) {
-    const { customerInfo } = await Purchases.purchasePackage(pkg);
-    console.log("revenueCatService Purchase customer info:", customerInfo);
-    return customerInfo;
+    try {
+      const { customerInfo } = await Purchases.purchasePackage(pkg);
+      console.log("revenueCatService Purchase customer info:", customerInfo);
+      updateSubscriptionStatus(customerInfo);
+      return customerInfo;
+    } catch (error: any) {
+      // Check if user is already subscribed
+      if (error.code === PURCHASES_ERROR_CODE.PRODUCT_ALREADY_PURCHASED_ERROR) {
+        console.log(
+          "revenueCatService User is already subscribed, updating state",
+        );
+        const customerInfo = await Purchases.getCustomerInfo();
+        updateSubscriptionStatus(customerInfo);
+        return customerInfo;
+      }
+
+      console.error("RevenueCat purchase error:", error);
+    }
   },
 
   async restorePurchases() {
