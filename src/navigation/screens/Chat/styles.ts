@@ -139,8 +139,8 @@ export const styles = StyleSheet.create({
     height: 34,
   },
   aiIcon: {
-    width: 200,
-    height: 200,
+    width: 120,
+    height: 120,
   },
   lockedContainer: {
     flex: 1,
