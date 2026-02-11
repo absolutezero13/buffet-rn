@@ -6,6 +6,8 @@ import { theme } from "../../../theme";
 import { styles } from "./styles";
 import useSubscriptionStore from "../../../store/useSubscriptionStore";
 import useUserStore from "../../../store/useUserStore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { STORAGE_KEYS } from "../../constants";
 
 const BISON = require("../../../assets/bison.png");
 
@@ -58,7 +60,10 @@ export function Loading() {
           hasOnboarded: true,
           onboardingCompleted: false,
         });
-
+        AsyncStorage.setItem(
+          STORAGE_KEYS.USER,
+          JSON.stringify({ hasOnboarded: true }),
+        );
         return;
       }
       navigation.navigate("Paywall" as never);
