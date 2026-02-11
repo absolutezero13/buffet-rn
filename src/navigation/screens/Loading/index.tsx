@@ -1,9 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { use, useEffect, useRef, useState } from "react";
 import { View, Text, Animated, Easing } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import { theme } from "../../../theme";
 import { styles } from "./styles";
+import useSubscriptionStore from "../../../store/useSubscriptionStore";
+import useUserStore from "../../../store/useUserStore";
 
 const BISON = require("../../../assets/bison.png");
 
@@ -33,7 +35,7 @@ export function Loading() {
           easing: Easing.inOut(Easing.ease),
           useNativeDriver: true,
         }),
-      ])
+      ]),
     );
     tiltAnimation.start();
 
@@ -49,7 +51,16 @@ export function Loading() {
   }, []);
 
   useEffect(() => {
+    const isSubscribed = useSubscriptionStore.getState().isSubscribed;
     const timer = setTimeout(() => {
+      if (isSubscribed) {
+        useUserStore.setState({
+          hasOnboarded: true,
+          onboardingCompleted: false,
+        });
+
+        return;
+      }
       navigation.navigate("Paywall" as never);
     }, 3000);
 
@@ -73,14 +84,9 @@ export function Loading() {
       <View style={styles.content}>
         <Animated.Image
           source={BISON}
-          style={[
-            styles.emoji,
-            { transform: [{ rotate: rotation }] },
-          ]}
+          style={[styles.emoji, { transform: [{ rotate: rotation }] }]}
         />
-        <Text style={styles.stepText}>
-          Almost ready{dots}
-        </Text>
+        <Text style={styles.stepText}>Almost ready{dots}</Text>
       </View>
     </View>
   );
