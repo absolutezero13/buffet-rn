@@ -29,6 +29,7 @@ export function TypeSelector({ selected, onSelect }: TypeSelectorProps) {
         horizontal
         showsHorizontalScrollIndicator={false}
         style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
       >
         {types.map((type) => (
           <TouchableOpacity
@@ -58,12 +59,17 @@ export function TypeSelector({ selected, onSelect }: TypeSelectorProps) {
 const styles = StyleSheet.create({
   container: {
     marginBottom: theme.spacing.md,
+    marginHorizontal: -theme.spacing.lg,
   },
   label: {
     color: theme.colors.textSecondary,
     fontSize: theme.fontSize.sm,
     marginBottom: theme.spacing.sm,
     fontWeight: theme.fontWeight.medium,
+    marginHorizontal: theme.spacing.lg,
+  },
+  scrollContent: {
+    paddingHorizontal: theme.spacing.lg,
   },
   scroll: {
     flexDirection: "row",
