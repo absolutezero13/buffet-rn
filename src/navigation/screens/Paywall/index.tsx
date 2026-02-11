@@ -5,12 +5,13 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
+  Image,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PurchasesPackage } from "react-native-purchases";
 import { theme } from "../../../theme";
-import { Button } from "../../../components";
+import { Button, IconButton } from "../../../components";
 import { revenueCatService } from "../../../services/revenueCatService";
 import { styles } from "./styles";
 
@@ -76,23 +77,27 @@ export function Paywall({ onClose }: PaywallProps) {
   };
 
   const priceText = pkg?.product.priceString
-    ? `${pkg.product.priceString}/month`
+    ? `Subscribe for ${pkg.product.priceString}/month`
     : "Subscribe";
 
   return (
-    <View style={styles.container}>
+    <>
       <LinearGradient
         colors={[theme.colors.background, theme.colors.surface]}
         style={styles.gradient}
       />
 
       <SafeAreaView style={styles.safeArea}>
-        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-          <Text style={styles.closeText}>✕</Text>
-        </TouchableOpacity>
+        <IconButton
+          icon="close"
+          onPress={onClose}
+          style={styles.closeButton}
+          size="small"
+        />
 
         <View style={styles.content}>
-          <Text style={styles.emoji}>🦬</Text>
+          {/* <Text style={styles.emoji}>🦬</Text> */}
+          <Image source={require("../Chat/ai-icon.png")} style={styles.icon} />
           <Text style={styles.title}>Buffet AI Pro</Text>
           <Text style={styles.subtitle}>
             Unlock the full power of your investment companion
@@ -119,7 +124,6 @@ export function Paywall({ onClose }: PaywallProps) {
                 disabled={isPurchasing || !pkg}
                 loading={isPurchasing}
                 fullWidth
-                size="large"
               />
 
               <TouchableOpacity
@@ -133,6 +137,6 @@ export function Paywall({ onClose }: PaywallProps) {
           )}
         </View>
       </SafeAreaView>
-    </View>
+    </>
   );
 }

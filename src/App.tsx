@@ -11,6 +11,7 @@ import { STORAGE_KEYS } from "./navigation/constants";
 import useUserStore from "./store/useUserStore";
 import { revenueCatService } from "./services/revenueCatService";
 import { KeyboardProvider } from "react-native-keyboard-controller";
+import useSubscriptionStore from "./store/useSubscriptionStore";
 
 Asset.loadAsync([...NavigationAssets]);
 
@@ -23,6 +24,7 @@ const initApp = async () => {
     userStore ? JSON.parse(userStore) : { hasOnboarded: false },
   );
   try {
+    useSubscriptionStore.setState({ isSubscribed: true });
     await revenueCatService.initialize();
   } catch (error) {
     console.error("RevenueCat initialization failed:", error);

@@ -12,13 +12,11 @@ class AssetApi {
     const storedAssets = await AsyncStorage.getItem(STORAGE_KEYS.ASSETS);
     console.log("getUserAssets storedAssets", storedAssets);
 
-    // Initialize currency store (will fetch rates if needed)
     await useCurrencyStore.getState().initializeCurrency();
 
     if (storedAssets) {
       const assets = JSON.parse(storedAssets) as Asset[];
 
-      // Always fetch prices in USD
       const pricePromises = assets.map(async (asset) => {
         if (asset.type && asset.symbol) {
           return api.getPriceByAssetType(asset.type, asset.symbol, "USD");
@@ -27,7 +25,6 @@ class AssetApi {
 
       const prices = await Promise.all(pricePromises);
 
-      // Store prices in USD - conversion happens in UI
       const updatedAssets = assets.map((asset, index) => ({
         ...asset,
         currentPrice: prices[index] || asset.currentPrice,

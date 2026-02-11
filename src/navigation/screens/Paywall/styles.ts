@@ -18,7 +18,6 @@ export const styles = StyleSheet.create({
   },
   closeButton: {
     alignSelf: "flex-end",
-    padding: theme.spacing.md,
     marginRight: theme.spacing.md,
   },
   closeText: {
@@ -28,8 +27,11 @@ export const styles = StyleSheet.create({
   content: {
     flex: 1,
     alignItems: "center",
-    justifyContent: "center",
     paddingHorizontal: theme.spacing.xl,
+  },
+  icon: {
+    width: 150,
+    height: 150,
   },
   emoji: {
     fontSize: 80,
@@ -47,7 +49,7 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.md,
     textAlign: "center",
     lineHeight: 24,
-    marginBottom: theme.spacing.xxl,
+    marginBottom: theme.spacing.md,
   },
   features: {
     width: "100%",
@@ -74,7 +76,7 @@ export const styles = StyleSheet.create({
   },
   footer: {
     paddingHorizontal: theme.spacing.xl,
-    paddingBottom: theme.spacing.xxl,
+    marginTop: theme.spacing.xxl,
   },
   restoreButton: {
     alignItems: "center",

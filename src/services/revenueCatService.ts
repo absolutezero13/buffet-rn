@@ -16,7 +16,7 @@ const ENTITLEMENT_ID = "pro";
 function updateSubscriptionStatus(customerInfo: CustomerInfo) {
   const isActive =
     typeof customerInfo.entitlements.active[ENTITLEMENT_ID] !== "undefined";
-  useSubscriptionStore.getState().setIsSubscribed(isActive);
+  // useSubscriptionStore.getState().setIsSubscribed(isActive);
 }
 
 export const revenueCatService = {
