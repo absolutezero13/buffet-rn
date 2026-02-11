@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { View, FlatList, KeyboardAvoidingView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ChatMessage } from "../../../components";
+import { ChatMessage, ChatMessageType } from "../../../components";
 import {
   ChatHeader,
   EmptyChat,
@@ -15,9 +15,10 @@ import {
 } from "../../../services/chatApi";
 import { useBottomTabBarHeight } from "react-native-bottom-tabs";
 import Animated from "react-native-reanimated";
+
 export function Chat() {
   const [chatMessages, setChatMessages] = useState<
-    { id: string; role: "user" | "assistant"; content: string }[]
+    (ChatMessageType & { isStreaming?: boolean })[]
   >([]);
   const [chatHistory, setChatHistory] = useState<GeminiMessage[]>([]);
   const [inputText, setInputText] = useState("");
@@ -32,6 +33,14 @@ export function Chat() {
       }, 200);
     }
   }, [chatMessages]);
+
+  const handleStreamingComplete = useCallback((messageId: string) => {
+    setChatMessages((prev) =>
+      prev.map((msg) =>
+        msg.id === messageId ? { ...msg, isStreaming: false } : msg
+      )
+    );
+  }, []);
 
   const handleSend = async () => {
     if (!inputText.trim()) return;
@@ -53,7 +62,7 @@ export function Chat() {
       const assistantMessageId = (Date.now() + 1).toString();
       setChatMessages((prev) => [
         ...prev,
-        { id: assistantMessageId, role: "assistant", content: reply },
+        { id: assistantMessageId, role: "assistant", content: reply, isStreaming: true },
       ]);
 
       // Update history for next request
@@ -71,6 +80,7 @@ export function Chat() {
           id: errorMessageId,
           role: "assistant",
           content: "Sorry, I couldn't process your request. Please try again.",
+          isStreaming: false,
         },
       ]);
     } finally {
@@ -87,6 +97,16 @@ export function Chat() {
     setChatHistory([]);
   };
 
+  const renderMessage = useCallback(
+    ({ item }: { item: ChatMessageType & { isStreaming?: boolean } }) => (
+      <ChatMessage
+        message={item}
+        onStreamingComplete={() => handleStreamingComplete(item.id)}
+      />
+    ),
+    [handleStreamingComplete]
+  );
+
   return (
     <>
       <ChatHeader hasMessages={chatMessages.length > 0} onClear={clearChat} />
@@ -99,7 +119,7 @@ export function Chat() {
           <FlatList
             ref={flatListRef}
             data={chatMessages}
-            renderItem={({ item }) => <ChatMessage message={item} />}
+            renderItem={renderMessage}
             keyExtractor={(item) => item.id}
             contentContainerStyle={[styles.messageList, { paddingBottom: 0 }]}
             ListEmptyComponent={
