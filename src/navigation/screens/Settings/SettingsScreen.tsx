@@ -120,7 +120,6 @@ export function Settings() {
             </Text>
             <Button
               title="Restore Purchases"
-              variant="ghost"
               onPress={handleRestorePurchases}
               fullWidth
             />
@@ -131,13 +130,15 @@ export function Settings() {
             <Text style={styles.sectionDescription}>
               Signing out will remove all saved data from this device.
             </Text>
-            <Button
+            {/* <Button
               title="Sign Out"
-              variant="danger"
               onPress={handleSignOut}
               style={styles.signOutButton}
               fullWidth
-            />
+            /> */}
+            <Text onPress={handleSignOut} style={styles.signOutButton}>
+              Sign out
+            </Text>
           </GlassCard>
         </ScrollView>
       </View>

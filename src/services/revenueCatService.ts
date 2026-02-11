@@ -11,12 +11,12 @@ const API_KEY = Platform.select({
   android: "YOUR_REVENUECAT_ANDROID_API_KEY",
 }) as string;
 
-const ENTITLEMENT_ID = "pro";
+const ENTITLEMENT_ID = "Buffet AI Pro";
 
 function updateSubscriptionStatus(customerInfo: CustomerInfo) {
   const isActive =
     typeof customerInfo.entitlements.active[ENTITLEMENT_ID] !== "undefined";
-  // useSubscriptionStore.getState().setIsSubscribed(isActive);
+  useSubscriptionStore.getState().setIsSubscribed(isActive);
 }
 
 export const revenueCatService = {

@@ -78,6 +78,11 @@ export const styles = StyleSheet.create({
   },
   signOutButton: {
     marginTop: theme.spacing.sm,
+    color: theme.colors.dangerLight,
+    fontSize: theme.fontSize.sm,
+    fontWeight: theme.fontWeight.medium,
+    textAlign: "center",
+    textDecorationLine: "underline",
   },
   currency: {
     color: theme.colors.text,

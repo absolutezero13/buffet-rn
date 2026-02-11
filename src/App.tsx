@@ -24,7 +24,6 @@ const initApp = async () => {
     userStore ? JSON.parse(userStore) : { hasOnboarded: false },
   );
   try {
-    useSubscriptionStore.setState({ isSubscribed: true });
     await revenueCatService.initialize();
   } catch (error) {
     console.error("RevenueCat initialization failed:", error);
