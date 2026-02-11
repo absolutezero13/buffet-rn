@@ -104,6 +104,7 @@ export function AssetDetail() {
     if (!asset) return;
 
     if (!isSubscribed) {
+      generateFallbackData();
       setIsLoading(false);
       return;
     }
@@ -256,6 +257,8 @@ export function AssetDetail() {
             selectedPoint={selectedPoint}
             onRangeChange={setSelectedRange}
             onRetry={fetchPriceHistory}
+            isSubscribed={isSubscribed}
+            onPaywallPress={() => navigation.navigate("Paywall" as never)}
           />
 
           <PriceStats

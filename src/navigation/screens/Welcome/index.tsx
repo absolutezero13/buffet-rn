@@ -1,13 +1,13 @@
 import React, { useRef, useState } from "react";
 import { View, FlatList, Animated, Text, TouchableOpacity } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { useNavigation } from "@react-navigation/native";
 import { theme } from "../../../theme";
 import { OnboardingSlide } from "../../../components";
 import { PaginationDots, WelcomeButtons } from "./components";
 import { SLIDES } from "./constants";
 import { styles } from "./styles";
 import { currencyOptions } from "../../constants";
-import useUserStore from "../../../store/useUserStore";
 import useCurrencyStore from "../../../store/useCurrencyStore";
 
 export function Welcome() {
@@ -15,20 +15,21 @@ export function Welcome() {
   const [currency, setUserCurrency] = useState(currencyOptions[0]);
   const scrollX = useRef(new Animated.Value(0)).current;
   const flatListRef = useRef<FlatList>(null);
+  const navigation = useNavigation();
 
   const handleNext = async () => {
     if (currentIndex < SLIDES.length - 1) {
       flatListRef.current?.scrollToIndex({ index: currentIndex + 1 });
     } else {
       await useCurrencyStore.getState().setUserCurrency(currency);
-      useUserStore.setState({ onboardingCompleted: true });
+      navigation.navigate("Loading" as never);
     }
   };
 
   const handleSkip = async () => {
     // Set default currency (USD)
     await useCurrencyStore.getState().setUserCurrency(currencyOptions[0]);
-    useUserStore.setState({ onboardingCompleted: true });
+    navigation.navigate("Loading" as never);
   };
 
   const onViewableItemsChanged = useRef(({ viewableItems }: any) => {

@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Pressable,
+  StyleSheet,
 } from "react-native";
 import { LineChart } from "react-native-gifted-charts";
 import { theme } from "../../../../theme";
@@ -35,6 +36,8 @@ interface PriceChartProps {
   selectedPoint: { price: number; date: string } | null;
   onRangeChange: (index: number) => void;
   onRetry: () => void;
+  isSubscribed?: boolean;
+  onPaywallPress?: () => void;
 }
 
 export function PriceChart({
@@ -48,6 +51,8 @@ export function PriceChart({
   selectedPoint,
   onRangeChange,
   onRetry,
+  isSubscribed = true,
+  onPaywallPress,
 }: PriceChartProps) {
   const { userCurrency } = useCurrencyStore();
   const symbol = userCurrency.symbol;
@@ -145,26 +150,18 @@ export function PriceChart({
             }}
             yAxisOffset={minValue * 0.995}
           />
+          {!isSubscribed && (
+            <Pressable style={blurStyles.blurOverlay} onPress={onPaywallPress}>
+              <View style={blurStyles.blurContent}>
+                <Text style={blurStyles.lockEmoji}>🔒</Text>
+                <Text style={blurStyles.blurText}>
+                  Subscribe to view price charts
+                </Text>
+                <Text style={blurStyles.blurSubtext}>Tap to unlock</Text>
+              </View>
+            </Pressable>
+          )}
           <View style={styles.timeRangeRow}>
-            {/* {timeRanges.map((range, index) => (
-          <TouchableOpacity
-            key={range.label}
-            style={[
-              styles.timeRangeButton,
-              selectedRange === index && styles.timeRangeButtonActive,
-            ]}
-            onPress={() => onRangeChange(index)}
-          >
-            <Text
-              style={[
-                styles.timeRangeText,
-                selectedRange === index && styles.timeRangeTextActive,
-              ]}
-            >
-              {range.label}
-            </Text>
-          </TouchableOpacity>
-        ))} */}
             <GlassPicker
               options={timeRanges.map((r) => r.label)}
               selectedIndex={selectedRange}
@@ -186,3 +183,33 @@ export function PriceChart({
     </View>
   );
 }
+
+const blurStyles = StyleSheet.create({
+  blurOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(5, 10, 20, 0.85)",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: theme.borderRadius.lg,
+    zIndex: 20,
+  },
+  blurContent: {
+    alignItems: "center",
+  },
+  lockEmoji: {
+    fontSize: 40,
+    marginBottom: theme.spacing.md,
+  },
+  blurText: {
+    color: theme.colors.text,
+    fontSize: theme.fontSize.md,
+    fontWeight: theme.fontWeight.semibold,
+    textAlign: "center",
+    marginBottom: theme.spacing.xs,
+  },
+  blurSubtext: {
+    color: theme.colors.primary,
+    fontSize: theme.fontSize.sm,
+    fontWeight: theme.fontWeight.medium,
+  },
+});

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator } from "react-native";
+import { View, Text, Animated } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { useNavigation } from "@react-navigation/native";
 import { theme } from "../../../theme";
 import { styles } from "./styles";
 
@@ -13,27 +14,58 @@ const LOADING_STEPS = [
 
 const STEP_DURATION = 800;
 
-interface LoadingScreenProps {
-  onComplete: () => void;
-}
-
-export function Loading({ onComplete }: LoadingScreenProps) {
+export function Loading() {
   const [stepIndex, setStepIndex] = useState(0);
+  const fadeAnim = useState(() => new Animated.Value(1))[0];
+  const slideAnim = useState(() => new Animated.Value(0))[0];
+  const navigation = useNavigation();
 
   useEffect(() => {
     const timer = setInterval(() => {
       setStepIndex((prev) => {
         if (prev >= LOADING_STEPS.length - 1) {
           clearInterval(timer);
-          setTimeout(onComplete, STEP_DURATION);
+          setTimeout(() => {
+            navigation.navigate("Paywall" as never);
+          }, STEP_DURATION);
           return prev;
         }
+
+        // Animate out
+        Animated.parallel([
+          Animated.timing(fadeAnim, {
+            toValue: 0,
+            duration: 200,
+            useNativeDriver: true,
+          }),
+          Animated.timing(slideAnim, {
+            toValue: -30,
+            duration: 200,
+            useNativeDriver: true,
+          }),
+        ]).start(() => {
+          // Reset position and animate in
+          slideAnim.setValue(30);
+          Animated.parallel([
+            Animated.timing(fadeAnim, {
+              toValue: 1,
+              duration: 300,
+              useNativeDriver: true,
+            }),
+            Animated.timing(slideAnim, {
+              toValue: 0,
+              duration: 300,
+              useNativeDriver: true,
+            }),
+          ]).start();
+        });
+
         return prev + 1;
       });
     }, STEP_DURATION);
 
     return () => clearInterval(timer);
-  }, [onComplete]);
+  }, [navigation, fadeAnim, slideAnim]);
 
   const step = LOADING_STEPS[stepIndex];
 
@@ -45,18 +77,36 @@ export function Loading({ onComplete }: LoadingScreenProps) {
       />
 
       <View style={styles.content}>
-        <Text style={styles.emoji}>{step.emoji}</Text>
-        <Text style={styles.stepText}>{step.text}</Text>
-        <ActivityIndicator
-          size="large"
-          color={theme.colors.primary}
-          style={styles.spinner}
-        />
+        <Animated.Text
+          style={[
+            styles.emoji,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }],
+            },
+          ]}
+        >
+          {step.emoji}
+        </Animated.Text>
+        <Animated.Text
+          style={[
+            styles.stepText,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }],
+            },
+          ]}
+        >
+          {step.text}
+        </Animated.Text>
+        <Animated.View style={[styles.spinner, { opacity: fadeAnim }]}>
+          <View style={styles.spinnerDot} />
+        </Animated.View>
       </View>
 
       <View style={styles.progressContainer}>
         {LOADING_STEPS.map((_, index) => (
-          <View
+          <Animated.View
             key={index}
             style={[
               styles.progressDot,

@@ -21,6 +21,7 @@ import {
   ChatMessage as GeminiMessage,
 } from "../../../services/chatApi";
 import { useBottomTabBarHeight } from "react-native-bottom-tabs";
+import { useNavigation } from "@react-navigation/native";
 import useSubscriptionStore from "../../../store/useSubscriptionStore";
 import useUserAssets from "../../../store/useUserAssets";
 
@@ -36,6 +37,7 @@ export function Chat() {
 
   const bottomTabHeight = useBottomTabBarHeight();
   const { isSubscribed } = useSubscriptionStore();
+  const navigation = useNavigation();
   useEffect(() => {
     if (chatMessages.length > 0) {
       setTimeout(() => {
@@ -54,6 +56,11 @@ export function Chat() {
 
   const handleSend = async () => {
     if (!inputText.trim()) return;
+
+    if (!isSubscribed) {
+      navigation.navigate("Paywall" as never);
+      return;
+    }
 
     const userMessage = inputText.trim();
     const userMessageId = Date.now().toString();

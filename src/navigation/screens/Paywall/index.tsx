@@ -10,9 +10,13 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PurchasesPackage } from "react-native-purchases";
+import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { theme } from "../../../theme";
 import { Button, IconButton } from "../../../components";
 import { revenueCatService } from "../../../services/revenueCatService";
+import { STORAGE_KEYS } from "../../constants";
+import useUserStore from "../../../store/useUserStore";
 import { styles } from "./styles";
 
 const FEATURES = [
@@ -22,18 +26,30 @@ const FEATURES = [
   { emoji: "♾️", text: "Unlimited portfolio tracking" },
 ];
 
-interface PaywallProps {
-  onClose: () => void;
-}
-
-export function Paywall({ onClose }: PaywallProps) {
+export function Paywall() {
   const [pkg, setPkg] = useState<PurchasesPackage | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isPurchasing, setIsPurchasing] = useState(false);
+  const navigation = useNavigation();
+  const { hasOnboarded } = useUserStore();
 
   useEffect(() => {
     loadOfferings();
   }, []);
+
+  const handleClose = () => {
+    if (!hasOnboarded) {
+      // During onboarding flow: mark as onboarded
+      useUserStore.setState({ hasOnboarded: true, onboardingCompleted: false });
+      AsyncStorage.setItem(
+        STORAGE_KEYS.USER,
+        JSON.stringify({ hasOnboarded: true }),
+      );
+    } else {
+      // In-app: just go back
+      navigation.goBack();
+    }
+  };
 
   const loadOfferings = async () => {
     try {
@@ -54,7 +70,7 @@ export function Paywall({ onClose }: PaywallProps) {
     setIsPurchasing(true);
     try {
       await revenueCatService.purchase(pkg);
-      onClose();
+      handleClose();
     } catch (error: any) {
       if (!error.userCancelled) {
         Alert.alert("Error", "Purchase failed. Please try again.");
@@ -68,7 +84,7 @@ export function Paywall({ onClose }: PaywallProps) {
     setIsPurchasing(true);
     try {
       await revenueCatService.restorePurchases();
-      onClose();
+      handleClose();
     } catch (error) {
       Alert.alert("Error", "Could not restore purchases. Please try again.");
     } finally {
@@ -90,7 +106,7 @@ export function Paywall({ onClose }: PaywallProps) {
       <SafeAreaView style={styles.safeArea}>
         <IconButton
           icon="close"
-          onPress={onClose}
+          onPress={handleClose}
           style={styles.closeButton}
           size="small"
         />
