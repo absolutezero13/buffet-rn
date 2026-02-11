@@ -11,6 +11,10 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.background,
   },
+  assetImage: {
+    width: 48,
+    height: 48,
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -170,6 +174,7 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     position: "relative",
     paddingTop: 64,
+    height: 360,
   },
   chartOverlay: {
     position: "absolute",
@@ -199,7 +204,7 @@ export const styles = StyleSheet.create({
     fontSize: 11,
   },
   loadingContainer: {
-    height: 220,
+    height: 360,
     alignItems: "center",
     justifyContent: "center",
   },

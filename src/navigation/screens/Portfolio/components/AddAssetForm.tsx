@@ -17,16 +17,17 @@ import {
 } from "../../../../components";
 import { styles } from "../styles";
 import { currencyOptions } from "../../../constants";
+import { AssetType } from "../../../../services/types";
 
 interface AddAssetFormProps {
   selectedAsset: SearchResult | null;
-  type: string;
+  type: AssetType;
   quantity: string;
   purchasePrice: string;
   baseCurrency: "USD" | "EUR" | "GBP";
   cashCurrency: "USD" | "EUR" | "GBP";
   onSelectAsset: (asset: SearchResult | null) => void;
-  onTypeChange: (type: string) => void;
+  onTypeChange: (type: AssetType) => void;
   onQuantityChange: (value: string) => void;
   onPurchasePriceChange: (value: string) => void;
   onCashCurrencyChange: (value: "USD" | "EUR" | "GBP") => void;
