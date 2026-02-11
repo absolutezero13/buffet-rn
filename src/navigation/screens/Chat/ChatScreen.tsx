@@ -1,7 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, FlatList, KeyboardAvoidingView, Platform } from "react-native";
+import {
+  View,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  Text,
+  Alert,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ChatMessage } from "../../../components";
+import { ChatMessage, Button } from "../../../components";
 import {
   ChatHeader,
   EmptyChat,
@@ -14,7 +21,8 @@ import {
   ChatMessage as GeminiMessage,
 } from "../../../services/chatApi";
 import { useBottomTabBarHeight } from "react-native-bottom-tabs";
-import Animated from "react-native-reanimated";
+import useSubscriptionStore from "../../../store/useSubscriptionStore";
+
 export function Chat() {
   const [chatMessages, setChatMessages] = useState<
     { id: string; role: "user" | "assistant"; content: string }[]
@@ -25,6 +33,7 @@ export function Chat() {
   const flatListRef = useRef<FlatList>(null);
 
   const bottomTabHeight = useBottomTabBarHeight();
+  const { isSubscribed } = useSubscriptionStore();
   useEffect(() => {
     if (chatMessages.length > 0) {
       setTimeout(() => {

@@ -9,6 +9,7 @@ import { assetApi } from "./services/assetApi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { STORAGE_KEYS } from "./navigation/constants";
 import useUserStore from "./store/useUserStore";
+import { revenueCatService } from "./services/revenueCatService";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 
 Asset.loadAsync([...NavigationAssets]);
@@ -21,6 +22,11 @@ const initApp = async () => {
   useUserStore.setState(
     userStore ? JSON.parse(userStore) : { hasOnboarded: false },
   );
+  try {
+    await revenueCatService.initialize();
+  } catch (error) {
+    console.error("RevenueCat initialization failed:", error);
+  }
 };
 
 export function App() {

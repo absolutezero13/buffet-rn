@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { createNativeBottomTabNavigator } from "@bottom-tabs/react-navigation";
 import {
   createStaticNavigation,
@@ -7,7 +7,11 @@ import {
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { theme } from "../theme";
 import { Portfolio, Chat, Settings, Welcome, AssetDetail } from "./screens";
+import { Loading } from "./screens/Loading";
+import { Paywall } from "./screens/Paywall";
 import useUserStore from "../store/useUserStore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { STORAGE_KEYS } from "./constants";
 
 const Tabs = createNativeBottomTabNavigator();
 
@@ -77,9 +81,39 @@ const OnboardingNavigation = createStaticNavigation(OnboardingStack);
 const AppNavigation = createStaticNavigation(AppStack);
 
 export function Navigation() {
-  const { hasOnboarded } = useUserStore();
+  const { hasOnboarded, onboardingCompleted } = useUserStore();
+  const [showLoading, setShowLoading] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
+
+  useEffect(() => {
+    if (onboardingCompleted && !hasOnboarded) {
+      setShowLoading(true);
+    }
+  }, [onboardingCompleted, hasOnboarded]);
+
+  const handleLoadingComplete = useCallback(() => {
+    setShowLoading(false);
+    setShowPaywall(true);
+  }, []);
+
+  const handlePaywallClose = useCallback(() => {
+    setShowPaywall(false);
+    useUserStore.setState({ hasOnboarded: true, onboardingCompleted: false });
+    AsyncStorage.setItem(
+      STORAGE_KEYS.USER,
+      JSON.stringify({ hasOnboarded: true }),
+    );
+  }, []);
 
   if (!hasOnboarded) {
+    if (showPaywall) {
+      return <Paywall onClose={handlePaywallClose} />;
+    }
+
+    if (showLoading) {
+      return <Loading onComplete={handleLoadingComplete} />;
+    }
+
     return <OnboardingNavigation />;
   }
 

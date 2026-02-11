@@ -14,6 +14,7 @@ import { PriceHistoryPoint } from "../../../services/types";
 import useUserAssets from "../../../store/useUserAssets";
 import { assetApi } from "../../../services/assetApi";
 import { useCurrency } from "../../../hooks";
+import useSubscriptionStore from "../../../store/useSubscriptionStore";
 
 type RouteParams = {
   AssetDetail: {
@@ -40,6 +41,7 @@ export function AssetDetail() {
     getAssetPurchasePrice,
     getAssetCurrentPrice,
   } = useCurrency();
+  const { isSubscribed } = useSubscriptionStore();
   const [selectedRange, setSelectedRange] = useState(1);
   const [chartData, setChartData] = useState<
     { value: number; label: string; date: string }[]
@@ -101,6 +103,11 @@ export function AssetDetail() {
   const fetchPriceHistory = useCallback(async () => {
     if (!asset) return;
 
+    if (!isSubscribed) {
+      setIsLoading(false);
+      return;
+    }
+
     setSelectedPoint(null);
 
     try {
@@ -154,7 +161,7 @@ export function AssetDetail() {
     } finally {
       setIsLoading(false);
     }
-  }, [asset, selectedRange, generateFallbackData, toUserCurrency]);
+  }, [asset, selectedRange, generateFallbackData, toUserCurrency, isSubscribed]);
 
   useEffect(() => {
     fetchPriceHistory();
