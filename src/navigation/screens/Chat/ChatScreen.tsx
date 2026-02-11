@@ -68,7 +68,7 @@ export function Chat() {
 
     try {
       const reply = await chatApi.sendMessage(
-        additionalPrompt + userMessage,
+        additionalPrompt ? additionalPrompt + userMessage : userMessage,
         chatHistory,
       );
 
@@ -89,6 +89,7 @@ export function Chat() {
         { role: "user", parts: [{ text: userMessage }] },
         { role: "model", parts: [{ text: reply }] },
       ]);
+      setAdditionalPrompt("");
     } catch (error) {
       console.error("Failed to send message:", error);
       const errorMessageId = (Date.now() + 1).toString();
