@@ -1,7 +1,8 @@
 import React from "react";
-import { View, Text, Image } from "react-native";
+import { View, Text } from "react-native";
 import { GlassCard, Button } from "../../../../components";
 import { styles } from "../styles";
+import { Image } from "expo-image";
 
 interface EmptyPortfolioProps {
   onAddAsset: () => void;

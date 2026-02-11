@@ -6,7 +6,6 @@ import {
   ActivityIndicator,
   Pressable,
   StyleSheet,
-  Image,
 } from "react-native";
 import { LineChart } from "react-native-gifted-charts";
 import { theme } from "../../../../theme";
@@ -14,6 +13,7 @@ import { Button } from "../../../../components";
 import { styles, CHART_WIDTH } from "../styles";
 import useCurrencyStore from "../../../../store/useCurrencyStore";
 import GlassPicker from "../../../../components/GlassPicker";
+import { Image } from "expo-image";
 
 interface ChartDataPoint {
   value: number;
