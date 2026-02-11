@@ -2,18 +2,24 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { theme } from "../theme";
 import { GlassCard } from "./GlassCard";
+import { StreamingText } from "./StreamingText";
 
 export interface ChatMessageType {
   id: string;
   role: "user" | "assistant";
   content: string;
+  isStreaming?: boolean;
 }
 
 interface ChatMessageProps {
   message: ChatMessageType;
+  onStreamingComplete?: () => void;
 }
 
-export function ChatMessage({ message }: ChatMessageProps) {
+export function ChatMessage({
+  message,
+  onStreamingComplete,
+}: ChatMessageProps) {
   const isUser = message.role === "user";
 
   return (
@@ -25,9 +31,13 @@ export function ChatMessage({ message }: ChatMessageProps) {
       ) : (
         <GlassCard style={styles.assistantCard} effect="clear">
           <View style={styles.assistantHeader}>
-            <Text style={styles.assistantLabel}>🤖 Buffet AI</Text>
+            <Text style={styles.assistantLabel}>Buffet AI</Text>
           </View>
-          <Text style={styles.assistantText}>{message.content}</Text>
+          <StreamingText
+            text={message.content}
+            isStreaming={message.isStreaming}
+            onComplete={onStreamingComplete}
+          />
         </GlassCard>
       )}
     </View>

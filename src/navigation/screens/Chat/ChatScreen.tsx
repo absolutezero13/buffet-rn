@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   View,
   FlatList,
@@ -8,7 +8,7 @@ import {
   Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ChatMessage, Button } from "../../../components";
+import { ChatMessage, Button, ChatMessageType } from "../../../components";
 import {
   ChatHeader,
   EmptyChat,
@@ -22,13 +22,15 @@ import {
 } from "../../../services/chatApi";
 import { useBottomTabBarHeight } from "react-native-bottom-tabs";
 import useSubscriptionStore from "../../../store/useSubscriptionStore";
+import useUserAssets from "../../../store/useUserAssets";
 
 export function Chat() {
   const [chatMessages, setChatMessages] = useState<
-    { id: string; role: "user" | "assistant"; content: string }[]
+    (ChatMessageType & { isStreaming?: boolean })[]
   >([]);
   const [chatHistory, setChatHistory] = useState<GeminiMessage[]>([]);
   const [inputText, setInputText] = useState("");
+  const [additionalPrompt, setAdditionalPrompt] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const flatListRef = useRef<FlatList>(null);
 
@@ -41,6 +43,14 @@ export function Chat() {
       }, 200);
     }
   }, [chatMessages]);
+
+  const handleStreamingComplete = useCallback((messageId: string) => {
+    setChatMessages((prev) =>
+      prev.map((msg) =>
+        msg.id === messageId ? { ...msg, isStreaming: false } : msg,
+      ),
+    );
+  }, []);
 
   const handleSend = async () => {
     if (!inputText.trim()) return;
@@ -57,12 +67,20 @@ export function Chat() {
     setIsTyping(true);
 
     try {
-      const reply = await chatApi.sendMessage(userMessage, chatHistory);
+      const reply = await chatApi.sendMessage(
+        additionalPrompt + userMessage,
+        chatHistory,
+      );
 
       const assistantMessageId = (Date.now() + 1).toString();
       setChatMessages((prev) => [
         ...prev,
-        { id: assistantMessageId, role: "assistant", content: reply },
+        {
+          id: assistantMessageId,
+          role: "assistant",
+          content: reply,
+          isStreaming: true,
+        },
       ]);
 
       // Update history for next request
@@ -80,6 +98,7 @@ export function Chat() {
           id: errorMessageId,
           role: "assistant",
           content: "Sorry, I couldn't process your request. Please try again.",
+          isStreaming: false,
         },
       ]);
     } finally {
@@ -87,14 +106,29 @@ export function Chat() {
     }
   };
 
-  const handleSuggestionPress = (suggestion: string) => {
-    setInputText(suggestion);
+  const handleSuggestionPress = (suggestion: { text: string; id: string }) => {
+    if (suggestion.id === "how-portfolio") {
+      const userAssets = useUserAssets.getState().userAssets;
+      const additionalPrompt = JSON.stringify(userAssets);
+      setAdditionalPrompt(additionalPrompt);
+    }
+    setInputText(suggestion.text);
   };
 
   const clearChat = () => {
     setChatMessages([]);
     setChatHistory([]);
   };
+
+  const renderMessage = useCallback(
+    ({ item }: { item: ChatMessageType & { isStreaming?: boolean } }) => (
+      <ChatMessage
+        message={item}
+        onStreamingComplete={() => handleStreamingComplete(item.id)}
+      />
+    ),
+    [handleStreamingComplete],
+  );
 
   return (
     <>
@@ -108,7 +142,7 @@ export function Chat() {
           <FlatList
             ref={flatListRef}
             data={chatMessages}
-            renderItem={({ item }) => <ChatMessage message={item} />}
+            renderItem={renderMessage}
             keyExtractor={(item) => item.id}
             contentContainerStyle={[styles.messageList, { paddingBottom: 0 }]}
             ListEmptyComponent={

@@ -4,13 +4,13 @@ import { GlassCard } from "../../../../components";
 import { styles } from "../styles";
 
 interface EmptyChatProps {
-  onSuggestionPress: (suggestion: string) => void;
+  onSuggestionPress: (suggestion: { text: string; id: string }) => void;
 }
 
 const SUGGESTIONS = [
-  "How's my portfolio doing?",
-  "Tell me about Warren Buffett",
-  "Tips for diversification",
+  { text: "How's my portfolio doing?", id: "how-portfolio" },
+  { text: "Tell me about Warren Buffett", id: "warren-buffett" },
+  { text: "Tips for diversification", id: "diversification" },
 ];
 
 export function EmptyChat({ onSuggestionPress }: EmptyChatProps) {
@@ -33,7 +33,7 @@ export function EmptyChat({ onSuggestionPress }: EmptyChatProps) {
             style={styles.suggestionButton}
             onPress={() => onSuggestionPress(suggestion)}
           >
-            <Text style={styles.suggestionText}>{suggestion}</Text>
+            <Text style={styles.suggestionText}>{suggestion.text}</Text>
           </TouchableOpacity>
         ))}
       </View>

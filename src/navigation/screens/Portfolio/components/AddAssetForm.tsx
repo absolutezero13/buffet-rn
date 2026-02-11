@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
+  Keyboard,
 } from "react-native";
 import {
   Button,
@@ -48,6 +49,22 @@ export function AddAssetForm({
   onSubmit,
   onClose,
 }: AddAssetFormProps) {
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardWillShow",
+      () => setKeyboardVisible(true),
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardWillHide",
+      () => setKeyboardVisible(false),
+    );
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -64,13 +81,15 @@ export function AddAssetForm({
       </View>
 
       <View style={styles.sheetBody}>
-        <TypeSelector
-          selected={type}
-          onSelect={(t) => {
-            onTypeChange(t);
-            onSelectAsset(null);
-          }}
-        />
+        {!keyboardVisible && (
+          <TypeSelector
+            selected={type}
+            onSelect={(t) => {
+              onTypeChange(t);
+              onSelectAsset(null);
+            }}
+          />
+        )}
 
         {type === "cash" ? (
           <View style={styles.currencySelector}>

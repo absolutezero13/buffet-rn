@@ -7,6 +7,7 @@ import {
   ScrollView,
 } from "react-native";
 import { theme } from "../theme";
+import Animated, { LinearTransition } from "react-native-reanimated";
 
 interface TypeSelectorProps {
   selected: string;
@@ -22,7 +23,7 @@ const types = [
 
 export function TypeSelector({ selected, onSelect }: TypeSelectorProps) {
   return (
-    <View style={styles.container}>
+    <Animated.View layout={LinearTransition} style={styles.container}>
       <Text style={styles.label}>Asset Type</Text>
       <ScrollView
         horizontal
@@ -50,7 +51,7 @@ export function TypeSelector({ selected, onSelect }: TypeSelectorProps) {
           </TouchableOpacity>
         ))}
       </ScrollView>
-    </View>
+    </Animated.View>
   );
 }
 
