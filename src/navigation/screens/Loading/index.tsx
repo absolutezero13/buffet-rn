@@ -12,7 +12,7 @@ const LOADING_STEPS = [
   { emoji: "✨", text: "Almost ready..." },
 ];
 
-const STEP_DURATION = 800;
+const STEP_DURATION = 1500;
 
 export function Loading() {
   const [stepIndex, setStepIndex] = useState(0);

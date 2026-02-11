@@ -1,13 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import {
-  View,
-  FlatList,
-  KeyboardAvoidingView,
-  Platform,
-  Text,
-  Alert,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { View, FlatList, KeyboardAvoidingView } from "react-native";
 import { ChatMessage, Button, ChatMessageType } from "../../../components";
 import {
   ChatHeader,

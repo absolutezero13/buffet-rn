@@ -8,7 +8,7 @@ import {
   Image,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { SafeAreaView } from "react-native-safe-area-context";
+
 import { PurchasesPackage } from "react-native-purchases";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -32,7 +32,6 @@ export function Paywall() {
   const [isPurchasing, setIsPurchasing] = useState(false);
   const navigation = useNavigation();
   const { hasOnboarded } = useUserStore();
-
   useEffect(() => {
     loadOfferings();
   }, []);
@@ -103,11 +102,11 @@ export function Paywall() {
         style={styles.gradient}
       />
 
-      <SafeAreaView style={styles.safeArea}>
+      <View style={styles.safeArea}>
         <IconButton
           icon="close"
           onPress={handleClose}
-          style={styles.closeButton}
+          style={{ ...styles.closeButton, position: "absolute", top: 15 }}
           size="small"
         />
 
@@ -152,7 +151,7 @@ export function Paywall() {
             </>
           )}
         </View>
-      </SafeAreaView>
+      </View>
     </>
   );
 }

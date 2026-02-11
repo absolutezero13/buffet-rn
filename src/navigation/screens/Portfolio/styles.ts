@@ -8,8 +8,8 @@ export const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   emptyAsset: {
-    width: 200,
-    height: 200,
+    width: 120,
+    height: 120,
   },
   contentContainer: {
     paddingTop: PORTFOLIO_HEADER_HEIGHT + theme.spacing.md,

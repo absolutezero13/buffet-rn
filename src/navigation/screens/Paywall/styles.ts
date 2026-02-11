@@ -15,6 +15,7 @@ export const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
+    paddingBottom: theme.spacing.md,
   },
   closeButton: {
     alignSelf: "flex-end",
@@ -28,6 +29,7 @@ export const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     paddingHorizontal: theme.spacing.xl,
+    paddingTop: theme.spacing.xl,
   },
   icon: {
     width: 150,
