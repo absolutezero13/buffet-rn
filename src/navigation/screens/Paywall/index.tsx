@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
-  Image,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -18,6 +17,7 @@ import { revenueCatService } from "../../../services/revenueCatService";
 import { STORAGE_KEYS } from "../../constants";
 import useUserStore from "../../../store/useUserStore";
 import { styles } from "./styles";
+import { Image } from "expo-image";
 
 const FEATURES = [
   {

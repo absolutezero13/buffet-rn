@@ -1,7 +1,8 @@
 import React from "react";
-import { View, Text, TouchableOpacity, Image } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import { GlassCard } from "../../../../components";
 import { styles } from "../styles";
+import { Image } from "expo-image";
 
 interface EmptyChatProps {
   onSuggestionPress: (suggestion: { text: string; id: string }) => void;
