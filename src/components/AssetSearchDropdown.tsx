@@ -135,16 +135,21 @@ export function AssetSearchDropdown({
             setTimeout(() => setShowResults(false), 50);
           }}
         />
-        {isLoading && (
-          <ActivityIndicator
-            size="small"
-            color={theme.colors.primary}
-            style={styles.loader}
-          />
-        )}
-        {query.length > 0 && !isLoading && (
-          <TouchableOpacity onPress={handleClear} style={styles.clearButton}>
-            <MaterialIcons name="close" size={18} color={theme.colors.textMuted} />
+
+        {query.length > 0 && (
+          <TouchableOpacity
+            onPress={isLoading ? undefined : handleClear}
+            style={styles.clearButton}
+          >
+            {isLoading ? (
+              <ActivityIndicator size="small" color={theme.colors.primary} />
+            ) : (
+              <MaterialIcons
+                name={"close"}
+                size={18}
+                color={theme.colors.textMuted}
+              />
+            )}
           </TouchableOpacity>
         )}
       </View>
@@ -220,6 +225,7 @@ const styles = StyleSheet.create({
     padding: theme.spacing.md,
     alignItems: "center",
     justifyContent: "center",
+    width: 50,
   },
   dropdown: {
     position: "absolute",
