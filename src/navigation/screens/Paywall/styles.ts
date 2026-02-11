@@ -67,8 +67,10 @@ export const styles = StyleSheet.create({
     borderColor: theme.colors.glassBorder,
   },
   featureEmoji: {
-    fontSize: 24,
+    width: 32,
+    height: 32,
     marginRight: theme.spacing.md,
+    borderRadius: theme.borderRadius.full,
   },
   featureText: {
     color: theme.colors.text,

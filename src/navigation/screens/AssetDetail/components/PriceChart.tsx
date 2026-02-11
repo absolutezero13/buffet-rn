@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   Pressable,
   StyleSheet,
+  Image,
 } from "react-native";
 import { LineChart } from "react-native-gifted-charts";
 import { theme } from "../../../../theme";
@@ -153,12 +154,16 @@ export function PriceChart({
           {!isSubscribed && (
             <Pressable style={blurStyles.blurOverlay} onPress={onPaywallPress}>
               <View style={blurStyles.blurContent}>
-                <Text style={blurStyles.lockEmoji}>🔒</Text>
-                <Text style={blurStyles.blurText}>
-                  Subscribe to view price charts
-                </Text>
-                <Text style={blurStyles.blurSubtext}>Tap to unlock</Text>
+                <Image
+                  source={require("../../../../assets/lock.png")}
+                  style={blurStyles.lockEmoji}
+                />
               </View>
+              <Text style={blurStyles.blurText}>
+                {" "}
+                Subscribe to view price charts{" "}
+              </Text>
+              <Text style={blurStyles.blurSubtext}> Tap to unlock </Text>
             </Pressable>
           )}
           <View style={styles.timeRangeRow}>
@@ -197,7 +202,8 @@ const blurStyles = StyleSheet.create({
     alignItems: "center",
   },
   lockEmoji: {
-    fontSize: 40,
+    width: 80,
+    height: 80,
     marginBottom: theme.spacing.md,
   },
   blurText: {

@@ -20,10 +20,22 @@ import useUserStore from "../../../store/useUserStore";
 import { styles } from "./styles";
 
 const FEATURES = [
-  { emoji: "🤖", text: "AI-powered financial chatbot" },
-  { emoji: "📈", text: "Historical price charts" },
-  { emoji: "💡", text: "Personalized investment insights" },
-  { emoji: "♾️", text: "Unlimited portfolio tracking" },
+  {
+    emoji: require("../../../assets/bison.png"),
+    text: "AI-powered financial chatbot",
+  },
+  {
+    emoji: require("../../../assets/chart.png"),
+    text: "Historical price charts",
+  },
+  {
+    emoji: require("../../../assets/bulb.png"),
+    text: "Personalized investment insights",
+  },
+  {
+    emoji: require("../../../assets/infinity.png"),
+    text: "Unlimited portfolio tracking",
+  },
 ];
 
 export function Paywall() {
@@ -111,7 +123,6 @@ export function Paywall() {
         />
 
         <View style={styles.content}>
-          {/* <Text style={styles.emoji}>🦬</Text> */}
           <Image source={require("../Chat/ai-icon.png")} style={styles.icon} />
           <Text style={styles.title}>Buffet AI Pro</Text>
           <Text style={styles.subtitle}>
@@ -121,7 +132,7 @@ export function Paywall() {
           <View style={styles.features}>
             {FEATURES.map((feature, index) => (
               <View key={index} style={styles.featureRow}>
-                <Text style={styles.featureEmoji}>{feature.emoji}</Text>
+                <Image source={feature.emoji} style={styles.featureEmoji} />
                 <Text style={styles.featureText}>{feature.text}</Text>
               </View>
             ))}

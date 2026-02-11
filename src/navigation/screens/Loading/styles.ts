@@ -19,39 +19,15 @@ export const styles = StyleSheet.create({
     alignItems: "center",
   },
   emoji: {
-    fontSize: 64,
-    marginBottom: theme.spacing.lg,
+    width: 120,
+    height: 120,
+    marginBottom: theme.spacing.xl,
   },
   stepText: {
     color: theme.colors.text,
     fontSize: theme.fontSize.xl,
     fontWeight: theme.fontWeight.semibold,
     textAlign: "center",
-    marginBottom: theme.spacing.xl,
-  },
-  spinner: {
-    marginTop: theme.spacing.md,
-    alignItems: "center",
-  },
-  spinnerDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: theme.colors.primary,
-  },
-  progressContainer: {
-    flexDirection: "row",
-    position: "absolute",
-    bottom: 80,
-    gap: theme.spacing.sm,
-  },
-  progressDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: theme.colors.surfaceLighter,
-  },
-  progressDotActive: {
-    backgroundColor: theme.colors.primary,
+    minWidth: 180,
   },
 });
