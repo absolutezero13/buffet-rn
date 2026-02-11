@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
   },
   label: {
     color: theme.colors.textSecondary,
-    fontSize: theme.fontSize.sm,
+    fontSize: theme.fontSize.md,
     marginBottom: theme.spacing.xs,
   },
   value: {
@@ -101,11 +101,12 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     color: theme.colors.textMuted,
-    fontSize: theme.fontSize.xs,
+    fontSize: theme.fontSize.sm,
   },
   statValue: {
     color: theme.colors.text,
     fontSize: theme.fontSize.md,
     fontWeight: theme.fontWeight.medium,
+    marginTop: theme.spacing.xs,
   },
 });

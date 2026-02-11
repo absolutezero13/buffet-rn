@@ -96,7 +96,7 @@ export function Welcome() {
         viewabilityConfig={{ viewAreaCoveragePercentThreshold: 50 }}
         renderItem={({ item }) => (
           <OnboardingSlide
-            emoji={item.emoji}
+            asset={item.asset}
             title={item.title}
             description={item.description}
           >

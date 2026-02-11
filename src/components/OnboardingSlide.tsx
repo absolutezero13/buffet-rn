@@ -1,19 +1,19 @@
 import React from "react";
-import { View, Text, StyleSheet, Dimensions } from "react-native";
+import { View, Text, StyleSheet, Dimensions, Image } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { theme } from "../theme";
 
 const { width, height } = Dimensions.get("window");
 
 interface OnboardingSlideProps {
-  emoji: string;
+  asset: string;
   title: string;
   description: string;
   children?: React.ReactNode;
 }
 
 export function OnboardingSlide({
-  emoji,
+  asset,
   title,
   description,
   children,
@@ -24,7 +24,7 @@ export function OnboardingSlide({
         colors={["rgba(99, 102, 241, 0.2)", "transparent"]}
         style={styles.glow}
       />
-      <Text style={styles.emoji}>{emoji}</Text>
+      <Image source={asset} style={styles.asset} />
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.description}>{description}</Text>
       {children && <View style={styles.customContent}>{children}</View>}
@@ -38,6 +38,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: theme.spacing.xl,
+  },
+  asset: {
+    width: 200,
+    height: 200,
+    marginBottom: theme.spacing.xl,
   },
   glow: {
     position: "absolute",

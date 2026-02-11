@@ -7,6 +7,10 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.background,
   },
+  emptyAsset: {
+    width: 200,
+    height: 200,
+  },
   contentContainer: {
     paddingTop: PORTFOLIO_HEADER_HEIGHT + theme.spacing.md,
     paddingBottom: theme.spacing.xxl,
@@ -57,7 +61,7 @@ export const styles = StyleSheet.create({
   },
   emptyCard: {
     alignItems: "center",
-    paddingVertical: theme.spacing.xxl,
+    paddingBottom: theme.spacing.lg,
   },
   emptyEmoji: {
     fontSize: 48,
@@ -78,7 +82,7 @@ export const styles = StyleSheet.create({
     marginBottom: theme.spacing.lg,
   },
   emptyButton: {
-    marginTop: theme.spacing.md,
+    marginTop: theme.spacing.xs,
   },
   bottomPadding: {
     height: theme.spacing.xxl,

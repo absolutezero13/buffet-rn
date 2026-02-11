@@ -138,4 +138,8 @@ export const styles = StyleSheet.create({
   inputSafeArea: {
     height: 34,
   },
+  aiIcon: {
+    width: 200,
+    height: 200,
+  },
 });

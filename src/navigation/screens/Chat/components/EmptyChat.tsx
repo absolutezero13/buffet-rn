@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Image } from "react-native";
 import { GlassCard } from "../../../../components";
 import { styles } from "../styles";
 
@@ -17,7 +17,7 @@ export function EmptyChat({ onSuggestionPress }: EmptyChatProps) {
   return (
     <View style={styles.emptyContainer}>
       <GlassCard style={styles.welcomeCard}>
-        <Text style={styles.welcomeEmoji}>🤖</Text>
+        <Image source={require("../ai-icon.png")} style={styles.aiIcon} />
         <Text style={styles.welcomeTitle}>Buffet AI</Text>
         <Text style={styles.welcomeText}>
           Your intelligent investment assistant. Ask me about investing

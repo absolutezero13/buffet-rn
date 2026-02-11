@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { View, Text, Image } from "react-native";
 import { GlassCard, Button } from "../../../../components";
 import { styles } from "../styles";
 
@@ -10,7 +10,7 @@ interface EmptyPortfolioProps {
 export function EmptyPortfolio({ onAddAsset }: EmptyPortfolioProps) {
   return (
     <GlassCard style={styles.emptyCard}>
-      <Text style={styles.emptyEmoji}>📭</Text>
+      <Image source={require("../empty-asset.png")} style={styles.emptyAsset} />
       <Text style={styles.emptyTitle}>No Assets Yet</Text>
       <Text style={styles.emptyText}>
         Start building your portfolio by adding your first asset
