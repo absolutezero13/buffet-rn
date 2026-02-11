@@ -45,7 +45,7 @@ export const styles = StyleSheet.create({
   },
   welcomeCard: {
     alignItems: "center",
-    paddingVertical: theme.spacing.xl,
+    paddingVertical: theme.spacing.md,
     marginBottom: theme.spacing.xl,
   },
   welcomeEmoji: {
