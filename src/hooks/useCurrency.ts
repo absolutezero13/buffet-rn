@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 import useCurrencyStore from "../store/useCurrencyStore";
 import useWeightUnitStore from "../store/useWeightUnitStore";
-import { CurrencyCode, COMMODITY_OPTIONS } from "../navigation/constants";
+import { CurrencyCode, COMMODITY_OPTIONS, TROY_OUNCE_TO_GRAM } from "../navigation/constants";
 import { Asset } from "../services/types";
 
 /**
@@ -191,7 +191,7 @@ export function useCurrency() {
       if (isCommodityAsset(asset)) {
         // If user prefers grams, convert from ounces to grams
         if (weightUnit.id === "GRAM") {
-          return asset.quantity * 31.1035; // TROY_OUNCE_TO_GRAM
+          return asset.quantity * TROY_OUNCE_TO_GRAM;
         }
       }
       return asset.quantity;

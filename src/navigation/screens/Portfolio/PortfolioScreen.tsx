@@ -84,7 +84,7 @@ export function Portfolio() {
     await assetApi.addAsset({
       name: assetName,
       symbol:
-        type === "crypto" ? (selectedAsset?.id ?? "unknows") : assetSymbol,
+        type === "crypto" ? (selectedAsset?.id ?? "unknown") : assetSymbol,
       type: type as "stock" | "etf" | "crypto" | "gold" | "cash" | "other",
       quantity: finalQuantity,
       purchasePrice: finalPurchasePrice,
