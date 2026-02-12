@@ -163,23 +163,27 @@ export function PriceChart({
             <Pressable style={blurStyles.blurOverlay} onPress={onPaywallPress}>
               <LinearGradient
                 colors={[
-                  "rgba(5, 10, 20, 0.7)",
+                  "transparent",
+                  "rgba(5, 10, 20, 0.6)",
                   "rgba(5, 10, 20, 0.85)",
                   "rgba(5, 10, 20, 0.95)",
                 ]}
+                locations={[0, 0.3, 0.6, 1]}
                 style={blurStyles.gradient}
               />
               <View style={blurStyles.blurContent}>
-                <View style={blurStyles.lockIconContainer}>
-                  <Image
-                    source={require("../../../../assets/lock.png")}
-                    style={blurStyles.lockEmoji}
-                  />
-                </View>
-                <Text style={blurStyles.blurText}>
-                  Subscribe to view price charts
+                <Image
+                  source={require("../../../../assets/lock.png")}
+                  style={blurStyles.lockIcon}
+                />
+                <Text style={blurStyles.title}>Unlock Price Charts</Text>
+                <Text style={blurStyles.subtitle}>
+                  Subscribe to Buffet AI Pro to view detailed price charts
                 </Text>
-                <Text style={blurStyles.blurSubtext}>Tap to unlock</Text>
+                <Button
+                  title="Subscribe Now"
+                  onPress={onPaywallPress ?? (() => {})}
+                />
               </View>
             </Pressable>
           )}
@@ -209,10 +213,9 @@ export function PriceChart({
 const blurStyles = StyleSheet.create({
   blurOverlay: {
     ...StyleSheet.absoluteFillObject,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: "flex-end",
     borderRadius: theme.borderRadius.lg,
-    zIndex: 20,
+    zIndex: 100,
     overflow: "hidden",
   },
   gradient: {
@@ -220,33 +223,27 @@ const blurStyles = StyleSheet.create({
   },
   blurContent: {
     alignItems: "center",
-    zIndex: 1,
+    paddingHorizontal: theme.spacing.xl,
+    paddingBottom: theme.spacing.xxl * 2,
   },
-  lockIconContainer: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: "rgba(0, 217, 255, 0.1)",
-    borderWidth: 1,
-    borderColor: "rgba(0, 217, 255, 0.3)",
-    justifyContent: "center",
-    alignItems: "center",
+  lockIcon: {
+    width: 64,
+    height: 64,
     marginBottom: theme.spacing.md,
   },
-  lockEmoji: {
-    width: 36,
-    height: 36,
-  },
-  blurText: {
+  title: {
     color: theme.colors.text,
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: theme.fontSize.xl,
+    fontWeight: theme.fontWeight.bold,
     textAlign: "center",
-    marginBottom: theme.spacing.xs,
+    marginBottom: theme.spacing.sm,
   },
-  blurSubtext: {
-    color: theme.colors.primary,
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.medium,
+  subtitle: {
+    color: theme.colors.textSecondary,
+    fontSize: theme.fontSize.md,
+    textAlign: "center",
+    lineHeight: 22,
+    marginBottom: theme.spacing.lg,
+    paddingHorizontal: theme.spacing.md,
   },
 });

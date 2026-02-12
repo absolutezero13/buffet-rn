@@ -51,7 +51,7 @@ export function AssetCard({ asset, onDelete }: AssetCardProps) {
       style={styles.container}
       interactive
     >
-      <Pressable onPress={handlePress}>
+      <Pressable onPress={asset.type === "cash" ? undefined : handlePress}>
         <View style={styles.header}>
           <View style={styles.headerLeft}>
             <Image
