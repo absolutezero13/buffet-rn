@@ -15,9 +15,10 @@ import {
 } from "./components";
 import { styles } from "./styles";
 import { theme } from "../../../theme";
-import { CurrencyCode } from "../../constants";
+import { CurrencyCode, TROY_OUNCE_TO_GRAM } from "../../constants";
 import { assetApi } from "../../../services/assetApi";
 import useCurrencyStore from "../../../store/useCurrencyStore";
+import useWeightUnitStore from "../../../store/useWeightUnitStore";
 import useUserAssets from "../../../store/useUserAssets";
 import { useCurrency } from "../../../hooks";
 import { AssetType } from "../../../services/types";
@@ -25,6 +26,7 @@ import { AssetType } from "../../../services/types";
 export function Portfolio() {
   const { userAssets: assets, isLoading } = useUserAssets();
   const { userCurrency } = useCurrencyStore();
+  const { weightUnit } = useWeightUnitStore();
   const { getAssetCurrentValue, getAssetTotalCost } = useCurrency();
 
   const sheetRef = useRef<TrueSheet>(null);
@@ -64,6 +66,18 @@ export function Portfolio() {
       ? `Cash (${cashCurrency})`
       : selectedAsset?.name || "";
 
+    // For commodities, convert quantity from user's weight unit to ounces for storage
+    // Also convert purchase price from per-gram to per-ounce if user is in gram mode
+    let finalQuantity = parseFloat(quantity);
+    let finalPurchasePrice = isCash ? 1 : parseFloat(purchasePrice);
+
+    if (type === "gold" && weightUnit.id === "GRAM") {
+      // Convert grams to ounces (stored quantity is always in ounces)
+      finalQuantity = finalQuantity / TROY_OUNCE_TO_GRAM;
+      // Convert price per gram to price per ounce
+      finalPurchasePrice = finalPurchasePrice * TROY_OUNCE_TO_GRAM;
+    }
+
     resetForm();
     sheetRef.current?.dismiss();
 
@@ -72,8 +86,8 @@ export function Portfolio() {
       symbol:
         type === "crypto" ? (selectedAsset?.id ?? "unknows") : assetSymbol,
       type: type as "stock" | "etf" | "crypto" | "gold" | "cash" | "other",
-      quantity: parseFloat(quantity),
-      purchasePrice: isCash ? 1 : parseFloat(purchasePrice),
+      quantity: finalQuantity,
+      purchasePrice: finalPurchasePrice,
       purchaseCurrency: userCurrency?.id || "USD",
     });
   };

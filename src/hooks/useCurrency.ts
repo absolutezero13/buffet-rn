@@ -181,6 +181,39 @@ export function useCurrency() {
     [convertFromUSD, convertFromOunce],
   );
 
+  /**
+   * Get the display quantity for an asset
+   * For commodities, converts from troy ounces to user's weight unit
+   * (Commodities are stored in troy ounces)
+   */
+  const getAssetDisplayQuantity = useCallback(
+    (asset: Asset): number => {
+      if (isCommodityAsset(asset)) {
+        // If user prefers grams, convert from ounces to grams
+        if (weightUnit.id === "GRAM") {
+          return asset.quantity * 31.1035; // TROY_OUNCE_TO_GRAM
+        }
+      }
+      return asset.quantity;
+    },
+    [weightUnit],
+  );
+
+  /**
+   * Get the unit label for quantity display
+   * For commodities, returns the weight unit label (oz or g)
+   * For other assets, returns empty string
+   */
+  const getAssetQuantityUnit = useCallback(
+    (asset: Asset): string => {
+      if (isCommodityAsset(asset)) {
+        return weightUnit.label;
+      }
+      return "";
+    },
+    [weightUnit],
+  );
+
   return {
     userCurrency,
     weightUnit,
@@ -197,6 +230,8 @@ export function useCurrency() {
     getAssetGainLoss,
     getAssetPurchasePrice,
     getAssetCurrentPrice,
+    getAssetDisplayQuantity,
+    getAssetQuantityUnit,
     isCommodityAsset,
   };
 }

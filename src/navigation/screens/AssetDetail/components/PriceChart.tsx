@@ -7,6 +7,7 @@ import {
   Pressable,
   StyleSheet,
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { LineChart } from "react-native-gifted-charts";
 import { theme } from "../../../../theme";
 import { Button } from "../../../../components";
@@ -160,17 +161,26 @@ export function PriceChart({
           />
           {!isSubscribed && (
             <Pressable style={blurStyles.blurOverlay} onPress={onPaywallPress}>
+              <LinearGradient
+                colors={[
+                  "rgba(5, 10, 20, 0.7)",
+                  "rgba(5, 10, 20, 0.85)",
+                  "rgba(5, 10, 20, 0.95)",
+                ]}
+                style={blurStyles.gradient}
+              />
               <View style={blurStyles.blurContent}>
-                <Image
-                  source={require("../../../../assets/lock.png")}
-                  style={blurStyles.lockEmoji}
-                />
+                <View style={blurStyles.lockIconContainer}>
+                  <Image
+                    source={require("../../../../assets/lock.png")}
+                    style={blurStyles.lockEmoji}
+                  />
+                </View>
+                <Text style={blurStyles.blurText}>
+                  Subscribe to view price charts
+                </Text>
+                <Text style={blurStyles.blurSubtext}>Tap to unlock</Text>
               </View>
-              <Text style={blurStyles.blurText}>
-                {" "}
-                Subscribe to view price charts{" "}
-              </Text>
-              <Text style={blurStyles.blurSubtext}> Tap to unlock </Text>
             </Pressable>
           )}
           <View style={styles.timeRangeRow}>
@@ -199,19 +209,33 @@ export function PriceChart({
 const blurStyles = StyleSheet.create({
   blurOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(5, 10, 20, 0.85)",
     justifyContent: "center",
     alignItems: "center",
     borderRadius: theme.borderRadius.lg,
     zIndex: 20,
+    overflow: "hidden",
+  },
+  gradient: {
+    ...StyleSheet.absoluteFillObject,
   },
   blurContent: {
     alignItems: "center",
+    zIndex: 1,
+  },
+  lockIconContainer: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: "rgba(0, 217, 255, 0.1)",
+    borderWidth: 1,
+    borderColor: "rgba(0, 217, 255, 0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: theme.spacing.md,
   },
   lockEmoji: {
-    width: 80,
-    height: 80,
-    marginBottom: theme.spacing.md,
+    width: 36,
+    height: 36,
   },
   blurText: {
     color: theme.colors.text,

@@ -6,6 +6,7 @@ import {
   EmptyChat,
   TypingIndicator,
   ChatInput,
+  ChatPaywallOverlay,
 } from "./components";
 import { styles } from "./styles";
 import {
@@ -160,6 +161,12 @@ export function Chat() {
             isDisabled={isTyping}
           />
         </View>
+
+        {!isSubscribed && (
+          <ChatPaywallOverlay
+            onPress={() => navigation.navigate("Paywall" as never)}
+          />
+        )}
       </KeyboardAvoidingView>
     </>
   );

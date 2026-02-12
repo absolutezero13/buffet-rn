@@ -27,6 +27,8 @@ export function AssetCard({ asset, onDelete }: AssetCardProps) {
     getAssetGainLoss,
     getAssetPurchasePrice,
     getAssetCurrentPrice,
+    getAssetDisplayQuantity,
+    getAssetQuantityUnit,
   } = useCurrency();
   const navigation = useNavigation();
 
@@ -35,6 +37,8 @@ export function AssetCard({ asset, onDelete }: AssetCardProps) {
   const { gainLoss, gainLossPercent, isPositive } = getAssetGainLoss(asset);
   const purchasePriceDisplay = getAssetPurchasePrice(asset);
   const currentPriceDisplay = getAssetCurrentPrice(asset);
+  const displayQuantity = getAssetDisplayQuantity(asset);
+  const quantityUnit = getAssetQuantityUnit(asset);
 
   const handlePress = () => {
     navigation.navigate("AssetDetail", { assetId: asset.id } as never);
@@ -64,7 +68,10 @@ export function AssetCard({ asset, onDelete }: AssetCardProps) {
         <View style={styles.details}>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Quantity</Text>
-            <Text style={styles.detailValue}>{asset.quantity}</Text>
+            <Text style={styles.detailValue}>
+              {displayQuantity.toFixed(quantityUnit ? 2 : 0)}
+              {quantityUnit ? ` ${quantityUnit}` : ""}
+            </Text>
           </View>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Avg. Cost</Text>
