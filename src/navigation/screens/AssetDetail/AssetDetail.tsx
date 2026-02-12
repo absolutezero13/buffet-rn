@@ -41,6 +41,10 @@ export function AssetDetail() {
     getAssetGainLoss,
     getAssetPurchasePrice,
     getAssetCurrentPrice,
+    getAssetDisplayQuantity,
+    getAssetQuantityUnit,
+    convertCommodityPrice,
+    isCommodityAsset,
   } = useCurrency();
   const { isSubscribed } = useSubscriptionStore();
   const [selectedRange, setSelectedRange] = useState(1);
@@ -129,9 +133,13 @@ export function AssetDetail() {
       }
 
       if (history.length > 0) {
-        // Convert prices from USD to user currency
-        const firstPrice = toUserCurrency(history[0].price);
-        const lastPrice = toUserCurrency(history[history.length - 1].price);
+        // Convert prices from USD to user currency (and weight unit for commodities)
+        const isCommodity = isCommodityAsset(asset);
+        const convertPrice = (price: number) =>
+          isCommodity ? convertCommodityPrice(price) : toUserCurrency(price);
+
+        const firstPrice = convertPrice(history[0].price);
+        const lastPrice = convertPrice(history[history.length - 1].price);
         const changeAmount = lastPrice - firstPrice;
         const changePercent = (changeAmount / firstPrice) * 100;
         setPriceChange({ amount: changeAmount, percent: changePercent });
@@ -143,7 +151,7 @@ export function AssetDetail() {
         );
 
         const formattedData = sampledHistory.map((point, index) => ({
-          value: toUserCurrency(point.price),
+          value: convertPrice(point.price),
           label:
             index % Math.ceil(sampledHistory.length / 5) === 0
               ? point.date
@@ -169,6 +177,8 @@ export function AssetDetail() {
     selectedRange,
     generateFallbackData,
     toUserCurrency,
+    convertCommodityPrice,
+    isCommodityAsset,
     isSubscribed,
   ]);
 
@@ -260,7 +270,8 @@ export function AssetDetail() {
           />
 
           <HoldingsCard
-            quantity={asset.quantity}
+            quantity={getAssetDisplayQuantity(asset)}
+            quantityUnit={getAssetQuantityUnit(asset)}
             purchasePrice={purchasePriceDisplay}
             currentPrice={currentPriceDisplay}
             totalCost={totalCost}

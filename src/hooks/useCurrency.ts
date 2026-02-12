@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 import useCurrencyStore from "../store/useCurrencyStore";
 import useWeightUnitStore from "../store/useWeightUnitStore";
-import { CurrencyCode, COMMODITY_OPTIONS } from "../navigation/constants";
+import { CurrencyCode, COMMODITY_OPTIONS, TROY_OUNCE_TO_GRAM } from "../navigation/constants";
 import { Asset } from "../services/types";
 
 /**
@@ -181,6 +181,39 @@ export function useCurrency() {
     [convertFromUSD, convertFromOunce],
   );
 
+  /**
+   * Get the display quantity for an asset
+   * For commodities, converts from troy ounces to user's weight unit
+   * (Commodities are stored in troy ounces)
+   */
+  const getAssetDisplayQuantity = useCallback(
+    (asset: Asset): number => {
+      if (isCommodityAsset(asset)) {
+        // If user prefers grams, convert from ounces to grams
+        if (weightUnit.id === "GRAM") {
+          return asset.quantity * TROY_OUNCE_TO_GRAM;
+        }
+      }
+      return asset.quantity;
+    },
+    [weightUnit],
+  );
+
+  /**
+   * Get the unit label for quantity display
+   * For commodities, returns the weight unit label (oz or g)
+   * For other assets, returns empty string
+   */
+  const getAssetQuantityUnit = useCallback(
+    (asset: Asset): string => {
+      if (isCommodityAsset(asset)) {
+        return weightUnit.label;
+      }
+      return "";
+    },
+    [weightUnit],
+  );
+
   return {
     userCurrency,
     weightUnit,
@@ -197,6 +230,8 @@ export function useCurrency() {
     getAssetGainLoss,
     getAssetPurchasePrice,
     getAssetCurrentPrice,
+    getAssetDisplayQuantity,
+    getAssetQuantityUnit,
     isCommodityAsset,
   };
 }

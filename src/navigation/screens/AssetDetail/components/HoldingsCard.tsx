@@ -7,6 +7,7 @@ import useCurrencyStore from "../../../../store/useCurrencyStore";
 
 interface HoldingsCardProps {
   quantity: number;
+  quantityUnit?: string;
   purchasePrice: number;
   currentPrice: number;
   totalCost: number;
@@ -17,6 +18,7 @@ interface HoldingsCardProps {
 
 export function HoldingsCard({
   quantity,
+  quantityUnit,
   purchasePrice,
   currentPrice,
   totalCost,
@@ -33,7 +35,10 @@ export function HoldingsCard({
 
       <View style={styles.detailRow}>
         <Text style={styles.detailLabel}>Quantity</Text>
-        <Text style={styles.detailValue}>{quantity}</Text>
+        <Text style={styles.detailValue}>
+          {quantity.toFixed(quantityUnit ? 2 : 0)}
+          {quantityUnit ? ` ${quantityUnit}` : ""}
+        </Text>
       </View>
 
       <View style={styles.detailRow}>

@@ -18,6 +18,7 @@ import {
 import { styles } from "../styles";
 import { currencyOptions } from "../../../constants";
 import { AssetType } from "../../../../services/types";
+import useWeightUnitStore from "../../../../store/useWeightUnitStore";
 
 interface AddAssetFormProps {
   selectedAsset: SearchResult | null;
@@ -51,6 +52,18 @@ export function AddAssetForm({
   onClose,
 }: AddAssetFormProps) {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const { weightUnit } = useWeightUnitStore();
+
+  // Get the quantity label based on asset type
+  const getQuantityLabel = () => {
+    if (type === "cash") {
+      return `Amount (${cashCurrency})`;
+    }
+    if (type === "gold") {
+      return `Quantity (${weightUnit.label})`;
+    }
+    return "Quantity";
+  };
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -144,7 +157,7 @@ export function AddAssetForm({
         )}
 
         <TextInput
-          label={type === "cash" ? `Amount (${cashCurrency})` : "Quantity"}
+          label={getQuantityLabel()}
           placeholder={type === "cash" ? `e.g., 100` : "e.g., 10"}
           value={quantity}
           onChangeText={onQuantityChange}
