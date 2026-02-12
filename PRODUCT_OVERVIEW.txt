@@ -12,20 +12,20 @@ brokerages and the rise of cryptocurrency exchanges, yet the tools available
 to everyday investors remain fragmented and intimidating. A typical retail
 investor faces several pain points:
 
-  • Portfolio fragmentation — Assets are spread across multiple platforms
+  • Portfolio fragmentation: Assets are spread across multiple platforms
     (stock brokers, crypto exchanges, commodity dealers, savings accounts).
     There is no single view of total wealth or performance.
 
-  • Information overload — Financial news, market data, and analyst opinions
+  • Information overload: Financial news, market data, and analyst opinions
     are abundant but difficult to synthesise. Investors struggle to get
     concise, personalised answers to simple questions like "Should I
     rebalance?" or "How is my portfolio performing this quarter?"
 
-  • Lack of actionable guidance — Free tools show prices and charts but
+  • Lack of actionable guidance: Free tools show prices and charts but
     rarely offer context or insight. Professional advisory services are
     expensive and inaccessible for small portfolios.
 
-  • Complexity of financial data — Reading candlestick charts, understanding
+  • Complexity of financial data: Reading candlestick charts, understanding
     P/E ratios, and interpreting macro trends requires knowledge that most
     casual investors do not have.
 

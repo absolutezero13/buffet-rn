@@ -7,8 +7,9 @@
 
 Frontend Framework
   - React Native 0.81.4 with Expo 54
-  - React 19.1.0
   - TypeScript 5.9
+  - Node.js 22.13.1
+  - Firebase Functions for backend
 
 Navigation
   - @react-navigation/native v7 (static configuration API)
@@ -128,24 +129,23 @@ Development
 
 2.5 Backend Services
 
-  The app communicates with a Google Cloud Run backend that proxies
+  The app communicates with a Firebase Functions backend that proxies
   several third-party APIs:
 
   Endpoint              Purpose
   ─────────────────────────────────────────────────────────
   /stock-price          Current stock price (Alpaca)
   /stock-quote          Full stock bar data (Alpaca)
-  /stock-quotes         Batch stock quotes
-  /stock-history        Historical stock prices
+  /stock-quotes         Batch stock quotes (Yahoo Finance )
+  /stock-history        Historical stock prices (Yahoo Finance)
   /crypto-price         Current crypto price (CoinGecko)
-  /crypto-history       Historical crypto prices
-  /commodity-price      Current commodity price
-  /commodity-history    Historical commodity prices
-  /currency-rate        Fiat currency exchange rates
-  /search-symbol        Stock / ETF symbol search
-  /search-crypto        Cryptocurrency search
+  /crypto-history       Historical crypto prices (CoinGecko)
+  /commodity-price      Current commodity price (Yahoo Finance)
+  /commodity-history    Historical commodity prices (Yahoo Finance)
+  /currency-rate        Fiat currency exchange rates (exchangeratesapi.io)
+  /search-symbol        Stock / ETF symbol search (Yahoo Finance)
+  /search-crypto        Cryptocurrency search (CoinGecko)
   /chat                 AI chat (Google Gemini)
-
 
 3. REVENUECAT IMPLEMENTATION
 --------------------------------------------------------------------------------
@@ -160,8 +160,6 @@ Development
 3.2 Configuration
 
   • SDK: react-native-purchases 9.7.6
-  • iOS API key: configured (appl_rkyexrakCNcyColpHhXLQPBxeXc)
-  • Android API key: placeholder — to be replaced before Android launch
   • Entitlement identifier: "Buffet AI Pro"
 
 3.3 Service API (revenueCatService)
