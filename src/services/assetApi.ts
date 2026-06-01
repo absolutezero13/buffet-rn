@@ -75,41 +75,73 @@ class AssetApi {
         return;
       }
 
-      const purchasePriceInUSD = convertToUSD(
-        asset.purchasePrice,
-        asset.purchaseCurrency as CurrencyCode,
-      );
+      const purchasePriceInUSD =
+        asset.type === "cash"
+          ? 1
+          : convertToUSD(
+              asset.purchasePrice,
+              asset.purchaseCurrency as CurrencyCode,
+            );
 
-      const existingAssetIndex = userAssets.findIndex(
-        (a) => a.symbol === asset.symbol && a.type === asset.type,
-      );
+      const existingAssetIndex =
+        asset.type === "cash"
+          ? userAssets.findIndex(
+              (a) =>
+                a.type === "cash" &&
+                a.symbol === asset.symbol &&
+                a.name === asset.name,
+            )
+          : userAssets.findIndex(
+              (a) => a.symbol === asset.symbol && a.type === asset.type,
+            );
 
       let updatedAssets: Asset[];
 
       if (existingAssetIndex !== -1) {
         const existingAsset = userAssets[existingAssetIndex];
-        const totalQuantity = existingAsset.quantity + asset.quantity;
-        const weightedAvgPurchasePrice =
-          (existingAsset.purchasePrice * existingAsset.quantity +
-            purchasePriceInUSD * asset.quantity) /
-          totalQuantity;
 
-        const updatedAsset: Asset = {
-          ...existingAsset,
-          quantity: totalQuantity,
-          purchasePrice: weightedAvgPurchasePrice,
-          currentPrice: priceInUSD,
-        };
+        if (asset.type === "cash") {
+          const updatedAsset: Asset = {
+            ...existingAsset,
+            quantity: existingAsset.quantity + asset.quantity,
+            purchasePrice: 1,
+            purchaseCurrency: asset.symbol,
+            currentPrice: 1,
+          };
 
-        updatedAssets = [...userAssets];
-        updatedAssets[existingAssetIndex] = updatedAsset;
+          updatedAssets = [...userAssets];
+          updatedAssets[existingAssetIndex] = updatedAsset;
+        } else {
+          const totalQuantity = existingAsset.quantity + asset.quantity;
+          const weightedAvgPurchasePrice =
+            (existingAsset.purchasePrice * existingAsset.quantity +
+              purchasePriceInUSD * asset.quantity) /
+            totalQuantity;
+
+          const updatedAsset: Asset = {
+            ...existingAsset,
+            quantity: totalQuantity,
+            purchasePrice: weightedAvgPurchasePrice,
+            currentPrice: priceInUSD,
+          };
+
+          updatedAssets = [...userAssets];
+          updatedAssets[existingAssetIndex] = updatedAsset;
+        }
       } else {
+        const cashId =
+          asset.type === "cash"
+            ? asset.name === `Cash (${asset.symbol})`
+              ? asset.symbol
+              : `cash-${asset.symbol}-${asset.name.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "source"}`
+            : asset.symbol;
+
         const newAsset: Asset = {
           ...asset,
-          id: asset.symbol,
-          currentPrice: priceInUSD,
-          purchasePrice: purchasePriceInUSD,
-          purchaseCurrency: "USD",
+          id: cashId,
+          currentPrice: asset.type === "cash" ? 1 : priceInUSD,
+          purchasePrice: asset.type === "cash" ? 1 : purchasePriceInUSD,
+          purchaseCurrency: asset.type === "cash" ? asset.symbol : "USD",
         };
 
         updatedAssets = [...userAssets, newAsset];

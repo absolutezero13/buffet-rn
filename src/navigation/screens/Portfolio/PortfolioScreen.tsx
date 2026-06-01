@@ -37,6 +37,7 @@ export function Portfolio() {
   const [cashCurrency, setCashCurrency] = useState<CurrencyCode>(
     userCurrency?.id || "USD",
   );
+  const [cashName, setCashName] = useState("");
   const handleRefresh = async () => {
     await assetApi.refreshPrices();
   };
@@ -47,6 +48,7 @@ export function Portfolio() {
     setQuantity("");
     setPurchasePrice("");
     setCashCurrency(userCurrency?.id || "USD");
+    setCashName("");
   };
 
   const handleAddAsset = async () => {
@@ -63,7 +65,7 @@ export function Portfolio() {
     const isCash = type === "cash";
     const assetSymbol = isCash ? cashCurrency : selectedAsset?.symbol || "";
     const assetName = isCash
-      ? `Cash (${cashCurrency})`
+      ? cashName.trim() || `Cash (${cashCurrency})`
       : selectedAsset?.name || "";
 
     // For commodities, convert quantity from user's weight unit to ounces for storage
@@ -88,7 +90,7 @@ export function Portfolio() {
       type: type as "stock" | "etf" | "crypto" | "gold" | "cash" | "other",
       quantity: finalQuantity,
       purchasePrice: finalPurchasePrice,
-      purchaseCurrency: userCurrency?.id || "USD",
+      purchaseCurrency: isCash ? cashCurrency : userCurrency?.id || "USD",
     });
   };
 
@@ -181,11 +183,13 @@ export function Portfolio() {
           purchasePrice={purchasePrice}
           baseCurrency={userCurrency?.id || "USD"}
           cashCurrency={cashCurrency}
+          cashName={cashName}
           onSelectAsset={setSelectedAsset}
           onTypeChange={setType}
           onQuantityChange={setQuantity}
           onPurchasePriceChange={setPurchasePrice}
           onCashCurrencyChange={setCashCurrency}
+          onCashNameChange={setCashName}
           onSubmit={handleAddAsset}
           onClose={handleCloseSheet}
         />

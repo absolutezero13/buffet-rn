@@ -18,7 +18,6 @@ export function AssetCard({ asset, onDelete }: AssetCardProps) {
   const {
     currencySymbol,
     getAssetCurrentValue,
-    getAssetTotalCost,
     getAssetGainLoss,
     getAssetPurchasePrice,
     getAssetCurrentPrice,
@@ -26,14 +25,16 @@ export function AssetCard({ asset, onDelete }: AssetCardProps) {
     getAssetQuantityUnit,
   } = useCurrency();
   const navigation = useNavigation();
+  const isCash = asset.type === "cash";
 
   const totalValue = getAssetCurrentValue(asset);
-  const totalCost = getAssetTotalCost(asset);
-  const { gainLoss, gainLossPercent, isPositive } = getAssetGainLoss(asset);
-  const purchasePriceDisplay = getAssetPurchasePrice(asset);
-  const currentPriceDisplay = getAssetCurrentPrice(asset);
   const displayQuantity = getAssetDisplayQuantity(asset);
   const quantityUnit = getAssetQuantityUnit(asset);
+  const purchasePriceDisplay = isCash ? 0 : getAssetPurchasePrice(asset);
+  const currentPriceDisplay = isCash ? 0 : getAssetCurrentPrice(asset);
+  const { gainLoss, gainLossPercent, isPositive } = isCash
+    ? { gainLoss: 0, gainLossPercent: 0, isPositive: true }
+    : getAssetGainLoss(asset);
 
   const handlePress = () => {
     navigation.navigate("AssetDetail", { assetId: asset.id } as never);
@@ -79,20 +80,24 @@ export function AssetCard({ asset, onDelete }: AssetCardProps) {
                 {quantityUnit ? ` ${quantityUnit}` : ""}
               </Text>
             </View>
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Avg. Cost</Text>
-              <Text style={styles.detailValue}>
-                {currencySymbol}
-                {purchasePriceDisplay.toFixed(2)}
-              </Text>
-            </View>
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Current Price</Text>
-              <Text style={styles.detailValue}>
-                {currencySymbol}
-                {currentPriceDisplay.toFixed(2)}
-              </Text>
-            </View>
+            {!isCash && (
+              <>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Avg. Cost</Text>
+                  <Text style={styles.detailValue}>
+                    {currencySymbol}
+                    {purchasePriceDisplay.toFixed(2)}
+                  </Text>
+                </View>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Current Price</Text>
+                  <Text style={styles.detailValue}>
+                    {currencySymbol}
+                    {currentPriceDisplay.toFixed(2)}
+                  </Text>
+                </View>
+              </>
+            )}
           </View>
 
           <View style={styles.footer}>
@@ -104,33 +109,37 @@ export function AssetCard({ asset, onDelete }: AssetCardProps) {
               </Text>
             </View>
             <View style={styles.gainLossContainer}>
-              <Text
-                style={[
-                  styles.gainLoss,
-                  {
-                    color: isPositive
-                      ? theme.colors.positive
-                      : theme.colors.negative,
-                  },
-                ]}
-              >
-                {isPositive ? "+" : ""}
-                {currencySymbol}
-                {gainLoss.toFixed(2)}
-              </Text>
-              <Text
-                style={[
-                  styles.gainLossPercent,
-                  {
-                    color: isPositive
-                      ? theme.colors.positive
-                      : theme.colors.negative,
-                  },
-                ]}
-              >
-                ({isPositive ? "+" : ""}
-                {gainLossPercent.toFixed(2)}%)
-              </Text>
+              {!isCash && (
+                <>
+                  <Text
+                    style={[
+                      styles.gainLoss,
+                      {
+                        color: isPositive
+                          ? theme.colors.positive
+                          : theme.colors.negative,
+                      },
+                    ]}
+                  >
+                    {isPositive ? "+" : ""}
+                    {currencySymbol}
+                    {gainLoss.toFixed(2)}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.gainLossPercent,
+                      {
+                        color: isPositive
+                          ? theme.colors.positive
+                          : theme.colors.negative,
+                      },
+                    ]}
+                  >
+                    ({isPositive ? "+" : ""}
+                    {gainLossPercent.toFixed(2)}%)
+                  </Text>
+                </>
+              )}
             </View>
           </View>
         </Pressable>

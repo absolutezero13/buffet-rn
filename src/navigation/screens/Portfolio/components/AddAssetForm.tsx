@@ -27,11 +27,13 @@ interface AddAssetFormProps {
   purchasePrice: string;
   baseCurrency: CurrencyCode;
   cashCurrency: CurrencyCode;
+  cashName: string;
   onSelectAsset: (asset: SearchResult | null) => void;
   onTypeChange: (type: AssetType) => void;
   onQuantityChange: (value: string) => void;
   onPurchasePriceChange: (value: string) => void;
   onCashCurrencyChange: (value: CurrencyCode) => void;
+  onCashNameChange: (value: string) => void;
   onSubmit: () => void;
   onClose: () => void;
 }
@@ -43,11 +45,13 @@ export function AddAssetForm({
   purchasePrice,
   baseCurrency,
   cashCurrency,
+  cashName,
   onSelectAsset,
   onTypeChange,
   onQuantityChange,
   onPurchasePriceChange,
   onCashCurrencyChange,
+  onCashNameChange,
   onSubmit,
   onClose,
 }: AddAssetFormProps) {
@@ -106,39 +110,41 @@ export function AddAssetForm({
         )}
 
         {type === "cash" ? (
-          <View style={styles.currencySelector}>
-            <Text style={styles.currencyLabel}>Currency</Text>
-            <View style={styles.currencyOptions}>
-              {currencyOptions.map((option) => {
-                const isActive = option.id === cashCurrency;
-                return (
-                  <TouchableOpacity
-                    key={option.id}
-                    style={[
-                      styles.currencyOption,
-                      isActive && styles.currencyOptionActive,
-                    ]}
-                    onPress={() => {
-                      onCashCurrencyChange(option.id);
-                      onSelectAsset({
-                        symbol: option.id,
-                        name: `Cash (${option.id})`,
-                      });
-                    }}
-                  >
-                    <Text
+          <>
+            <View style={styles.currencySelector}>
+              <Text style={styles.currencyLabel}>Currency</Text>
+              <View style={styles.currencyOptions}>
+                {currencyOptions.map((option) => {
+                  const isActive = option.id === cashCurrency;
+                  return (
+                    <TouchableOpacity
+                      key={option.id}
                       style={[
-                        styles.currencyOptionText,
-                        isActive && styles.currencyOptionTextActive,
+                        styles.currencyOption,
+                        isActive && styles.currencyOptionActive,
                       ]}
+                      onPress={() => onCashCurrencyChange(option.id)}
                     >
-                      {option.id}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
+                      <Text
+                        style={[
+                          styles.currencyOptionText,
+                          isActive && styles.currencyOptionTextActive,
+                        ]}
+                      >
+                        {option.id}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
             </View>
-          </View>
+            <TextInput
+              label="Name"
+              placeholder="e.g., Savings Account"
+              value={cashName}
+              onChangeText={onCashNameChange}
+            />
+          </>
         ) : (
           <View style={styles.dropdownContainer}>
             <AssetSearchDropdown

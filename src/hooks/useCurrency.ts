@@ -14,6 +14,8 @@ const isCommodityAsset = (asset: Asset): boolean => {
   );
 };
 
+const isCashAsset = (asset: Asset): boolean => asset.type === "cash";
+
 /**
  * Hook for currency conversion and formatting utilities
  * All prices from API are in USD, this hook helps convert them to user's currency
@@ -98,9 +100,16 @@ export function useCurrency() {
    */
   const getAssetCurrentValue = useCallback(
     (asset: Asset): number => {
+      if (isCashAsset(asset)) {
+        return convertBetweenCurrencies(
+          asset.quantity,
+          asset.symbol as CurrencyCode,
+          userCurrency.id,
+        );
+      }
       return convertFromUSD(asset.currentPrice) * asset.quantity;
     },
-    [convertFromUSD],
+    [convertBetweenCurrencies, convertFromUSD, userCurrency.id],
   );
 
   /**
@@ -109,6 +118,9 @@ export function useCurrency() {
    */
   const getAssetTotalCost = useCallback(
     (asset: Asset): number => {
+      if (isCashAsset(asset)) {
+        return getAssetCurrentValue(asset);
+      }
       const purchasePriceInUserCurrency = convertBetweenCurrencies(
         asset.purchasePrice,
         asset.purchaseCurrency as CurrencyCode,
@@ -116,7 +128,7 @@ export function useCurrency() {
       );
       return purchasePriceInUserCurrency * asset.quantity;
     },
-    [userCurrency, convertBetweenCurrencies],
+    [getAssetCurrentValue, userCurrency, convertBetweenCurrencies],
   );
 
   /**
@@ -130,6 +142,9 @@ export function useCurrency() {
       gainLossPercent: number;
       isPositive: boolean;
     } => {
+      if (isCashAsset(asset)) {
+        return { gainLoss: 0, gainLossPercent: 0, isPositive: true };
+      }
       const currentValue = getAssetCurrentValue(asset);
       const totalCost = getAssetTotalCost(asset);
       const gainLoss = currentValue - totalCost;
@@ -150,6 +165,13 @@ export function useCurrency() {
    */
   const getAssetPurchasePrice = useCallback(
     (asset: Asset): number => {
+      if (isCashAsset(asset)) {
+        return convertBetweenCurrencies(
+          1,
+          asset.symbol as CurrencyCode,
+          userCurrency.id,
+        );
+      }
       const priceInUserCurrency = convertBetweenCurrencies(
         asset.purchasePrice,
         asset.purchaseCurrency as CurrencyCode,
@@ -171,6 +193,13 @@ export function useCurrency() {
    */
   const getAssetCurrentPrice = useCallback(
     (asset: Asset): number => {
+      if (isCashAsset(asset)) {
+        return convertBetweenCurrencies(
+          1,
+          asset.symbol as CurrencyCode,
+          userCurrency.id,
+        );
+      }
       const priceInUserCurrency = convertFromUSD(asset.currentPrice);
       // For commodities, convert from per-ounce to user's weight unit
       if (isCommodityAsset(asset)) {
@@ -206,6 +235,9 @@ export function useCurrency() {
    */
   const getAssetQuantityUnit = useCallback(
     (asset: Asset): string => {
+      if (isCashAsset(asset)) {
+        return asset.symbol;
+      }
       if (isCommodityAsset(asset)) {
         return weightUnit.label;
       }
