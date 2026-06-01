@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import {
+  Keyboard,
   ScrollView,
   StyleSheet,
   Text,
@@ -47,6 +48,26 @@ export function SubscriptionSearchDropdown({
     onCustomValueChange(subscription.name);
     setShowResults(false);
     onSelect(subscription);
+    Keyboard.dismiss();
+  };
+
+  const handleChangeText = (value: string) => {
+    onCustomValueChange(value);
+    onSelect(null);
+
+    const trimmedQuery = value.trim().toLowerCase();
+    if (trimmedQuery.length < 2) {
+      setShowResults(true);
+      return;
+    }
+
+    const filtered = SUBSCRIPTION_OPTIONS.filter(
+      (item) =>
+        item.name.toLowerCase().includes(trimmedQuery) ||
+        item.category.toLowerCase().includes(trimmedQuery),
+    );
+
+    setShowResults(filtered.length > 0);
   };
 
   const handleClear = () => {
@@ -65,14 +86,28 @@ export function SubscriptionSearchDropdown({
           placeholder="Search or type a custom subscription..."
           placeholderTextColor={theme.colors.textMuted}
           value={customValue}
-          onChangeText={(value) => {
-            onCustomValueChange(value);
-            onSelect(null);
-            setShowResults(true);
+          onChangeText={handleChangeText}
+          onFocus={() => {
+            const trimmedQuery = customValue.trim().toLowerCase();
+            if (trimmedQuery.length < 2) {
+              setShowResults(true);
+              return;
+            }
+
+            const filtered = SUBSCRIPTION_OPTIONS.filter(
+              (item) =>
+                item.name.toLowerCase().includes(trimmedQuery) ||
+                item.category.toLowerCase().includes(trimmedQuery),
+            );
+            setShowResults(filtered.length > 0);
           }}
-          onFocus={() => setShowResults(true)}
           onBlur={() => {
-            setTimeout(() => setShowResults(false), 50);
+            setTimeout(() => setShowResults(false), 150);
+          }}
+          returnKeyType="done"
+          onSubmitEditing={() => {
+            setShowResults(false);
+            Keyboard.dismiss();
           }}
         />
 
@@ -110,13 +145,11 @@ export function SubscriptionSearchDropdown({
         </View>
       )}
 
-      {showResults && customValue.length >= 2 && results.length === 0 && (
-        <View style={styles.dropdown}>
-          <View style={styles.noResults}>
-            <Text style={styles.noResultsText}>Use custom subscription</Text>
-          </View>
-        </View>
-      )}
+      {customValue.trim().length >= 2 &&
+        !selectedValue &&
+        results.length === 0 && (
+          <Text style={styles.customHint}>Using custom subscription</Text>
+        )}
     </View>
   );
 }
@@ -187,12 +220,9 @@ const styles = StyleSheet.create({
     color: theme.colors.textMuted,
     fontSize: theme.fontSize.sm,
   },
-  noResults: {
-    padding: theme.spacing.lg,
-    alignItems: "center",
-  },
-  noResultsText: {
+  customHint: {
     color: theme.colors.textMuted,
     fontSize: theme.fontSize.sm,
+    marginTop: theme.spacing.xs,
   },
 });

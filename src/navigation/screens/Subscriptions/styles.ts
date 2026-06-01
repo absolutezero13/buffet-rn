@@ -107,4 +107,21 @@ export const styles = StyleSheet.create({
     marginTop: theme.spacing.md,
     marginBottom: theme.spacing.lg,
   },
+  keyboardAccessory: {
+    alignItems: "flex-end",
+    backgroundColor: theme.colors.surface,
+    borderTopColor: theme.colors.glassBorder,
+    borderTopWidth: 1,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+  },
+  keyboardDone: {
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.xs,
+  },
+  keyboardDoneText: {
+    color: theme.colors.primary,
+    fontSize: theme.fontSize.md,
+    fontWeight: theme.fontWeight.semibold,
+  },
 });

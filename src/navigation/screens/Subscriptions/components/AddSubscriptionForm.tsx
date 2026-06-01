@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
+  InputAccessoryView,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
+  ScrollView,
   Text,
   TouchableOpacity,
   View,
@@ -35,6 +38,8 @@ const billingCycles: Array<{ id: BillingCycle; label: string }> = [
   { id: "yearly", label: "Yearly" },
 ];
 
+const PRICE_INPUT_ACCESSORY_ID = "subscription-price-input";
+
 export function AddSubscriptionForm({
   selectedSubscription,
   customSubscriptionName,
@@ -49,24 +54,6 @@ export function AddSubscriptionForm({
   onSubmit,
   onClose,
 }: AddSubscriptionFormProps) {
-  const [keyboardVisible, setKeyboardVisible] = useState(false);
-
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      "keyboardWillShow",
-      () => setKeyboardVisible(true),
-    );
-    const keyboardDidHideListener = Keyboard.addListener(
-      "keyboardWillHide",
-      () => setKeyboardVisible(false),
-    );
-
-    return () => {
-      keyboardDidShowListener.remove();
-      keyboardDidHideListener.remove();
-    };
-  }, []);
-
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -78,11 +65,19 @@ export function AddSubscriptionForm({
           icon="close"
           size="small"
           variant="ghost"
-          onPress={onClose}
+          onPress={() => {
+            Keyboard.dismiss();
+            onClose();
+          }}
         />
       </View>
 
-      <View style={styles.sheetBody}>
+      <ScrollView
+        style={styles.sheetBody}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        showsVerticalScrollIndicator={false}
+      >
         <SubscriptionSearchDropdown
           selectedValue={selectedSubscription}
           customValue={customSubscriptionName}
@@ -96,67 +91,64 @@ export function AddSubscriptionForm({
           value={amount}
           onChangeText={onAmountChange}
           keyboardType="decimal-pad"
+          inputAccessoryViewID={PRICE_INPUT_ACCESSORY_ID}
         />
 
-        {!keyboardVisible && (
-          <>
-            <View style={styles.selectorGroup}>
-              <Text style={styles.selectorLabel}>Billing Cycle</Text>
-              <View style={styles.segmentedOptions}>
-                {billingCycles.map((option) => {
-                  const isActive = option.id === billingCycle;
-                  return (
-                    <TouchableOpacity
-                      key={option.id}
-                      style={[
-                        styles.segmentedOption,
-                        isActive && styles.segmentedOptionActive,
-                      ]}
-                      onPress={() => onBillingCycleChange(option.id)}
-                    >
-                      <Text
-                        style={[
-                          styles.segmentedOptionText,
-                          isActive && styles.segmentedOptionTextActive,
-                        ]}
-                      >
-                        {option.label}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            </View>
+        <View style={styles.selectorGroup}>
+          <Text style={styles.selectorLabel}>Billing Cycle</Text>
+          <View style={styles.segmentedOptions}>
+            {billingCycles.map((option) => {
+              const isActive = option.id === billingCycle;
+              return (
+                <TouchableOpacity
+                  key={option.id}
+                  style={[
+                    styles.segmentedOption,
+                    isActive && styles.segmentedOptionActive,
+                  ]}
+                  onPress={() => onBillingCycleChange(option.id)}
+                >
+                  <Text
+                    style={[
+                      styles.segmentedOptionText,
+                      isActive && styles.segmentedOptionTextActive,
+                    ]}
+                  >
+                    {option.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
 
-            <View style={styles.selectorGroup}>
-              <Text style={styles.selectorLabel}>Currency</Text>
-              <View style={styles.segmentedOptions}>
-                {currencyOptions.map((option) => {
-                  const isActive = option.id === currency;
-                  return (
-                    <TouchableOpacity
-                      key={option.id}
-                      style={[
-                        styles.segmentedOption,
-                        isActive && styles.segmentedOptionActive,
-                      ]}
-                      onPress={() => onCurrencyChange(option.id)}
-                    >
-                      <Text
-                        style={[
-                          styles.segmentedOptionText,
-                          isActive && styles.segmentedOptionTextActive,
-                        ]}
-                      >
-                        {option.id}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            </View>
-          </>
-        )}
+        <View style={styles.selectorGroup}>
+          <Text style={styles.selectorLabel}>Currency</Text>
+          <View style={styles.segmentedOptions}>
+            {currencyOptions.map((option) => {
+              const isActive = option.id === currency;
+              return (
+                <TouchableOpacity
+                  key={option.id}
+                  style={[
+                    styles.segmentedOption,
+                    isActive && styles.segmentedOptionActive,
+                  ]}
+                  onPress={() => onCurrencyChange(option.id)}
+                >
+                  <Text
+                    style={[
+                      styles.segmentedOptionText,
+                      isActive && styles.segmentedOptionTextActive,
+                    ]}
+                  >
+                    {option.id}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
 
         <Button
           title="Add Subscription"
@@ -164,7 +156,17 @@ export function AddSubscriptionForm({
           fullWidth
           style={styles.addButton}
         />
-      </View>
+      </ScrollView>
+
+      {Platform.OS === "ios" && (
+        <InputAccessoryView nativeID={PRICE_INPUT_ACCESSORY_ID}>
+          <View style={styles.keyboardAccessory}>
+            <Pressable onPress={Keyboard.dismiss} style={styles.keyboardDone}>
+              <Text style={styles.keyboardDoneText}>Done</Text>
+            </Pressable>
+          </View>
+        </InputAccessoryView>
+      )}
     </KeyboardAvoidingView>
   );
 }
