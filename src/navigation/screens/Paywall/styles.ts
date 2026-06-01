@@ -41,7 +41,7 @@ export const styles = StyleSheet.create({
   },
   title: {
     color: theme.colors.text,
-    fontSize: theme.fontSize.xxl,
+    fontSize: theme.fontSize.xl,
     fontWeight: theme.fontWeight.bold,
     textAlign: "center",
     marginBottom: theme.spacing.sm,

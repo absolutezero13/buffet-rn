@@ -56,13 +56,7 @@ const CurrencyBottomSheet = () => {
                 >
                   {option.id}
                 </Text>
-                <Text style={localStyles.currencyName}>
-                  {option.id === "USD"
-                    ? "US Dollar"
-                    : option.id === "EUR"
-                      ? "Euro"
-                      : "British Pound"}
-                </Text>
+                <Text style={localStyles.currencyName}>{option.name}</Text>
               </View>
               {isActive && (
                 <View style={localStyles.checkmark}>

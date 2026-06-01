@@ -6,9 +6,9 @@ import {
   PortfolioSummary,
   SearchResult,
   BisonLoader,
+  TabHeader,
 } from "../../../components";
 import {
-  PortfolioHeader,
   EmptyPortfolio,
   AssetsSectionHeader,
   AddAssetForm,
@@ -107,7 +107,7 @@ export function Portfolio() {
       {
         text: "Delete",
         style: "destructive",
-        onPress: () => assetApi.deletAsset(id),
+        onPress: () => assetApi.deleteAsset(id),
       },
     ]);
   };
@@ -125,7 +125,7 @@ export function Portfolio() {
 
   return (
     <>
-      <PortfolioHeader />
+      <TabHeader title="Portfolio" />
       {isLoading && <BisonLoader />}
 
       <View style={styles.container}>

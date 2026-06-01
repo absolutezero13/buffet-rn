@@ -16,7 +16,7 @@ import {
   SearchResult,
 } from "../../../../components";
 import { styles } from "../styles";
-import { currencyOptions } from "../../../constants";
+import { CurrencyCode, currencyOptions } from "../../../constants";
 import { AssetType } from "../../../../services/types";
 import useWeightUnitStore from "../../../../store/useWeightUnitStore";
 
@@ -25,13 +25,13 @@ interface AddAssetFormProps {
   type: AssetType;
   quantity: string;
   purchasePrice: string;
-  baseCurrency: "USD" | "EUR" | "GBP";
-  cashCurrency: "USD" | "EUR" | "GBP";
+  baseCurrency: CurrencyCode;
+  cashCurrency: CurrencyCode;
   onSelectAsset: (asset: SearchResult | null) => void;
   onTypeChange: (type: AssetType) => void;
   onQuantityChange: (value: string) => void;
   onPurchasePriceChange: (value: string) => void;
-  onCashCurrencyChange: (value: "USD" | "EUR" | "GBP") => void;
+  onCashCurrencyChange: (value: CurrencyCode) => void;
   onSubmit: () => void;
   onClose: () => void;
 }

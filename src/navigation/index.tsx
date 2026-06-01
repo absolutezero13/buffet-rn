@@ -6,7 +6,13 @@ import {
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { theme } from "../theme";
-import { Portfolio, Chat, Settings, Welcome, AssetDetail } from "./screens";
+import {
+  Portfolio,
+  Subscriptions,
+  Settings,
+  Welcome,
+  AssetDetail,
+} from "./screens";
 import { Loading } from "./screens/Loading";
 import { Paywall } from "./screens/Paywall";
 import useUserStore from "../store/useUserStore";
@@ -31,11 +37,11 @@ function MainTabs() {
         }}
       />
       <Tabs.Screen
-        name="Chat"
-        component={Chat}
+        name="Subscriptions"
+        component={Subscriptions}
         options={{
-          title: "AI Chat",
-          tabBarIcon: () => ({ sfSymbol: "sparkles" }),
+          title: "Subscriptions",
+          tabBarIcon: () => ({ sfSymbol: "repeat.circle.fill" }),
         }}
       />
       <Tabs.Screen

@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Asset } from "./types";
 import useUserAssets from "../store/useUserAssets";
 import { api } from "./api";
-import { STORAGE_KEYS } from "../navigation/constants";
+import { CurrencyCode, STORAGE_KEYS } from "../navigation/constants";
 import useCurrencyStore from "../store/useCurrencyStore";
 
 class AssetApi {
@@ -77,7 +77,7 @@ class AssetApi {
 
       const purchasePriceInUSD = convertToUSD(
         asset.purchasePrice,
-        asset.purchaseCurrency as "USD" | "EUR" | "GBP",
+        asset.purchaseCurrency as CurrencyCode,
       );
 
       const existingAssetIndex = userAssets.findIndex(
@@ -125,7 +125,7 @@ class AssetApi {
     }
   }
 
-  async deletAsset(id: string): Promise<void> {
+  async deleteAsset(id: string): Promise<void> {
     const { userAssets } = useUserAssets.getState();
     const updatedAssets = userAssets.filter((asset) => asset.id !== id);
 
@@ -134,6 +134,10 @@ class AssetApi {
       STORAGE_KEYS.ASSETS,
       JSON.stringify(updatedAssets),
     );
+  }
+
+  async deletAsset(id: string): Promise<void> {
+    await this.deleteAsset(id);
   }
 
   async refreshPrices(): Promise<void> {

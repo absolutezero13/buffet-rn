@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { View, FlatList, KeyboardAvoidingView } from "react-native";
+import { Alert, View, FlatList, KeyboardAvoidingView } from "react-native";
 import { ChatMessage, Button, ChatMessageType } from "../../../components";
 import {
   ChatHeader,
@@ -117,8 +117,17 @@ export function Chat() {
   };
 
   const clearChat = () => {
-    setChatMessages([]);
-    setChatHistory([]);
+    Alert.alert("Clear Chat", "Are you sure you want to delete this chat?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: () => {
+          setChatMessages([]);
+          setChatHistory([]);
+        },
+      },
+    ]);
   };
 
   const renderMessage = useCallback(

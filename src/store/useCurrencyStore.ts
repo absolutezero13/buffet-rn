@@ -15,6 +15,7 @@ interface ExchangeRates {
   USD: number; // Always 1
   EUR: number;
   GBP: number;
+  TRY: number;
   lastUpdated: number;
 }
 
@@ -43,10 +44,21 @@ const defaultRates: ExchangeRates = {
   USD: 1,
   EUR: 0.92, // Fallback rates
   GBP: 0.79,
+  TRY: 45.89,
   lastUpdated: 0,
 };
 
 const defaultCurrency = currencyOptions[0]; // USD
+
+const hasValidExchangeRates = (rates: Partial<ExchangeRates>) =>
+  typeof rates.USD === "number" &&
+  typeof rates.EUR === "number" &&
+  typeof rates.GBP === "number" &&
+  typeof rates.TRY === "number" &&
+  rates.USD === 1 &&
+  rates.EUR > 0 &&
+  rates.GBP > 0 &&
+  rates.TRY > 1;
 
 const useCurrencyStore = create<CurrencyStore>((set, get) => ({
   userCurrency: defaultCurrency,
@@ -65,8 +77,8 @@ const useCurrencyStore = create<CurrencyStore>((set, get) => ({
       // Load cached exchange rates
       const cachedRates = await AsyncStorage.getItem(STORAGE_KEY_RATES);
       if (cachedRates) {
-        const rates = JSON.parse(cachedRates) as ExchangeRates;
-        set({ exchangeRates: rates });
+        const rates = JSON.parse(cachedRates) as Partial<ExchangeRates>;
+        set({ exchangeRates: { ...defaultRates, ...rates } });
       }
 
       // Fetch fresh rates if cache is expired
@@ -93,8 +105,10 @@ const useCurrencyStore = create<CurrencyStore>((set, get) => ({
     // Check if cache is still valid (unless forced)
     const now = Date.now();
     const cacheAge = now - exchangeRates.lastUpdated;
+    const hasCompleteCache = hasValidExchangeRates(exchangeRates);
     if (
       !force &&
+      hasCompleteCache &&
       cacheAge < CACHE_DURATION_MS &&
       exchangeRates.lastUpdated > 0
     ) {
@@ -111,16 +125,23 @@ const useCurrencyStore = create<CurrencyStore>((set, get) => ({
     try {
       console.log("Fetching fresh exchange rates...");
 
-      // Fetch EUR and GBP rates from USD in parallel
-      const [eurRate, gbpRate] = await Promise.all([
+      const [eurRate, gbpRate, tryRate] = await Promise.all([
         api.getCurrencyRate("USD", "EUR"),
         api.getCurrencyRate("USD", "GBP"),
+        api.getCurrencyRate("USD", "TRY"),
       ]);
 
       const newRates: ExchangeRates = {
         USD: 1,
-        EUR: eurRate ?? exchangeRates.EUR, // Fallback to cached/default if API fails
-        GBP: gbpRate ?? exchangeRates.GBP,
+        EUR:
+          eurRate ??
+          (exchangeRates.EUR > 0 ? exchangeRates.EUR : defaultRates.EUR),
+        GBP:
+          gbpRate ??
+          (exchangeRates.GBP > 0 ? exchangeRates.GBP : defaultRates.GBP),
+        TRY:
+          tryRate ??
+          (exchangeRates.TRY > 1 ? exchangeRates.TRY : defaultRates.TRY),
         lastUpdated: now,
       };
 
@@ -138,13 +159,13 @@ const useCurrencyStore = create<CurrencyStore>((set, get) => ({
 
   convertFromUSD: (amountInUSD: number): number => {
     const { userCurrency, exchangeRates } = get();
-    const rate = exchangeRates[userCurrency.id];
+    const rate = exchangeRates[userCurrency.id] ?? defaultRates[userCurrency.id];
     return amountInUSD * rate;
   },
 
   convertToUSD: (amount: number, fromCurrency: CurrencyCode): number => {
     const { exchangeRates } = get();
-    const rate = exchangeRates[fromCurrency];
+    const rate = exchangeRates[fromCurrency] ?? defaultRates[fromCurrency];
     // To convert TO USD, we divide by the rate (since rates are USD -> other)
     return amount / rate;
   },
@@ -158,8 +179,10 @@ const useCurrencyStore = create<CurrencyStore>((set, get) => ({
 
     const { exchangeRates } = get();
     // First convert to USD, then to target currency
-    const amountInUSD = amount / exchangeRates[from];
-    return amountInUSD * exchangeRates[to];
+    const fromRate = exchangeRates[from] ?? defaultRates[from];
+    const toRate = exchangeRates[to] ?? defaultRates[to];
+    const amountInUSD = amount / fromRate;
+    return amountInUSD * toRate;
   },
 }));
 

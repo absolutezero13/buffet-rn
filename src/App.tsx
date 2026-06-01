@@ -6,12 +6,12 @@ import { StatusBar } from "react-native";
 import { Navigation } from "./navigation";
 import { theme } from "./theme";
 import { assetApi } from "./services/assetApi";
+import { subscriptionApi } from "./services/subscriptionApi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { STORAGE_KEYS } from "./navigation/constants";
 import useUserStore from "./store/useUserStore";
 import { revenueCatService } from "./services/revenueCatService";
 import { KeyboardProvider } from "react-native-keyboard-controller";
-import useSubscriptionStore from "./store/useSubscriptionStore";
 
 Asset.loadAsync([...NavigationAssets]);
 
@@ -19,6 +19,7 @@ SplashScreen.preventAutoHideAsync();
 
 const initApp = async () => {
   await assetApi.getUserAssets();
+  await subscriptionApi.getUserSubscriptions();
   const userStore = await AsyncStorage.getItem(STORAGE_KEYS.USER);
   useUserStore.setState(
     userStore ? { ...JSON.parse(userStore), isInitialized: true } : { hasOnboarded: false, isInitialized: true },

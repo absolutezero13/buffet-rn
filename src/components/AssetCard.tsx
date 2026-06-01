@@ -1,13 +1,8 @@
 import React from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Pressable,
-} from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { GlassCard } from "./GlassCard";
+import { IconButton } from "./IconButton";
 import { theme } from "../theme";
 import { Asset } from "../services/types";
 import { useCurrency } from "../hooks";
@@ -51,9 +46,12 @@ export function AssetCard({ asset, onDelete }: AssetCardProps) {
       style={styles.container}
       interactive
     >
-      <Pressable onPress={asset.type === "cash" ? undefined : handlePress}>
+      <View>
         <View style={styles.header}>
-          <View style={styles.headerLeft}>
+          <Pressable
+            style={styles.headerLeft}
+            onPress={asset.type === "cash" ? undefined : handlePress}
+          >
             <Image
               source={getAssetTypeImage(asset.type)}
               style={styles.typeEmoji}
@@ -62,72 +60,81 @@ export function AssetCard({ asset, onDelete }: AssetCardProps) {
               <Text style={styles.symbol}>{asset.symbol.toUpperCase()}</Text>
               <Text style={styles.name}>{asset.name}</Text>
             </View>
-          </View>
+          </Pressable>
+          <IconButton
+            icon="delete-outline"
+            size="xsmall"
+            variant="ghost"
+            iconColor={theme.colors.dangerLight}
+            onPress={onDelete}
+          />
         </View>
 
-        <View style={styles.details}>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Quantity</Text>
-            <Text style={styles.detailValue}>
-              {displayQuantity.toFixed(quantityUnit ? 2 : 0)}
-              {quantityUnit ? ` ${quantityUnit}` : ""}
-            </Text>
+        <Pressable onPress={asset.type === "cash" ? undefined : handlePress}>
+          <View style={styles.details}>
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Quantity</Text>
+              <Text style={styles.detailValue}>
+                {displayQuantity.toFixed(quantityUnit ? 2 : 0)}
+                {quantityUnit ? ` ${quantityUnit}` : ""}
+              </Text>
+            </View>
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Avg. Cost</Text>
+              <Text style={styles.detailValue}>
+                {currencySymbol}
+                {purchasePriceDisplay.toFixed(2)}
+              </Text>
+            </View>
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Current Price</Text>
+              <Text style={styles.detailValue}>
+                {currencySymbol}
+                {currentPriceDisplay.toFixed(2)}
+              </Text>
+            </View>
           </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Avg. Cost</Text>
-            <Text style={styles.detailValue}>
-              {currencySymbol}
-              {purchasePriceDisplay.toFixed(2)}
-            </Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Current Price</Text>
-            <Text style={styles.detailValue}>
-              {currencySymbol}
-              {currentPriceDisplay.toFixed(2)}
-            </Text>
-          </View>
-        </View>
 
-        <View style={styles.footer}>
-          <View>
-            <Text style={styles.totalLabel}>Total Value</Text>
-            <Text style={styles.totalValue}>
-              {currencySymbol}
-              {totalValue.toFixed(2)}
-            </Text>
+          <View style={styles.footer}>
+            <View>
+              <Text style={styles.totalLabel}>Total Value</Text>
+              <Text style={styles.totalValue}>
+                {currencySymbol}
+                {totalValue.toFixed(2)}
+              </Text>
+            </View>
+            <View style={styles.gainLossContainer}>
+              <Text
+                style={[
+                  styles.gainLoss,
+                  {
+                    color: isPositive
+                      ? theme.colors.positive
+                      : theme.colors.negative,
+                  },
+                ]}
+              >
+                {isPositive ? "+" : ""}
+                {currencySymbol}
+                {gainLoss.toFixed(2)}
+              </Text>
+              <Text
+                style={[
+                  styles.gainLossPercent,
+                  {
+                    color: isPositive
+                      ? theme.colors.positive
+                      : theme.colors.negative,
+                  },
+                ]}
+              >
+                ({isPositive ? "+" : ""}
+                {gainLossPercent.toFixed(2)}%)
+              </Text>
+            </View>
           </View>
-          <View style={styles.gainLossContainer}>
-            <Text
-              style={[
-                styles.gainLoss,
-                {
-                  color: isPositive
-                    ? theme.colors.positive
-                    : theme.colors.negative,
-                },
-              ]}
-            >
-              {isPositive ? "+" : ""}
-              {currencySymbol}
-              {gainLoss.toFixed(2)}
-            </Text>
-            <Text
-              style={[
-                styles.gainLossPercent,
-                {
-                  color: isPositive
-                    ? theme.colors.positive
-                    : theme.colors.negative,
-                },
-              ]}
-            >
-              ({isPositive ? "+" : ""}
-              {gainLossPercent.toFixed(2)}%)
-            </Text>
-          </View>
-        </View>
-      </Pressable>
+        </Pressable>
+      </View>
     </GlassCard>
   );
 }
@@ -145,6 +152,8 @@ const styles = StyleSheet.create({
   headerLeft: {
     flexDirection: "row",
     alignItems: "center",
+    flex: 1,
+    paddingRight: theme.spacing.sm,
   },
   typeEmoji: {
     width: 32,

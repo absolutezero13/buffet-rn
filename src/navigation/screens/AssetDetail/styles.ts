@@ -4,7 +4,7 @@ import { theme } from "../../../theme";
 const { width } = Dimensions.get("window");
 
 export const CHART_WIDTH = width;
-export const HEADER_HEIGHT = 140;
+export const HEADER_HEIGHT = 120;
 
 export const styles = StyleSheet.create({
   container: {
@@ -20,14 +20,14 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
     position: "absolute",
     top: -1,
     left: -1,
     right: -1,
     zIndex: 100,
-    borderBottomEndRadius: theme.borderRadius.xxl,
-    borderBottomStartRadius: theme.borderRadius.xxl,
+    borderBottomEndRadius: theme.borderRadius.xl,
+    borderBottomStartRadius: theme.borderRadius.xl,
     height: HEADER_HEIGHT,
   },
   backButton: {
@@ -47,7 +47,7 @@ export const styles = StyleSheet.create({
   },
   symbol: {
     color: theme.colors.text,
-    fontSize: theme.fontSize.xl,
+    fontSize: theme.fontSize.lg,
     fontWeight: theme.fontWeight.bold,
   },
   type: {

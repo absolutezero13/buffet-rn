@@ -1,7 +1,14 @@
-import React from "react";
-import { View, Text, ScrollView, Alert, Pressable } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Button, GlassCard } from "../../../components";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  Alert,
+  Pressable,
+  Modal,
+  TextInput,
+} from "react-native";
+import { Button, GlassCard, TabHeader } from "../../../components";
 import { styles } from "./styles";
 import CurrencyBottomSheet, {
   globalCurrencyBottomSheetRef,
@@ -14,22 +21,36 @@ import useWeightUnitStore from "../../../store/useWeightUnitStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { STORAGE_KEYS } from "../../constants";
 import useUserAssets from "../../../store/useUserAssets";
-import useUserStore from "../../../store/useUserStore";
 import useSubscriptionStore from "../../../store/useSubscriptionStore";
+import useRecurringSubscriptionsStore from "../../../store/useRecurringSubscriptionsStore";
 import { revenueCatService } from "../../../services/revenueCatService";
-import { LiquidGlassView } from "@callstack/liquid-glass";
+import { theme } from "../../../theme";
 
 export function Settings() {
   const { userCurrency } = useCurrencyStore();
   const { weightUnit } = useWeightUnitStore();
   const { isSubscribed } = useSubscriptionStore();
+  const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
 
-  const { top } = useSafeAreaInsets();
-  const clearUser = () => {
-    AsyncStorage.removeItem(STORAGE_KEYS.USER);
-    AsyncStorage.removeItem(STORAGE_KEYS.ASSETS);
+  const closeDeleteModal = () => {
+    setDeleteModalVisible(false);
+    setDeleteConfirmation("");
+  };
+
+  const deleteLocalData = async () => {
+    if (deleteConfirmation !== "delete") {
+      return;
+    }
+
+    await AsyncStorage.multiRemove([
+      STORAGE_KEYS.ASSETS,
+      STORAGE_KEYS.SUBSCRIPTIONS,
+    ]);
     useUserAssets.setState({ userAssets: [] });
-    useUserStore.setState({ hasOnboarded: false, onboardingCompleted: false });
+    useRecurringSubscriptionsStore.setState({ subscriptions: [] });
+    closeDeleteModal();
+    Alert.alert("Data Deleted", "Your portfolio and subscriptions were deleted.");
   };
 
   const handleRestorePurchases = async () => {
@@ -41,30 +62,9 @@ export function Settings() {
     }
   };
 
-  const handleSignOut = () => {
-    Alert.alert(
-      "Sign Out",
-      "This will wipe all your data and return you to onboarding. Continue?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Sign Out",
-          style: "destructive",
-          onPress: clearUser,
-        },
-      ],
-    );
-  };
-
   return (
     <>
-      <LiquidGlassView
-        effect="clear"
-        style={[styles.header, { paddingTop: top }]}
-      >
-        <Text style={styles.title}>Settings</Text>
-        <Text style={styles.subtitle}>Manage your preferences</Text>
-      </LiquidGlassView>
+      <TabHeader title="Settings" />
       <View style={styles.container}>
         <ScrollView
           style={styles.scrollView}
@@ -126,22 +126,61 @@ export function Settings() {
           </GlassCard>
 
           <GlassCard effect="clear" style={styles.card}>
-            <Text style={styles.sectionTitle}>Manage Account</Text>
+            <Text style={styles.sectionTitle}>Delete Data</Text>
             <Text style={styles.sectionDescription}>
-              Signing out will remove all saved data from this device.
+              Delete saved portfolio assets and tracked subscriptions from this
+              device.
             </Text>
-            {/* <Button
-              title="Sign Out"
-              onPress={handleSignOut}
-              style={styles.signOutButton}
-              fullWidth
-            /> */}
-            <Text onPress={handleSignOut} style={styles.signOutButton}>
-              Sign out
+            <Text
+              onPress={() => setDeleteModalVisible(true)}
+              style={styles.deleteDataAction}
+            >
+              Delete data
             </Text>
           </GlassCard>
         </ScrollView>
       </View>
+
+      <Modal
+        visible={isDeleteModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={closeDeleteModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitle}>Delete Data</Text>
+            <Text style={styles.modalText}>
+              Type delete to permanently remove portfolio assets and
+              subscriptions from this device.
+            </Text>
+            <TextInput
+              value={deleteConfirmation}
+              onChangeText={setDeleteConfirmation}
+              autoCapitalize="none"
+              autoCorrect={false}
+              placeholder="delete"
+              placeholderTextColor={theme.colors.textMuted}
+              style={styles.modalInput}
+            />
+            <View style={styles.modalActions}>
+              <Button
+                title="Cancel"
+                variant="ghost"
+                onPress={closeDeleteModal}
+                style={styles.modalButton}
+              />
+              <Button
+                title="Delete"
+                variant="danger"
+                disabled={deleteConfirmation !== "delete"}
+                onPress={deleteLocalData}
+                style={styles.modalButton}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       <CurrencyBottomSheet />
       <WeightUnitBottomSheet />

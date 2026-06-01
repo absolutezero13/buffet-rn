@@ -1,7 +1,6 @@
 import { StyleSheet } from "react-native";
+import { TAB_HEADER_HEIGHT } from "../../../components/TabHeader";
 import { theme } from "../../../theme";
-
-export const SETTINGS_HEADER_HEIGHT = 140;
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -13,27 +12,11 @@ export const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingBottom: theme.spacing.xxl,
-    paddingTop: SETTINGS_HEADER_HEIGHT + theme.spacing.md,
-  },
-  header: {
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.md,
-    position: "absolute",
-    width: "100%",
-    zIndex: 10,
-    borderBottomEndRadius: theme.borderRadius.xxl,
-    borderBottomStartRadius: theme.borderRadius.xxl,
-    top: 0,
-    height: SETTINGS_HEADER_HEIGHT,
-  },
-  title: {
-    color: theme.colors.text,
-    fontSize: theme.fontSize.xxl,
-    fontWeight: theme.fontWeight.bold,
+    paddingTop: TAB_HEADER_HEIGHT + theme.spacing.md,
   },
   subtitle: {
     color: theme.colors.textMuted,
-    fontSize: theme.fontSize.md,
+    fontSize: theme.fontSize.sm,
     marginTop: theme.spacing.xs,
   },
   card: {
@@ -41,14 +24,21 @@ export const styles = StyleSheet.create({
   },
   sectionTitle: {
     color: theme.colors.text,
-    fontSize: theme.fontSize.lg,
+    fontSize: theme.fontSize.md,
     fontWeight: theme.fontWeight.semibold,
   },
   sectionDescription: {
     color: theme.colors.textMuted,
     fontSize: theme.fontSize.sm,
-    marginBottom: theme.spacing.md,
+    marginBottom: theme.spacing.sm,
     marginTop: theme.spacing.xs,
+  },
+  deleteDataAction: {
+    alignSelf: "center",
+    color: theme.colors.dangerLight,
+    fontSize: theme.fontSize.sm,
+    fontWeight: theme.fontWeight.medium,
+    paddingVertical: theme.spacing.xs,
   },
   currencyOptions: {
     flexDirection: "row",
@@ -76,17 +66,53 @@ export const styles = StyleSheet.create({
   currencyOptionTextActive: {
     color: theme.colors.primary,
   },
-  signOutButton: {
-    marginTop: theme.spacing.sm,
-    color: theme.colors.dangerLight,
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.medium,
-    textAlign: "center",
-    textDecorationLine: "underline",
-  },
   currency: {
     color: theme.colors.text,
     fontSize: theme.fontSize.md,
     marginTop: theme.spacing.sm,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: theme.colors.overlayLight,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: theme.spacing.lg,
+  },
+  modalCard: {
+    width: "100%",
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.xl,
+    borderWidth: 1,
+    borderColor: theme.colors.glassBorder,
+    padding: theme.spacing.lg,
+  },
+  modalTitle: {
+    color: theme.colors.text,
+    fontSize: theme.fontSize.lg,
+    fontWeight: theme.fontWeight.bold,
+    marginBottom: theme.spacing.sm,
+  },
+  modalText: {
+    color: theme.colors.textSecondary,
+    fontSize: theme.fontSize.sm,
+    lineHeight: 20,
+    marginBottom: theme.spacing.md,
+  },
+  modalInput: {
+    color: theme.colors.text,
+    fontSize: theme.fontSize.md,
+    backgroundColor: theme.colors.surfaceLight,
+    borderRadius: theme.borderRadius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.glassBorder,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.md,
+  },
+  modalActions: {
+    flexDirection: "row",
+    gap: theme.spacing.sm,
+  },
+  modalButton: {
+    flex: 1,
   },
 });

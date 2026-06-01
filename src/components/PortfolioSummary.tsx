@@ -83,12 +83,12 @@ const styles = StyleSheet.create({
   },
   label: {
     color: theme.colors.textSecondary,
-    fontSize: theme.fontSize.md,
+    fontSize: theme.fontSize.sm,
     marginBottom: theme.spacing.xs,
   },
   value: {
     color: theme.colors.text,
-    fontSize: theme.fontSize.hero,
+    fontSize: theme.fontSize.xxl,
     fontWeight: theme.fontWeight.bold,
     marginBottom: theme.spacing.md,
   },

@@ -4,6 +4,7 @@ import { styles } from "../styles";
 import { LiquidGlassView } from "@callstack/liquid-glass";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { IconButton } from "../../../../components";
+import { theme } from "../../../../theme";
 
 interface ChatHeaderProps {
   hasMessages: boolean;
@@ -19,7 +20,13 @@ export function ChatHeader({ hasMessages, onClear }: ChatHeaderProps) {
     >
       <Text style={styles.title}>AI Assistant</Text>
       {hasMessages && (
-        <IconButton icon="delete-outline" size="medium" variant="ghost" onPress={onClear} />
+        <IconButton
+          icon="delete-outline"
+          size="medium"
+          variant="ghost"
+          iconColor={theme.colors.dangerLight}
+          onPress={onClear}
+        />
       )}
     </LiquidGlassView>
   );

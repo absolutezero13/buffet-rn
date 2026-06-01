@@ -1,22 +1,19 @@
 import { StyleSheet } from "react-native";
 import { TAB_HEADER_HEIGHT } from "../../../components/TabHeader";
 import { theme } from "../../../theme";
+
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
   },
-  emptyAsset: {
-    width: 120,
-    height: 120,
+  scrollView: {
+    flex: 1,
+    paddingHorizontal: theme.spacing.md,
   },
   contentContainer: {
     paddingTop: TAB_HEADER_HEIGHT + theme.spacing.md,
     paddingBottom: theme.spacing.xxl,
-  },
-  scrollView: {
-    flex: 1,
-    paddingHorizontal: theme.spacing.md,
   },
   subtitle: {
     color: theme.colors.textMuted,
@@ -29,14 +26,6 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: theme.spacing.md,
   },
-  headerButtons: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing.sm,
-  },
-  refreshButton: {
-    minWidth: 44,
-  },
   sectionTitle: {
     color: theme.colors.text,
     fontSize: theme.fontSize.md,
@@ -45,11 +34,6 @@ export const styles = StyleSheet.create({
   emptyCard: {
     alignItems: "center",
     paddingBottom: theme.spacing.lg,
-  },
-  emptyEmoji: {
-    fontSize: 48,
-    marginBottom: theme.spacing.md,
-    textAlign: "center",
   },
   emptyTitle: {
     color: theme.colors.text,
@@ -63,9 +47,6 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.md,
     textAlign: "center",
     marginBottom: theme.spacing.lg,
-  },
-  emptyButton: {
-    marginTop: theme.spacing.xs,
   },
   bottomPadding: {
     height: theme.spacing.xxl,
@@ -88,24 +69,20 @@ export const styles = StyleSheet.create({
   sheetBody: {
     flex: 1,
   },
-  dropdownContainer: {
-    zIndex: 100,
-    elevation: 100,
-  },
-  currencySelector: {
+  selectorGroup: {
     marginBottom: theme.spacing.md,
   },
-  currencyLabel: {
+  selectorLabel: {
     color: theme.colors.textSecondary,
     fontSize: theme.fontSize.sm,
     marginBottom: theme.spacing.xs,
     fontWeight: theme.fontWeight.medium,
   },
-  currencyOptions: {
+  segmentedOptions: {
     flexDirection: "row",
     gap: theme.spacing.sm,
   },
-  currencyOption: {
+  segmentedOption: {
     flex: 1,
     alignItems: "center",
     paddingVertical: theme.spacing.md,
@@ -114,16 +91,16 @@ export const styles = StyleSheet.create({
     borderColor: theme.colors.glassBorder,
     backgroundColor: theme.colors.surfaceLight,
   },
-  currencyOptionActive: {
+  segmentedOptionActive: {
     borderColor: theme.colors.primary,
     backgroundColor: theme.colors.glass,
   },
-  currencyOptionText: {
+  segmentedOptionText: {
     color: theme.colors.textMuted,
     fontSize: theme.fontSize.sm,
     fontWeight: theme.fontWeight.medium,
   },
-  currencyOptionTextActive: {
+  segmentedOptionTextActive: {
     color: theme.colors.primary,
   },
   addButton: {

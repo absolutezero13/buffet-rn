@@ -13,7 +13,7 @@ type MaterialIconName = keyof typeof MaterialIcons.glyphMap;
 interface IconButtonProps {
   icon: MaterialIconName;
   onPress: () => void;
-  size?: "small" | "medium" | "large";
+  size?: "xsmall" | "small" | "medium" | "large";
   variant?: "primary" | "secondary" | "ghost" | "danger";
   disabled?: boolean;
   style?: ViewStyle;
@@ -21,6 +21,7 @@ interface IconButtonProps {
 }
 
 const SIZES = {
+  xsmall: { button: 34, icon: 17 },
   small: { button: 44, icon: 20 },
   medium: { button: 52, icon: 24 },
   large: { button: 60, icon: 26 },

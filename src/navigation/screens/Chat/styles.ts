@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 import { theme } from "../../../theme";
 
-export const CHAT_HEADER_HEIGHT = 120;
+export const CHAT_HEADER_HEIGHT = 112;
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -12,18 +12,18 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
     position: "absolute",
     width: "100%",
     zIndex: 10,
-    borderBottomEndRadius: theme.borderRadius.xxl,
-    borderBottomStartRadius: theme.borderRadius.xxl,
+    borderBottomEndRadius: theme.borderRadius.xl,
+    borderBottomStartRadius: theme.borderRadius.xl,
     top: 0,
     height: CHAT_HEADER_HEIGHT,
   },
   title: {
     color: theme.colors.text,
-    fontSize: theme.fontSize.xxl,
+    fontSize: theme.fontSize.xl,
     fontWeight: theme.fontWeight.bold,
   },
   clearButton: {

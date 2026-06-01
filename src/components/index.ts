@@ -13,4 +13,5 @@ export type { ChatMessageType } from "./ChatMessage";
 export { OnboardingSlide } from "./OnboardingSlide";
 export { StreamingText } from "./StreamingText";
 export { BisonLoader } from "./BisonLoader";
+export { TabHeader, TAB_HEADER_HEIGHT } from "./TabHeader";
 export { isLiquidGlassSupported } from "@callstack/liquid-glass";

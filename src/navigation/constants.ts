@@ -1,12 +1,13 @@
 import { SearchResult } from "../components";
 import { AssetType } from "../services/types";
 
-export type CurrencyCode = "USD" | "EUR" | "GBP";
+export type CurrencyCode = "USD" | "EUR" | "GBP" | "TRY";
 
 export type CurrencyOption = {
   id: CurrencyCode;
   label: string;
   symbol: string;
+  name: string;
 };
 
 export const currencyOptions: CurrencyOption[] = [
@@ -14,16 +15,25 @@ export const currencyOptions: CurrencyOption[] = [
     id: "USD",
     label: "USD",
     symbol: "$",
+    name: "US Dollar",
   },
   {
     id: "EUR",
     label: "EUR",
     symbol: "€",
+    name: "Euro",
   },
   {
     id: "GBP",
     label: "GBP",
     symbol: "£",
+    name: "British Pound",
+  },
+  {
+    id: "TRY",
+    label: "TRY",
+    symbol: "₺",
+    name: "Turkish Lira",
   },
 ];
 
@@ -59,6 +69,7 @@ export const COMMODITY_OPTIONS: SearchResult[] = [
 ];
 export const STORAGE_KEYS = {
   ASSETS: "USER_ASSETS",
+  SUBSCRIPTIONS: "USER_SUBSCRIPTIONS",
   USER: "USER",
   ALPACA_ASSETS: "ALPACA_ASSETS",
   COINGECKO_COINS: "COINGECKO_COINS",

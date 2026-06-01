@@ -197,7 +197,7 @@ export function AssetDetail() {
           text: "Delete",
           style: "destructive",
           onPress: () => {
-            assetApi.deletAsset(asset.id);
+            assetApi.deleteAsset(asset.id);
             navigation.goBack();
           },
         },
